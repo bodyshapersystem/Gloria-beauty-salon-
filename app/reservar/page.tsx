@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Nav } from "@/components/public/Nav";
 import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
-import { BookingWidget } from "@/components/public/BookingWidget";
+import { BookingWidgetV2 } from "@/components/public/BookingWidgetV2";
 
 export const metadata: Metadata = {
   title: "Reserva tu cita | Gloria Beauty Salon",
@@ -29,7 +29,7 @@ export default function ReservarPage() {
       </div>
 
       <div className="px-6 md:px-8 pb-24 md:pb-[130px]">
-        <BookingWidget />
+        <BookingWidgetV2 />
       </div>
 
       <Footer />
