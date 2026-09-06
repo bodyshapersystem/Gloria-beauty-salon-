@@ -1,27 +1,291 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  CalendarDays,
+  ChevronRight,
+  Heart,
+  HelpCircle,
+  LockKeyhole,
+  MapPin,
+  Package,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 import { useAccess } from "@/components/access/AccessShell";
 import { supabase } from "@/lib/supabase/client";
 
-export default function AccessProfilePage(){
-  const {profile,refreshProfile}=useAccess();
-  const router=useRouter();
-  const [form,setForm]=useState({first_name:"",last_name:"",phone:"",birthday:"",communication_email:true,communication_sms:true,address_line1:"",address_line2:"",city:"",state:"",postal_code:""});
-  const [saving,setSaving]=useState(false); const [message,setMessage]=useState<string|null>(null);
-  useEffect(()=>{if(profile)setForm({first_name:profile.first_name||"",last_name:profile.last_name||"",phone:profile.phone||"",birthday:profile.birthday||"",communication_email:profile.communication_email,communication_sms:profile.communication_sms,address_line1:profile.address_line1||"",address_line2:profile.address_line2||"",city:profile.city||"",state:profile.state||"",postal_code:profile.postal_code||""})},[profile?.id]);
-  if(!profile)return null;
-  const set=(key:string,value:string|boolean)=>setForm(v=>({...v,[key]:value}));
-  async function save(e:FormEvent){e.preventDefault();setSaving(true);setMessage(null);const {error}=await supabase.from("client_profiles").update({...form,birthday:form.birthday||null}).eq("id",profile.id);setSaving(false);setMessage(error?"No pudimos guardar los cambios.":"Profile updated.");if(!error)await refreshProfile()}
-  async function logout(){await supabase.auth.signOut();router.replace("/")}
-  return <div><p className="text-[10px] uppercase tracking-[0.3em] text-mocha">Gloria Access</p><h1 className="mt-2 font-serif text-[42px] md:text-[56px] leading-none">Profile</h1><p className="mt-3 text-[14px] text-taupe">Tu información, preferencias y seguridad.</p>
-    <form onSubmit={save} className="mt-9 grid gap-5 lg:grid-cols-[1.25fr_.75fr]">
-      <section className="rounded-[28px] border border-champagne/30 bg-white/45 p-6 md:p-8"><p className="text-[9px] uppercase tracking-[0.24em] text-mocha">Personal Information</p><div className="mt-5 grid grid-cols-2 gap-4"><Field label="Nombre" value={form.first_name} onChange={v=>set("first_name",v)}/><Field label="Apellido" value={form.last_name} onChange={v=>set("last_name",v)}/><Field label="Email" value={profile.email||""} disabled/><Field label="Teléfono" value={form.phone} onChange={v=>set("phone",v)}/><Field label="Cumpleaños" type="date" value={form.birthday} onChange={v=>set("birthday",v)}/></div><div className="mt-8"><p className="text-[9px] uppercase tracking-[0.24em] text-mocha">Address</p><div className="mt-4 grid grid-cols-2 gap-4"><div className="col-span-2"><Field label="Address" value={form.address_line1} onChange={v=>set("address_line1",v)}/></div><div className="col-span-2"><Field label="Apt / Unit" value={form.address_line2} onChange={v=>set("address_line2",v)}/></div><Field label="City" value={form.city} onChange={v=>set("city",v)}/><Field label="State" value={form.state} onChange={v=>set("state",v)}/><Field label="ZIP" value={form.postal_code} onChange={v=>set("postal_code",v)}/></div></div></section>
-      <div className="space-y-5"><section className="rounded-[28px] border border-champagne/30 bg-white/45 p-6"><p className="text-[9px] uppercase tracking-[0.24em] text-mocha">Communication</p><Toggle label="Email updates" value={form.communication_email} onChange={v=>set("communication_email",v)}/><Toggle label="SMS updates" value={form.communication_sms} onChange={v=>set("communication_sms",v)}/></section><section className="rounded-[28px] bg-espresso text-ivory p-6"><p className="text-[9px] uppercase tracking-[0.24em] text-champagne">Login & Security</p><p className="mt-3 text-[12px] text-ivory/65">Your password is private and never visible to salon staff.</p><button type="button" onClick={logout} className="mt-5 rounded-full border border-ivory/30 px-5 py-2.5 text-[9px] uppercase tracking-[0.16em]">Log out</button></section></div>
-      <div className="lg:col-span-2 flex items-center gap-4"><button disabled={saving} className="rounded-full bg-espresso px-6 py-3 text-[10px] uppercase tracking-[0.16em] text-ivory disabled:opacity-50">{saving?"Saving...":"Save changes"}</button>{message&&<p className="text-[12px] text-mocha">{message}</p>}</div>
-    </form>
-  </div>;
+type Staff = { id: string; name: string };
+type Address = {
+  id: string;
+  full_name: string;
+  address_line1: string;
+  address_line2: string | null;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  is_default: boolean;
+};
+
+const contactPhone = "+1 (305) 781-5456";
+const whatsappUrl = "https://wa.me/13057815456";
+
+export default function AccessProfilePage() {
+  const { profile, refreshProfile } = useAccess();
+  const router = useRouter();
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [ordersCount, setOrdersCount] = useState(0);
+  const [favoritesCount, setFavoritesCount] = useState(0);
+  const [nextAppointment, setNextAppointment] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [emailChange, setEmailChange] = useState("");
+  const [securityMessage, setSecurityMessage] = useState<string | null>(null);
+  const [addressOpen, setAddressOpen] = useState(false);
+  const [addressForm, setAddressForm] = useState({ full_name: "", address_line1: "", address_line2: "", city: "", state: "", postal_code: "", country: "US" });
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    phone: "",
+    whatsapp: "",
+    birthday: "",
+    preferred_language: "es",
+    preferred_professional_id: "",
+    preferred_appointment_time: "no_preference",
+    preferred_contact_method: "email",
+    communication_email: true,
+    communication_sms: false,
+    beauty_intelligence_enabled: true,
+    partner_recommendations_enabled: false,
+    rebooking_emails_enabled: true,
+    product_recommendations_enabled: true,
+    birthday_emails_enabled: true,
+    salon_updates_enabled: false,
+  });
+
+  useEffect(() => {
+    if (!profile) return;
+    setForm({
+      first_name: profile.first_name || "",
+      last_name: profile.last_name || "",
+      phone: profile.phone || "",
+      whatsapp: profile.whatsapp || profile.phone || "",
+      birthday: profile.birthday || "",
+      preferred_language: profile.preferred_language || "es",
+      preferred_professional_id: profile.preferred_professional_id || "",
+      preferred_appointment_time: profile.preferred_appointment_time || "no_preference",
+      preferred_contact_method: profile.preferred_contact_method || "email",
+      communication_email: profile.communication_email,
+      communication_sms: profile.communication_sms,
+      beauty_intelligence_enabled: profile.beauty_intelligence_enabled,
+      partner_recommendations_enabled: profile.partner_recommendations_enabled,
+      rebooking_emails_enabled: profile.rebooking_emails_enabled,
+      product_recommendations_enabled: profile.product_recommendations_enabled,
+      birthday_emails_enabled: profile.birthday_emails_enabled,
+      salon_updates_enabled: profile.salon_updates_enabled,
+    });
+    setEmailChange(profile.email || "");
+
+    (async () => {
+      const [{ data: staffData }, { data: addressData }, { count: orders }, { count: favorites }, { data: appt }] = await Promise.all([
+        supabase.from("staff").select("id,name").eq("active", true).order("name"),
+        supabase.from("client_addresses").select("id,full_name,address_line1,address_line2,city,state,postal_code,country,is_default").eq("client_id", profile.id).order("is_default", { ascending: false }),
+        supabase.from("orders").select("id", { count: "exact", head: true }).eq("client_id", profile.id),
+        supabase.from("client_favorites").select("id", { count: "exact", head: true }).eq("client_id", profile.id),
+        supabase.from("appointments").select("start_at").eq("client_id", profile.id).in("status", ["confirmed", "pending", "pending_deposit"]).gte("start_at", new Date().toISOString()).order("start_at").limit(1).maybeSingle(),
+      ]);
+      setStaff((staffData || []) as Staff[]);
+      setAddresses((addressData || []) as Address[]);
+      setOrdersCount(orders || 0);
+      setFavoritesCount(favorites || 0);
+      setNextAppointment(appt?.start_at || null);
+    })();
+  }, [profile?.id]);
+
+  const memberSince = useMemo(() => profile ? new Date(profile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" }) : "", [profile?.created_at]);
+  if (!profile) return null;
+
+  const set = (key: string, value: string | boolean) => setForm((v) => ({ ...v, [key]: value }));
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    const { error } = await supabase.from("client_profiles").update({
+      ...form,
+      birthday: form.birthday || null,
+      preferred_professional_id: form.preferred_professional_id || null,
+    }).eq("id", profile.id);
+    setSaving(false);
+    setMessage(error ? "No pudimos guardar los cambios." : "Tus cambios fueron guardados.");
+    if (!error) await refreshProfile();
+  }
+
+  async function requestEmailChange() {
+    if (!emailChange || emailChange === profile.email) return;
+    setSecurityMessage(null);
+    const { error } = await supabase.auth.updateUser({ email: emailChange });
+    setSecurityMessage(error ? "No pudimos iniciar el cambio de email." : "Revisa tu email para confirmar el cambio.");
+  }
+
+  async function sendPasswordReset() {
+    if (!profile.email) return;
+    setSecurityMessage(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(profile.email, { redirectTo: `${window.location.origin}/access/login` });
+    setSecurityMessage(error ? "No pudimos enviar el enlace." : "Te enviamos un enlace seguro para cambiar tu contraseña.");
+  }
+
+  async function addAddress(e: FormEvent) {
+    e.preventDefault();
+    const isFirst = addresses.length === 0;
+    const { data, error } = await supabase.from("client_addresses").insert({ client_id: profile.id, ...addressForm, is_default: isFirst }).select("id,full_name,address_line1,address_line2,city,state,postal_code,country,is_default").single();
+    if (!error && data) {
+      setAddresses((v) => [...v, data as Address]);
+      setAddressOpen(false);
+      setAddressForm({ full_name: "", address_line1: "", address_line2: "", city: "", state: "", postal_code: "", country: "US" });
+    }
+  }
+
+  async function setDefaultAddress(id: string) {
+    const { error } = await supabase.rpc("set_default_client_address", { p_address_id: id });
+    if (!error) setAddresses((v) => v.map((a) => ({ ...a, is_default: a.id === id })).sort((a, b) => Number(b.is_default) - Number(a.is_default)));
+  }
+
+  async function deleteAddress(id: string) {
+    const { error } = await supabase.from("client_addresses").delete().eq("id", id);
+    if (!error) setAddresses((v) => v.filter((a) => a.id !== id));
+  }
+
+  async function requestDeletion() {
+    const { error } = await supabase.from("client_deletion_requests").insert({ client_id: profile.id, status: "requested" });
+    setSecurityMessage(error ? "Ya existe una solicitud activa o no pudimos crearla." : "Recibimos tu solicitud. El equipo revisará los registros que deben conservarse antes de procesarla.");
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    router.replace("/");
+  }
+
+  return (
+    <div className="pb-10">
+      <section className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-mocha">Gloria Access</p>
+          <h1 className="mt-2 font-serif text-[44px] md:text-[60px] leading-none">Your Profile</h1>
+          <p className="mt-3 text-[14px] text-taupe">Tu información, tus preferencias y tu experiencia Gloria.</p>
+        </div>
+        <div className="flex items-center gap-4 rounded-full border border-champagne/35 bg-white/40 px-4 py-3 self-start md:self-auto">
+          <div className="h-11 w-11 rounded-full bg-blush flex items-center justify-center font-serif text-[20px] text-mocha">{profile.first_name?.[0] || "G"}</div>
+          <div><p className="text-[13px] font-medium">{profile.first_name} {profile.last_name}</p><p className="text-[10px] text-taupe">Member since {memberSince}</p></div>
+        </div>
+      </section>
+
+      <section className="mt-8 grid gap-3 md:grid-cols-3">
+        <Quick href="/access/appointments" icon={<CalendarDays size={20}/>} title="Next Appointment" value={nextAppointment ? new Date(nextAppointment).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "No upcoming appointments"} />
+        <Quick href="/access/beauty-profile" icon={<Sparkles size={20}/>} title="My Beauty Profile" value="Your looks, preferences and beauty history" />
+        <Quick href="/access/shop" icon={<Package size={20}/>} title="My Beauty Shelf" value={`${ordersCount} orders · ${favoritesCount} favorites`} />
+      </section>
+
+      <form onSubmit={save} className="mt-8 space-y-7">
+        <ProfileSection title="Personal Information" icon={<UserRound size={19}/>}>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="First name" value={form.first_name} onChange={(v)=>set("first_name",v)} />
+            <Field label="Last name" value={form.last_name} onChange={(v)=>set("last_name",v)} />
+            <Field label="Birthday" type="date" value={form.birthday} onChange={(v)=>set("birthday",v)} />
+            <Select label="Preferred language" value={form.preferred_language} onChange={(v)=>set("preferred_language",v)} options={[['es','Español'],['en','English']]} />
+          </div>
+        </ProfileSection>
+
+        <ProfileSection title="Contact & Communication" icon={<HelpCircle size={19}/>}>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Field label="Email" value={profile.email || ""} disabled />
+            <Field label="Mobile phone" value={form.phone} onChange={(v)=>set("phone",v)} />
+            <Field label="WhatsApp" value={form.whatsapp} onChange={(v)=>set("whatsapp",v)} />
+            <Select label="Preferred contact method" value={form.preferred_contact_method} onChange={(v)=>set("preferred_contact_method",v)} options={[['email','Email'],['phone','Phone'],['whatsapp','WhatsApp']]} />
+          </div>
+          <div className="mt-6 border-t border-champagne/25 pt-5">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-mocha">Appointment communications</p>
+            <p className="mt-2 text-[12px] text-taupe">Confirmations, reminders, reschedules and cancellation notices remain operational.</p>
+            <div className="mt-5 grid md:grid-cols-2 gap-x-10">
+              <Toggle label="Email channel" value={form.communication_email} onChange={(v)=>set("communication_email",v)} />
+              <Toggle label="SMS channel · future" value={form.communication_sms} onChange={(v)=>set("communication_sms",v)} />
+            </div>
+          </div>
+          <div className="mt-6 border-t border-champagne/25 pt-5">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-mocha">Beauty & Rebooking</p>
+            <div className="mt-2 grid md:grid-cols-2 gap-x-10">
+              <Toggle label="Rebooking reminders" value={form.rebooking_emails_enabled} onChange={(v)=>set("rebooking_emails_enabled",v)} />
+              <Toggle label="Product recommendations" value={form.product_recommendations_enabled} onChange={(v)=>set("product_recommendations_enabled",v)} />
+              <Toggle label="Birthday emails" value={form.birthday_emails_enabled} onChange={(v)=>set("birthday_emails_enabled",v)} />
+              <Toggle label="Salon updates" value={form.salon_updates_enabled} onChange={(v)=>set("salon_updates_enabled",v)} />
+            </div>
+          </div>
+        </ProfileSection>
+
+        <ProfileSection title="My Preferences" icon={<Sparkles size={19}/>}>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Select label="Preferred professional" value={form.preferred_professional_id} onChange={(v)=>set("preferred_professional_id",v)} options={[["","No preference"], ...staff.map((s)=>[s.id,s.name])]} />
+            <Select label="Preferred appointment time" value={form.preferred_appointment_time} onChange={(v)=>set("preferred_appointment_time",v)} options={[['morning','Morning'],['afternoon','Afternoon'],['no_preference','No preference']]} />
+          </div>
+          <div className="mt-6 grid md:grid-cols-2 gap-x-10">
+            <Toggle label="Personalized recommendations" description="Use your salon history and preferences to personalize service and product recommendations." value={form.beauty_intelligence_enabled} onChange={(v)=>set("beauty_intelligence_enabled",v)} />
+            <Toggle label="Partner recommendations" description="Allow occasional curated cards from Gloria-approved beauty partners. Your private data is not automatically shared." value={form.partner_recommendations_enabled} onChange={(v)=>set("partner_recommendations_enabled",v)} />
+          </div>
+        </ProfileSection>
+
+        <div className="flex items-center gap-4">
+          <button disabled={saving} className="rounded-full bg-espresso px-7 py-3.5 text-[10px] uppercase tracking-[0.18em] text-ivory disabled:opacity-50">{saving ? "Saving..." : "Save changes"}</button>
+          {message && <p className="text-[12px] text-mocha">{message}</p>}
+        </div>
+      </form>
+
+      <ProfileSection title="Saved Addresses" icon={<MapPin size={19}/>} className="mt-8">
+        {addresses.length === 0 ? <Empty text="Add an address for faster checkout." /> : <div className="space-y-3">{addresses.map((a)=><div key={a.id} className="flex items-start justify-between gap-4 border-b border-champagne/20 pb-4 last:border-0 last:pb-0"><div><div className="flex items-center gap-2"><p className="text-[13px] font-medium">{a.full_name}</p>{a.is_default&&<span className="rounded-full bg-blush px-2 py-1 text-[8px] uppercase tracking-[0.12em] text-mocha">Default</span>}</div><p className="mt-1 text-[12px] text-taupe">{a.address_line1}{a.address_line2 ? `, ${a.address_line2}` : ""}<br/>{a.city}, {a.state} {a.postal_code}</p></div><div className="flex gap-3 text-[9px] uppercase tracking-[0.12em] text-mocha">{!a.is_default&&<button type="button" onClick={()=>setDefaultAddress(a.id)}>Set default</button>}<button type="button" onClick={()=>deleteAddress(a.id)}>Delete</button></div></div>)}</div>}
+        <button type="button" onClick={()=>setAddressOpen((v)=>!v)} className="mt-5 text-[10px] uppercase tracking-[0.16em] text-mocha">{addressOpen ? "Cancel" : "+ Add address"}</button>
+        {addressOpen&&<form onSubmit={addAddress} className="mt-5 grid sm:grid-cols-2 gap-4"><Field label="Full name" value={addressForm.full_name} onChange={(v)=>setAddressForm(f=>({...f,full_name:v}))}/><Field label="Address line 1" value={addressForm.address_line1} onChange={(v)=>setAddressForm(f=>({...f,address_line1:v}))}/><Field label="Address line 2" value={addressForm.address_line2} onChange={(v)=>setAddressForm(f=>({...f,address_line2:v}))}/><Field label="City" value={addressForm.city} onChange={(v)=>setAddressForm(f=>({...f,city:v}))}/><Field label="State" value={addressForm.state} onChange={(v)=>setAddressForm(f=>({...f,state:v}))}/><Field label="ZIP" value={addressForm.postal_code} onChange={(v)=>setAddressForm(f=>({...f,postal_code:v}))}/><button className="sm:col-span-2 justify-self-start rounded-full bg-mocha px-6 py-3 text-[9px] uppercase tracking-[0.16em] text-ivory">Save address</button></form>}
+      </ProfileSection>
+
+      <section className="mt-8 grid md:grid-cols-2 gap-4">
+        <Shortcut href="/access/shop" icon={<Package size={19}/>} title="My Orders" subtitle={ordersCount ? `${ordersCount} recent orders` : "Your beauty shelf is waiting."} action="View orders" />
+        <Shortcut href="/access/shop" icon={<Heart size={19}/>} title="Favorites" subtitle={favoritesCount ? `${favoritesCount} saved products` : "No favorites yet."} action="View favorites" />
+      </section>
+
+      <ProfileSection title="Login & Security" icon={<LockKeyhole size={19}/>} className="mt-8">
+        <p className="text-[12px] text-taupe">Your password is private and is never visible to salon staff.</p>
+        <div className="mt-5 grid sm:grid-cols-[1fr_auto] gap-3 items-end"><Field label="Change login email" value={emailChange} onChange={setEmailChange}/><button type="button" onClick={requestEmailChange} className="rounded-full border border-mocha/35 px-5 py-3 text-[9px] uppercase tracking-[0.14em] text-mocha">Verify new email</button></div>
+        <div className="mt-4"><button type="button" onClick={sendPasswordReset} className="text-[10px] uppercase tracking-[0.14em] text-mocha">Send password reset link</button></div>
+        {securityMessage&&<p className="mt-4 text-[12px] text-mocha">{securityMessage}</p>}
+      </ProfileSection>
+
+      <ProfileSection title="Privacy" icon={<ShieldCheck size={19}/>} className="mt-8">
+        <p className="text-[12px] leading-relaxed text-taupe">Your profile, Beauty Profile and purchase history stay connected to your Gloria client record. Turning off personalized recommendations stops client-facing Beauty Intelligence personalization; it does not erase operational salon history.</p>
+        <button type="button" onClick={requestDeletion} className="mt-5 text-[9px] uppercase tracking-[0.14em] text-mocha">Request account deletion</button>
+      </ProfileSection>
+
+      <ProfileSection title="Need Help?" icon={<HelpCircle size={19}/>} className="mt-8">
+        <div className="grid sm:grid-cols-2 gap-3">
+          <a href={whatsappUrl} target="_blank" rel="noreferrer" className="rounded-2xl border border-champagne/25 px-4 py-4 text-[12px]">WhatsApp Gloria Beauty Salon</a>
+          <a href="tel:+13057815456" className="rounded-2xl border border-champagne/25 px-4 py-4 text-[12px]">Call {contactPhone}</a>
+          <a href="mailto:hello@gloriabeautysalonmiami.com" className="rounded-2xl border border-champagne/25 px-4 py-4 text-[12px]">Email Support</a>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=1130%20SW%208th%20St%2C%20Miami%2C%20FL%2033130" target="_blank" rel="noreferrer" className="rounded-2xl border border-champagne/25 px-4 py-4 text-[12px]">View Location</a>
+        </div>
+        <p className="mt-5 text-[11px] leading-relaxed text-taupe">1130 SW 8th St, Miami, FL 33130<br/>Tuesday–Saturday · 9:00 AM–5:00 PM<br/>Instagram @gloriabeautysalon_ · Facebook iamgloriastylist</p>
+      </ProfileSection>
+
+      <div className="mt-9 flex justify-end"><button type="button" onClick={logout} className="rounded-full border border-espresso/25 px-6 py-3 text-[9px] uppercase tracking-[0.16em] text-espresso">Log out</button></div>
+    </div>
+  );
 }
-function Field({label,value,onChange,type="text",disabled=false}:{label:string;value:string;onChange?:(v:string)=>void;type?:string;disabled?:boolean}){return <label className="block"><span className="mb-2 block text-[9px] uppercase tracking-[0.15em] text-taupe">{label}</span><input type={type} value={value} disabled={disabled} onChange={e=>onChange?.(e.target.value)} className="w-full rounded-xl border border-taupe/25 bg-ivory/60 px-4 py-3 text-[13px] outline-none disabled:opacity-55 focus:border-mocha/50"/></label>}
-function Toggle({label,value,onChange}:{label:string;value:boolean;onChange:(v:boolean)=>void}){return <label className="mt-5 flex items-center justify-between gap-4"><span className="text-[13px] text-taupe">{label}</span><button type="button" onClick={()=>onChange(!value)} className={`relative h-7 w-12 rounded-full transition-colors ${value?"bg-mocha":"bg-taupe/25"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-ivory transition-transform ${value?"translate-x-5":"translate-x-1"}`}/></button></label>}
+
+function ProfileSection({title,icon,children,className=""}:{title:string;icon:React.ReactNode;children:React.ReactNode;className?:string}){return <section className={`rounded-[28px] border border-champagne/30 bg-white/40 p-6 md:p-8 ${className}`}><div className="flex items-center gap-3 text-mocha">{icon}<h2 className="font-serif text-[26px] leading-none text-espresso">{title}</h2></div><div className="mt-6">{children}</div></section>}
+function Quick({href,icon,title,value}:{href:string;icon:React.ReactNode;title:string;value:string}){return <Link href={href} className="group rounded-[22px] border border-champagne/30 bg-white/35 p-5 flex items-center gap-4"><span className="text-mocha">{icon}</span><span className="min-w-0 flex-1"><span className="block text-[9px] uppercase tracking-[0.18em] text-taupe">{title}</span><span className="mt-1 block text-[12px] text-espresso line-clamp-2">{value}</span></span><ChevronRight size={17} className="text-taupe transition-transform group-hover:translate-x-1"/></Link>}
+function Shortcut({href,icon,title,subtitle,action}:{href:string;icon:React.ReactNode;title:string;subtitle:string;action:string}){return <Link href={href} className="group rounded-[24px] border border-champagne/30 bg-white/35 p-6 flex items-center gap-4"><span className="text-mocha">{icon}</span><span className="flex-1"><span className="font-serif text-[22px]">{title}</span><span className="mt-1 block text-[11px] text-taupe">{subtitle}</span><span className="mt-3 block text-[9px] uppercase tracking-[0.14em] text-mocha">{action}</span></span><ChevronRight size={18} className="text-taupe"/></Link>}
+function Empty({text}:{text:string}){return <div className="rounded-2xl bg-blush/35 px-5 py-6 text-center text-[12px] text-taupe">{text}</div>}
+function Field({label,value,onChange,type="text",disabled=false}:{label:string;value:string;onChange?:(v:string)=>void;type?:string;disabled?:boolean}){return <label className="block"><span className="mb-2 block text-[9px] uppercase tracking-[0.15em] text-taupe">{label}</span><input aria-label={label} type={type} value={value} disabled={disabled} onChange={(e)=>onChange?.(e.target.value)} className="w-full rounded-xl border border-taupe/25 bg-ivory/60 px-4 py-3 text-[13px] outline-none disabled:opacity-55 focus:border-mocha/50"/></label>}
+function Select({label,value,onChange,options}:{label:string;value:string;onChange:(v:string)=>void;options:string[][]}){return <label className="block"><span className="mb-2 block text-[9px] uppercase tracking-[0.15em] text-taupe">{label}</span><select aria-label={label} value={value} onChange={(e)=>onChange(e.target.value)} className="w-full rounded-xl border border-taupe/25 bg-ivory/60 px-4 py-3 text-[13px] outline-none focus:border-mocha/50">{options.map(([v,l])=><option key={v} value={v}>{l}</option>)}</select></label>}
+function Toggle({label,value,onChange,description}:{label:string;value:boolean;onChange:(v:boolean)=>void;description?:string}){return <div className="py-3 flex items-start justify-between gap-5"><div><p className="text-[13px] text-espresso">{label}</p>{description&&<p className="mt-1 max-w-[460px] text-[11px] leading-relaxed text-taupe">{description}</p>}</div><button aria-label={`${label}: ${value ? "on" : "off"}`} aria-pressed={value} type="button" onClick={()=>onChange(!value)} className={`relative mt-0.5 h-7 w-12 shrink-0 rounded-full transition-colors ${value ? "bg-mocha" : "bg-taupe/25"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-ivory transition-transform ${value ? "translate-x-5" : "translate-x-1"}`}/></button></div>}
