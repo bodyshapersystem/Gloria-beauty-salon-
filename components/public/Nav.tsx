@@ -51,40 +51,42 @@ export function Nav() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-ivory/90 backdrop-blur-md border-b border-taupe/25">
-      <nav className="max-w-[1220px] mx-auto flex items-center justify-between px-6 md:px-8 py-4">
-        <Link href="/" aria-label="Gloria Beauty Salon — inicio">
-          <Logo className="h-14 w-auto" />
-        </Link>
+    <>
+      <header className="sticky top-0 z-50 bg-ivory/90 backdrop-blur-md border-b border-taupe/25">
+        <nav className="max-w-[1220px] mx-auto flex items-center justify-between px-6 md:px-8 py-4">
+          <Link href="/" aria-label="Gloria Beauty Salon — inicio">
+            <Logo className="h-14 w-auto" />
+          </Link>
 
-        <ul className="hidden lg:flex items-center gap-8">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link href={link.href} className="text-[13px] hover:text-mocha transition-colors">
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+          <ul className="hidden lg:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="text-[13px] hover:text-mocha transition-colors">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-        <div className="hidden lg:block">
-          <Button href="/reservar" variant="solid">
-            RESERVA TU CITA
-          </Button>
-        </div>
+          <div className="hidden lg:block">
+            <Button href="/reservar" variant="solid">
+              RESERVA TU CITA
+            </Button>
+          </div>
 
-        <button
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-          className="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-full text-espresso hover:bg-champagne/15 transition-colors"
-        >
-          {open ? <X size={27} strokeWidth={1.5} /> : <Menu size={29} strokeWidth={1.5} />}
-        </button>
-      </nav>
+          <button
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={open}
+            onClick={() => setOpen((value) => !value)}
+            className="lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-full text-espresso hover:bg-champagne/15 transition-colors"
+          >
+            {open ? <X size={27} strokeWidth={1.5} /> : <Menu size={29} strokeWidth={1.5} />}
+          </button>
+        </nav>
+      </header>
 
       {open && (
-        <div className="lg:hidden fixed inset-0 top-[89px] z-[60]">
+        <div className="lg:hidden fixed inset-x-0 bottom-0 top-[89px] z-[100]">
           <button
             aria-label="Cerrar menú"
             onClick={() => setOpen(false)}
@@ -233,6 +235,6 @@ export function Nav() {
           </aside>
         </div>
       )}
-    </header>
+    </>
   );
 }
