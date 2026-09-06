@@ -25,6 +25,11 @@ const nav:NavItem[]=[
   {label:"Settings",href:"/hub/settings/appointments",icon:Settings,audience:"admin"},
 ];
 
+function staffRouteAllowed(pathname:string){
+  if(pathname.startsWith("/hub/my-agenda")||pathname.startsWith("/hub/clients")||pathname.startsWith("/hub/progress")||pathname.startsWith("/hub/messages"))return true;
+  return /^\/hub\/appointments\/[^/]+\/complete$/.test(pathname);
+}
+
 export function HubShell({children}:{children:React.ReactNode}){
   const [user,setUser]=useState<HubUser|null>(null);
   const [loading,setLoading]=useState(true);
@@ -37,8 +42,9 @@ export function HubShell({children}:{children:React.ReactNode}){
     if(!session){setLoading(false);router.replace("/access/login");return;}
     const {data}=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();
     if(!data||!["owner","admin","staff"].includes(data.role)){setLoading(false);router.replace("/access");return;}
+    if(data.role==="staff"&&!staffRouteAllowed(pathname)){setUser(data as HubUser);setLoading(false);router.replace("/hub/my-agenda");return;}
     setUser(data as HubUser);setLoading(false);
-  })()},[]);
+  })()},[pathname,router]);
 
   if(loading)return <div className="min-h-screen bg-ivory flex items-center justify-center"><div className="text-center"><Logo className="h-20 w-auto mx-auto"/><p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-taupe">Opening Gloria Hub</p></div></div>;
   if(!user)return null;
