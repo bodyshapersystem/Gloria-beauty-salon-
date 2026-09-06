@@ -39,7 +39,7 @@ export const products: Product[] = [
     size: "300ml / 10.14 fl.oz",
     description:
       "Shampoo profesional TRUSS para el cuidado diario del cabello.",
-    photo: null,
+    photo: "/images/gloria/shop/products/truss-shampoo.jpg",
     price: 30,
   },
   {
@@ -49,7 +49,7 @@ export const products: Product[] = [
     size: "260ml / 8.79 fl.oz",
     description:
       "Spray reconstructor con proteína. Repara, desenreda y deja el cabello suave y sedoso.",
-    photo: null,
+    photo: "/images/gloria/shop/products/truss-deluxe-prime.jpg",
     price: 35,
   },
   {
@@ -59,7 +59,7 @@ export const products: Product[] = [
     size: "260ml / 9.15 fl.oz",
     description:
       "Máscara líquida con protección térmica. Sella la cutícula, da brillo intenso y disciplina el frizz.",
-    photo: null,
+    photo: "/images/gloria/shop/products/truss-frizz-zero.jpg",
     price: 40,
   },
 ];
