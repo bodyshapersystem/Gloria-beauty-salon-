@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CalendarRange, LayoutDashboard, Menu, Sparkles, UserRound, UsersRound, X } from "lucide-react";
+import { CalendarDays, CalendarRange, LayoutDashboard, Menu, Settings, Sparkles, UserRound, UsersRound, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
@@ -15,6 +15,7 @@ const nav=[
   {label:"Clients",href:"/hub/clients",icon:UsersRound},
   {label:"Beauty Intelligence",href:"/hub/intelligence",icon:Sparkles},
   {label:"Team",href:"/hub/team",icon:UserRound},
+  {label:"Settings",href:"/hub/settings/appointments",icon:Settings},
 ];
 
 export function HubShell({children}:{children:React.ReactNode}){
@@ -39,13 +40,13 @@ export function HubShell({children}:{children:React.ReactNode}){
     <aside className="hidden md:flex min-h-screen border-r border-champagne/25 bg-white/35 p-6 flex-col sticky top-0 h-screen">
       <Logo className="h-20 w-auto self-start"/>
       <div className="mt-10"><p className="text-[9px] uppercase tracking-[0.28em] text-mocha">Gloria Hub</p><p className="mt-2 font-serif text-[26px] leading-none">Business, beautifully organized.</p></div>
-      <nav className="mt-8 space-y-1">{nav.map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[12px] ${active?"bg-espresso text-ivory":"text-taupe hover:bg-white/55 hover:text-espresso"}`}><Icon size={18} strokeWidth={1.5}/>{item.label}</Link>})}</nav>
+      <nav className="mt-8 space-y-1">{nav.filter(item=>user.role!=="staff"||item.href!=="/hub/settings/appointments").map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-[12px] ${active?"bg-espresso text-ivory":"text-taupe hover:bg-white/55 hover:text-espresso"}`}><Icon size={18} strokeWidth={1.5}/>{item.label}</Link>})}</nav>
       <div className="mt-auto border-t border-champagne/25 pt-5"><p className="text-[9px] uppercase tracking-[0.2em] text-taupe">Signed in as</p><p className="mt-1 text-[12px] capitalize">{user.role}</p></div>
     </aside>
 
     <div className="min-w-0">
       <header className="md:hidden sticky top-0 z-40 h-[76px] border-b border-champagne/25 bg-ivory/95 px-5 flex items-center justify-between backdrop-blur-md"><Logo className="h-14 w-auto"/><button onClick={()=>setOpen(v=>!v)} aria-label="Open Hub menu">{open?<X size={25}/>:<Menu size={27}/>}</button></header>
-      {open&&<div className="md:hidden fixed inset-0 top-[76px] z-50 bg-espresso/40" onClick={()=>setOpen(false)}><div className="w-[86%] max-w-[360px] h-full bg-ivory p-5" onClick={e=>e.stopPropagation()}><p className="text-[9px] uppercase tracking-[0.25em] text-mocha">Gloria Hub</p><nav className="mt-5 space-y-1">{nav.map(item=>{const Icon=item.icon;return <Link onClick={()=>setOpen(false)} key={item.href} href={item.href} className="flex items-center gap-3 border-b border-champagne/20 py-4 text-[14px]"><Icon size={18}/>{item.label}</Link>})}</nav></div></div>}
+      {open&&<div className="md:hidden fixed inset-0 top-[76px] z-50 bg-espresso/40" onClick={()=>setOpen(false)}><div className="w-[86%] max-w-[360px] h-full bg-ivory p-5" onClick={e=>e.stopPropagation()}><p className="text-[9px] uppercase tracking-[0.25em] text-mocha">Gloria Hub</p><nav className="mt-5 space-y-1">{nav.filter(item=>user.role!=="staff"||item.href!=="/hub/settings/appointments").map(item=>{const Icon=item.icon;return <Link onClick={()=>setOpen(false)} key={item.href} href={item.href} className="flex items-center gap-3 border-b border-champagne/20 py-4 text-[14px]"><Icon size={18}/>{item.label}</Link>})}</nav></div></div>}
       <main className="px-5 md:px-8 lg:px-10 py-8 md:py-10 max-w-[1500px] mx-auto">{children}</main>
     </div>
   </div>
