@@ -12,10 +12,10 @@ export default function AccessAppointmentsPage(){
   const {profile}=useAccess();
   const [items,setItems]=useState<Appointment[]>([]);
   const [loading,setLoading]=useState(true);
-  useEffect(()=>{ if(!profile)return; (async()=>{ const {data}=await supabase.from("appointments").select("id,service_id,staff_id,start_at,end_at,status,source,service:service_id(name,price_label),staff:staff_id(name)").eq("client_id",profile.id).order("start_at",{ascending:false}); setItems((data as Appointment[])||[]); setLoading(false); })(); },[profile?.id]);
+  useEffect(()=>{ if(!profile)return; (async()=>{ const {data}=await supabase.from("appointments").select("id,service_id,staff_id,start_at,end_at,status,source,service:service_id(name,price_label),staff:staff_id(name)").eq("client_id",profile.id).order("start_at",{ascending:false}); setItems(((data as unknown) as Appointment[])||[]); setLoading(false); })(); },[profile?.id]);
   const now=Date.now();
-  const upcoming=useMemo(()=>items.filter(x=>new Date(x.start_at).getTime()>=now && !["cancelled","completed","no_show"].includes(x.status)).sort((a,b)=>+new Date(a.start_at)-+new Date(b.start_at)),[items]);
-  const past=useMemo(()=>items.filter(x=>new Date(x.start_at).getTime()<now || ["completed","cancelled","no_show"].includes(x.status)),[items]);
+  const upcoming=useMemo(()=>items.filter(x=>new Date(x.start_at).getTime()>=now && !["cancelled","completed","no_show"].includes(x.status)).sort((a,b)=>+new Date(a.start_at)-+new Date(b.start_at)),[items,now]);
+  const past=useMemo(()=>items.filter(x=>new Date(x.start_at).getTime()<now || ["completed","cancelled","no_show"].includes(x.status)),[items,now]);
   return <div>
     <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5"><div><p className="text-[10px] uppercase tracking-[0.3em] text-mocha">Gloria Access</p><h1 className="mt-2 font-serif text-[42px] md:text-[56px] leading-none">Mis citas</h1><p className="mt-3 text-[14px] text-taupe">Tu agenda Gloria, pasada y futura, en un solo lugar.</p></div><Link href="/access/book" className="inline-flex items-center justify-center gap-2 rounded-full bg-espresso px-5 py-3 text-[10px] uppercase tracking-[0.14em] text-ivory"><Plus size={15}/> Reservar</Link></div>
     {loading?<p className="mt-10 text-sm text-taupe">Cargando...</p>:items.length===0?<Empty/>:<>
