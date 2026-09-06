@@ -84,7 +84,7 @@ export default function ServiciosPage() {
                   </li>
                 ))}
               </ul>
-              <UnderlineLink href="/#book" className="mt-7 inline-block">
+              <UnderlineLink href="/reservar" className="mt-7 inline-block">
                 Ver disponibilidad
               </UnderlineLink>
             </div>
@@ -104,7 +104,7 @@ export default function ServiciosPage() {
           Selecciona tu servicio, tu profesional y el horario que mejor te
           acomode.
         </p>
-        <Button href="/#book" variant="pill-dark" className="mt-9 !border-champagne">
+        <Button href="/reservar" variant="pill-dark" className="mt-9 !border-champagne">
           RESERVA TU CITA
         </Button>
       </div>

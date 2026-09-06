@@ -28,7 +28,7 @@ export function Nav() {
         </ul>
 
         <div className="hidden lg:block">
-          <Button href="/#book" variant="solid">
+          <Button href="/reservar" variant="solid">
             RESERVA TU CITA
           </Button>
         </div>
@@ -54,7 +54,7 @@ export function Nav() {
               {link.label}
             </Link>
           ))}
-          <Button href="/#book" variant="solid" className="justify-center mt-2">
+          <Button href="/reservar" variant="solid" className="justify-center mt-2">
             RESERVA TU CITA
           </Button>
         </div>

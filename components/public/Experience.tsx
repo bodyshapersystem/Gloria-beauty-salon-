@@ -63,7 +63,7 @@ export function Experience() {
         </div>
 
         <Button
-          href="/#book"
+          href="/reservar"
           variant="pill-dark"
           className="mt-14 !border-champagne"
           withArrow

@@ -84,7 +84,7 @@ export default function SobreGloriaPage() {
             dar un poco más a quienes confían en ella.
           </p>
 
-          <Button href="/#book" variant="pill">
+          <Button href="/reservar" variant="pill">
             RESERVA TU CITA CON GLORIA
           </Button>
         </div>
