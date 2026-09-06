@@ -1,6 +1,5 @@
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
-import { Logo } from "@/components/brand/Logo";
 import { site } from "@/lib/data/site";
 
 const fields: [string, string][] = [
@@ -10,14 +9,25 @@ const fields: [string, string][] = [
   ["Horario", `${site.hours} · ${site.hoursClosed}`],
 ];
 
+const encodedAddress = encodeURIComponent(site.address);
+const mapEmbedSrc = `https://maps.google.com/maps?q=${encodedAddress}&z=16&output=embed`;
+const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
+
 export function Location() {
   return (
     <section
       id="contacto"
       className="px-6 md:px-8 pb-24 md:pb-[130px] max-w-[1220px] mx-auto grid md:grid-cols-2 gap-12 md:gap-[60px]"
     >
-      <div className="relative bg-espresso aspect-[16/11] flex items-center justify-center overflow-hidden">
-        <Logo className="w-[56%] max-w-[280px] h-auto" />
+      <div className="relative aspect-[16/11] overflow-hidden bg-blush group">
+        <iframe
+          src={mapEmbedSrc}
+          title="Ubicación de Gloria Beauty Salon"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="absolute inset-0 w-full h-full border-0 grayscale-[35%] contrast-[1.05] transition-[filter] duration-500 group-hover:grayscale-0"
+          allowFullScreen
+        />
       </div>
 
       <div>
@@ -40,7 +50,7 @@ export function Location() {
           ))}
         </div>
 
-        <Button href="#" variant="ghost" className="mt-8">
+        <Button href={directionsUrl} variant="ghost" className="mt-8">
           CÓMO LLEGAR
         </Button>
       </div>
