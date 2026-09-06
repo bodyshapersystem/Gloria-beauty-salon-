@@ -4,6 +4,13 @@ export type ServiceItem = {
   price: string;
 };
 
+export type ServiceGroup = {
+  slug: string;
+  name: string;
+  description?: string;
+  items: ServiceItem[];
+};
+
 export type ServiceCategory = {
   index: string;
   slug: string;
@@ -11,14 +18,12 @@ export type ServiceCategory = {
   tagline: string;
   photo: string;
   items: ServiceItem[];
+  groups?: ServiceGroup[];
 };
 
 // TODO(hub): replace with a query to `service_categories` + `services`
-// once Gloria On Demand / Gloria Hub are wired up (Phase 2 & 5). Prices
-// and durations here mirror the approved GLORIA BEAUTY SALON — SERVICE
-// MENU exactly — do not change without an explicit update from Gloria.
-// Availability is still only confirmed inside Gloria On Demand; this
-// page is informational, not the booking engine.
+// once Gloria On Demand / Gloria Hub are wired up. Prices and durations
+// mirror the approved GLORIA BEAUTY SALON service menu.
 export const serviceCategories: ServiceCategory[] = [
   {
     index: "01",
@@ -45,10 +50,68 @@ export const serviceCategories: ServiceCategory[] = [
       { name: "Hair Botox — Medium Hair", duration: "2h", price: "$140" },
       { name: "Hair Botox — Long Hair", duration: "2h 30min", price: "$180" },
       { name: "Braids", duration: "Starting at 30 min", price: "Starting at $30" },
+      { name: "Tape Extensions — Application", duration: "1h", price: "$100–$150" },
+    ],
+    groups: [
       {
-        name: "Tape Extensions — Application",
-        duration: "1h",
-        price: "$100–$150",
+        slug: "cortes",
+        name: "Cortes",
+        description: "Forma, movimiento y un corte pensado para tu estilo.",
+        items: [
+          { name: "Corte de dama", duration: "30 min", price: "$40" },
+          { name: "Corte de hombre", duration: "30 min", price: "$30" },
+        ],
+      },
+      {
+        slug: "secados",
+        name: "Secados",
+        description: "Blowouts pulidos, suaves y con movimiento.",
+        items: [
+          { name: "Secado — Cabello corto", duration: "20 min", price: "$30" },
+          { name: "Secado — Cabello mediano", duration: "30 min", price: "$40" },
+          { name: "Secado — Cabello largo", duration: "40 min", price: "$50" },
+        ],
+      },
+      {
+        slug: "color",
+        name: "Color",
+        description: "Tintes, luces y dimensiones personalizadas.",
+        items: [
+          { name: "Color de raíz", duration: "50 min", price: "$70" },
+          { name: "Color completo", duration: "1h 10min", price: "$100" },
+          { name: "Highlights parciales", duration: "1h", price: "$170" },
+          { name: "Full highlights", duration: "2h", price: "$230" },
+          { name: "Balayage", duration: "3–8h", price: "Desde $250" },
+        ],
+      },
+      {
+        slug: "tratamientos",
+        name: "Tratamientos",
+        description: "Suavidad, control y reparación para mantener el cabello sano.",
+        items: [
+          { name: "Keratina — Cabello corto", duration: "1h", price: "$100" },
+          { name: "Keratina — Cabello mediano", duration: "2h", price: "$150" },
+          { name: "Keratina — Cabello largo", duration: "2h 30min", price: "$220" },
+          { name: "Hair Botox — Cabello corto", duration: "1h", price: "$80" },
+          { name: "Hair Botox — Cabello mediano", duration: "2h", price: "$140" },
+          { name: "Hair Botox — Cabello largo", duration: "2h 30min", price: "$180" },
+        ],
+      },
+      {
+        slug: "extensiones",
+        name: "Extensiones",
+        description: "Longitud y volumen con aplicación personalizada.",
+        items: [
+          { name: "Tape Extensions — Aplicación", duration: "1h", price: "$100–$150" },
+        ],
+      },
+      {
+        slug: "estilismo",
+        name: "Estilismo",
+        description: "Detalles y estilos especiales para completar tu look.",
+        items: [
+          { name: "Braids / Trenzas", duration: "Desde 30 min", price: "Desde $30" },
+        ],
       },
     ],
   },
@@ -66,11 +129,7 @@ export const serviceCategories: ServiceCategory[] = [
       { name: "Aprés Manicure", duration: "1h", price: "$60" },
       { name: "DIP Manicure", duration: "45 min", price: "$45" },
       { name: "Polygel", duration: "45 min", price: "$50" },
-      {
-        name: "Full Set Acrylic — Hands",
-        duration: "1h 20min",
-        price: "$70",
-      },
+      { name: "Full Set Acrylic — Hands", duration: "1h 20min", price: "$70" },
     ],
   },
   {
