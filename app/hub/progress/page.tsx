@@ -1,0 +1,17 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { CalendarCheck2, DollarSign, RefreshCw, Sparkles } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
+
+type Appointment={id:string;status:string;start_at:string;price_cents:number|null;service:{name:string}|null};
+
+export default function ProgressPage(){
+  const [items,setItems]=useState<Appointment[]>([]);const [loading,setLoading]=useState(true);
+  useEffect(()=>{(async()=>{const since=new Date();since.setDate(since.getDate()-30);const {data}=await supabase.from("appointments").select("id,status,start_at,price_cents,service:service_id(name)").gte("start_at",since.toISOString()).order("start_at",{ascending:false});setItems((data as Appointment[])||[]);setLoading(false)})()},[]);
+  const stats=useMemo(()=>{const completed=items.filter(x=>x.status==="completed");const revenue=completed.reduce((s,x)=>s+(x.price_cents||0),0);const counts=new Map<string,number>();completed.forEach(x=>{const n=x.service?.name||"Service";counts.set(n,(counts.get(n)||0)+1)});const top=[...counts.entries()].sort((a,b)=>b[1]-a[1])[0];return {completed:completed.length,revenue,avg:completed.length?Math.round(revenue/completed.length):0,top:top?.[0]||"No completed visits yet",cancelled:items.filter(x=>x.status==="cancelled").length,noShow:items.filter(x=>x.status==="no_show").length}},[items]);
+  return <div><p className="text-[10px] uppercase tracking-[0.28em] text-mocha">Gloria Team</p><h1 className="mt-2 font-serif text-[48px] md:text-[58px] leading-none">My Progress</h1><p className="mt-3 text-[13px] text-taupe">A simple view of your last 30 days. Staff only sees their own appointment data.</p>{loading?<p className="mt-8 text-[12px] text-taupe">Loading progress...</p>:<><div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4"><Metric icon={<CalendarCheck2 size={18}/>} label="Completed visits" value={String(stats.completed)}/><Metric icon={<DollarSign size={18}/>} label="Recorded revenue" value={money(stats.revenue)}/><Metric icon={<RefreshCw size={18}/>} label="Average ticket" value={money(stats.avg)}/><Metric icon={<Sparkles size={18}/>} label="Top service" value={stats.top} small/></div><section className="mt-6 rounded-[26px] border border-champagne/30 bg-white/45 p-6"><p className="text-[9px] uppercase tracking-[0.18em] text-mocha">Quality snapshot</p><div className="mt-5 grid gap-4 sm:grid-cols-3"><Stat label="Appointments" value={String(items.length)}/><Stat label="Cancellations" value={String(stats.cancelled)}/><Stat label="No shows" value={String(stats.noShow)}/></div><p className="mt-5 text-[11px] leading-relaxed text-taupe">Revenue only reflects amounts currently recorded on appointments; it does not invent missing payment data.</p></section></>}</div>
+}
+function Metric({icon,label,value,small=false}:{icon:React.ReactNode;label:string;value:string;small?:boolean}){return <div className="rounded-[22px] border border-champagne/30 bg-white/45 p-5"><div className="text-mocha">{icon}</div><p className="mt-4 text-[9px] uppercase tracking-[0.15em] text-taupe">{label}</p><p className={`mt-2 font-serif ${small?"text-[24px]":"text-[34px]"}`}>{value}</p></div>}
+function Stat({label,value}:{label:string;value:string}){return <div><p className="text-[9px] uppercase tracking-[0.14em] text-taupe">{label}</p><p className="mt-2 font-serif text-[30px]">{value}</p></div>}
+function money(cents:number){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(cents/100)}
