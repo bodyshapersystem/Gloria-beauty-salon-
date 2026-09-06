@@ -1,0 +1,27 @@
+"use client";
+
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAccess } from "@/components/access/AccessShell";
+import { supabase } from "@/lib/supabase/client";
+
+export default function AccessProfilePage(){
+  const {profile,refreshProfile}=useAccess();
+  const router=useRouter();
+  const [form,setForm]=useState({first_name:"",last_name:"",phone:"",birthday:"",communication_email:true,communication_sms:true,address_line1:"",address_line2:"",city:"",state:"",postal_code:""});
+  const [saving,setSaving]=useState(false); const [message,setMessage]=useState<string|null>(null);
+  useEffect(()=>{if(profile)setForm({first_name:profile.first_name||"",last_name:profile.last_name||"",phone:profile.phone||"",birthday:profile.birthday||"",communication_email:profile.communication_email,communication_sms:profile.communication_sms,address_line1:profile.address_line1||"",address_line2:profile.address_line2||"",city:profile.city||"",state:profile.state||"",postal_code:profile.postal_code||""})},[profile?.id]);
+  if(!profile)return null;
+  const set=(key:string,value:string|boolean)=>setForm(v=>({...v,[key]:value}));
+  async function save(e:FormEvent){e.preventDefault();setSaving(true);setMessage(null);const {error}=await supabase.from("client_profiles").update({...form,birthday:form.birthday||null}).eq("id",profile.id);setSaving(false);setMessage(error?"No pudimos guardar los cambios.":"Profile updated.");if(!error)await refreshProfile()}
+  async function logout(){await supabase.auth.signOut();router.replace("/")}
+  return <div><p className="text-[10px] uppercase tracking-[0.3em] text-mocha">Gloria Access</p><h1 className="mt-2 font-serif text-[42px] md:text-[56px] leading-none">Profile</h1><p className="mt-3 text-[14px] text-taupe">Tu información, preferencias y seguridad.</p>
+    <form onSubmit={save} className="mt-9 grid gap-5 lg:grid-cols-[1.25fr_.75fr]">
+      <section className="rounded-[28px] border border-champagne/30 bg-white/45 p-6 md:p-8"><p className="text-[9px] uppercase tracking-[0.24em] text-mocha">Personal Information</p><div className="mt-5 grid grid-cols-2 gap-4"><Field label="Nombre" value={form.first_name} onChange={v=>set("first_name",v)}/><Field label="Apellido" value={form.last_name} onChange={v=>set("last_name",v)}/><Field label="Email" value={profile.email||""} disabled/><Field label="Teléfono" value={form.phone} onChange={v=>set("phone",v)}/><Field label="Cumpleaños" type="date" value={form.birthday} onChange={v=>set("birthday",v)}/></div><div className="mt-8"><p className="text-[9px] uppercase tracking-[0.24em] text-mocha">Address</p><div className="mt-4 grid grid-cols-2 gap-4"><div className="col-span-2"><Field label="Address" value={form.address_line1} onChange={v=>set("address_line1",v)}/></div><div className="col-span-2"><Field label="Apt / Unit" value={form.address_line2} onChange={v=>set("address_line2",v)}/></div><Field label="City" value={form.city} onChange={v=>set("city",v)}/><Field label="State" value={form.state} onChange={v=>set("state",v)}/><Field label="ZIP" value={form.postal_code} onChange={v=>set("postal_code",v)}/></div></div></section>
+      <div className="space-y-5"><section className="rounded-[28px] border border-champagne/30 bg-white/45 p-6"><p className="text-[9px] uppercase tracking-[0.24em] text-mocha">Communication</p><Toggle label="Email updates" value={form.communication_email} onChange={v=>set("communication_email",v)}/><Toggle label="SMS updates" value={form.communication_sms} onChange={v=>set("communication_sms",v)}/></section><section className="rounded-[28px] bg-espresso text-ivory p-6"><p className="text-[9px] uppercase tracking-[0.24em] text-champagne">Login & Security</p><p className="mt-3 text-[12px] text-ivory/65">Your password is private and never visible to salon staff.</p><button type="button" onClick={logout} className="mt-5 rounded-full border border-ivory/30 px-5 py-2.5 text-[9px] uppercase tracking-[0.16em]">Log out</button></section></div>
+      <div className="lg:col-span-2 flex items-center gap-4"><button disabled={saving} className="rounded-full bg-espresso px-6 py-3 text-[10px] uppercase tracking-[0.16em] text-ivory disabled:opacity-50">{saving?"Saving...":"Save changes"}</button>{message&&<p className="text-[12px] text-mocha">{message}</p>}</div>
+    </form>
+  </div>;
+}
+function Field({label,value,onChange,type="text",disabled=false}:{label:string;value:string;onChange?:(v:string)=>void;type?:string;disabled?:boolean}){return <label className="block"><span className="mb-2 block text-[9px] uppercase tracking-[0.15em] text-taupe">{label}</span><input type={type} value={value} disabled={disabled} onChange={e=>onChange?.(e.target.value)} className="w-full rounded-xl border border-taupe/25 bg-ivory/60 px-4 py-3 text-[13px] outline-none disabled:opacity-55 focus:border-mocha/50"/></label>}
+function Toggle({label,value,onChange}:{label:string;value:boolean;onChange:(v:boolean)=>void}){return <label className="mt-5 flex items-center justify-between gap-4"><span className="text-[13px] text-taupe">{label}</span><button type="button" onClick={()=>onChange(!value)} className={`relative h-7 w-12 rounded-full transition-colors ${value?"bg-mocha":"bg-taupe/25"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-ivory transition-transform ${value?"translate-x-5":"translate-x-1"}`}/></button></label>}
