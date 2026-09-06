@@ -47,19 +47,23 @@ const nav = [
   { label: "Profile", href: "/access/profile", icon: UserRound },
 ];
 
+const publicAccessRoutes = ["/access/login", "/access/create-account", "/access/activate"];
+
 export function AccessShell({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const isPublicRoute = publicAccessRoutes.some((route) => pathname.startsWith(route));
 
   async function refreshProfile() {
     const { data: sessionData } = await supabase.auth.getSession();
     const user = sessionData.session?.user;
+
     if (!user) {
       setProfile(null);
       setLoading(false);
-      router.replace("/access/login");
+      if (!isPublicRoute) router.replace("/access/login");
       return;
     }
 
@@ -74,23 +78,28 @@ export function AccessShell({ children }: { children: React.ReactNode }) {
       setProfile(null);
       setLoading(false);
       if (data?.access_status === "disabled") await supabase.auth.signOut();
-      router.replace("/access/login");
+      if (!isPublicRoute) router.replace("/access/login");
       return;
     }
 
     setProfile(data as ClientProfile);
     setLoading(false);
+    if (isPublicRoute) router.replace("/access");
   }
 
   useEffect(() => {
     refreshProfile();
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) router.replace("/access/login");
+      if (!session && !isPublicRoute) router.replace("/access/login");
     });
     return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [pathname]);
 
   const value = useMemo(() => ({ profile, loading, refreshProfile }), [profile, loading]);
+
+  if (isPublicRoute) {
+    return <div className="min-h-screen bg-ivory text-espresso">{children}</div>;
+  }
 
   if (loading) {
     return (
@@ -110,17 +119,11 @@ export function AccessShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-ivory text-espresso pb-24 md:pb-0">
         <header className="sticky top-0 z-40 border-b border-champagne/25 bg-ivory/95 backdrop-blur-md">
           <div className="max-w-[1180px] mx-auto px-5 md:px-8 h-[82px] flex items-center justify-between gap-6">
-            <Link href="/access" aria-label="Gloria Access home">
-              <Logo className="h-[62px] w-auto" />
-            </Link>
+            <Link href="/access" aria-label="Gloria Access home"><Logo className="h-[62px] w-auto" /></Link>
             <nav className="hidden md:flex items-center gap-7">
               {nav.map((item) => {
                 const active = pathname === item.href;
-                return (
-                  <Link key={item.href} href={item.href} className={`text-[12px] transition-colors ${active ? "text-mocha font-semibold" : "text-taupe hover:text-espresso"}`}>
-                    {item.label}
-                  </Link>
-                );
+                return <Link key={item.href} href={item.href} className={`text-[12px] transition-colors ${active ? "text-mocha font-semibold" : "text-taupe hover:text-espresso"}`}>{item.label}</Link>;
               })}
             </nav>
             <div className="text-right hidden sm:block">
