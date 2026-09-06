@@ -42,12 +42,18 @@ export default function ShopPage() {
         {products.map((p) => (
           <div key={p.slug} className="group">
             <div className="relative aspect-square overflow-hidden bg-blush flex items-center justify-center">
-              <Image
-                src={p.photo}
-                alt={`${p.brand} ${p.name}`}
-                fill
-                className="object-contain p-6 transition-transform duration-[1.1s] ease-out group-hover:scale-[1.04]"
-              />
+              {p.photo ? (
+                <Image
+                  src={p.photo}
+                  alt={`${p.brand} ${p.name}`}
+                  fill
+                  className="object-contain p-6 transition-transform duration-[1.1s] ease-out group-hover:scale-[1.04]"
+                />
+              ) : (
+                <span className="text-[11px] tracking-[0.12em] text-taupe text-center px-6">
+                  FOTO PRÓXIMAMENTE
+                </span>
+              )}
             </div>
             <div className="mt-4">
               <div className="text-[10.5px] tracking-[0.16em] text-taupe font-semibold">
