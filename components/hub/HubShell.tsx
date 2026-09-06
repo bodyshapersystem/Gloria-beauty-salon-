@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, LayoutDashboard, Menu, Sparkles, UserRound, UsersRound, X } from "lucide-react";
+import { CalendarDays, CalendarRange, LayoutDashboard, Menu, Sparkles, UserRound, UsersRound, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
@@ -11,6 +11,7 @@ type HubUser={role:"owner"|"admin"|"staff";staff_id:string|null};
 const nav=[
   {label:"Dashboard",href:"/hub",icon:LayoutDashboard},
   {label:"Appointments",href:"/hub/appointments",icon:CalendarDays},
+  {label:"Calendar",href:"/hub/calendar",icon:CalendarRange},
   {label:"Clients",href:"/hub/clients",icon:UsersRound},
   {label:"Beauty Intelligence",href:"/hub/intelligence",icon:Sparkles},
   {label:"Team",href:"/hub/team",icon:UserRound},
