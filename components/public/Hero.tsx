@@ -4,7 +4,7 @@ import { site } from "@/lib/data/site";
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden min-h-[94vh] bg-ivory">
+    <section className="relative overflow-hidden min-h-[58vh] md:min-h-[68vh] bg-ivory">
       <div className="absolute inset-0">
         <Image
           src="/images/gloria/hero/hero-01.jpg"
@@ -32,21 +32,21 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 max-w-[600px] px-6 md:px-12 py-16 md:py-28">
-        <Logo className="h-[104px] md:h-[150px] w-auto" />
-        <div className="w-[130px] h-px bg-champagne my-6" />
-        <h1 className="font-serif font-medium uppercase text-mocha leading-[1.28] text-[28px] md:text-[42px] tracking-[0.01em]">
+      <div className="relative z-10 max-w-[600px] px-6 md:px-12 py-10 md:py-16">
+        <Logo className="h-[78px] md:h-[110px] w-auto" />
+        <div className="w-[110px] h-px bg-champagne my-5" />
+        <h1 className="font-serif font-medium uppercase text-mocha leading-[1.28] text-[24px] md:text-[36px] tracking-[0.01em]">
           Realza tu esencia,
           <br />
           define tu estilo.
         </h1>
-        <div className="w-[130px] h-px bg-champagne my-6" />
+        <div className="w-[110px] h-px bg-champagne my-5" />
         <div className="text-sm tracking-[0.1em] text-taupe">
           {site.location}
         </div>
         <a
           href="#book"
-          className="mt-9 inline-flex items-center gap-4 rounded-full bg-taupe text-ivory px-8 py-[17px] text-[12.5px] font-semibold tracking-[0.1em] hover:bg-mocha transition-colors"
+          className="mt-7 inline-flex items-center gap-4 rounded-full bg-taupe text-ivory px-8 py-[15px] text-[12.5px] font-semibold tracking-[0.1em] hover:bg-mocha transition-colors"
         >
           RESERVA TU CITA <span className="text-[15px]">→</span>
         </a>
