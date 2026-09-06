@@ -14,17 +14,29 @@ type ClientProfile = {
   last_name: string;
   email: string | null;
   phone: string | null;
+  whatsapp: string | null;
   birthday: string | null;
   access_status: "invited" | "active" | "inactive" | "disabled";
   beauty_state: "no_appointment_history" | "appointment_confirmed" | "beauty_profile_active";
   preferred_professional_id: string | null;
+  preferred_language: "es" | "en";
+  preferred_appointment_time: "morning" | "afternoon" | "no_preference";
+  preferred_contact_method: "email" | "phone" | "whatsapp";
+  profile_photo_url: string | null;
   communication_email: boolean;
   communication_sms: boolean;
+  beauty_intelligence_enabled: boolean;
+  partner_recommendations_enabled: boolean;
+  rebooking_emails_enabled: boolean;
+  product_recommendations_enabled: boolean;
+  birthday_emails_enabled: boolean;
+  salon_updates_enabled: boolean;
   address_line1: string | null;
   address_line2: string | null;
   city: string | null;
   state: string | null;
   postal_code: string | null;
+  created_at: string;
 };
 
 type AccessContextValue = {
@@ -47,30 +59,26 @@ const nav = [
   { label: "Profile", href: "/access/profile", icon: UserRound },
 ];
 
-const publicAccessRoutes = ["/access/login", "/access/create-account", "/access/activate"];
-
 export function AccessShell({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
-  const isPublicRoute = publicAccessRoutes.some((route) => pathname.startsWith(route));
 
   async function refreshProfile() {
     const { data: sessionData } = await supabase.auth.getSession();
     const user = sessionData.session?.user;
-
     if (!user) {
       setProfile(null);
       setLoading(false);
-      if (!isPublicRoute) router.replace("/access/login");
+      router.replace("/access/login");
       return;
     }
 
     await supabase.rpc("link_my_existing_appointments");
     const { data } = await supabase
       .from("client_profiles")
-      .select("id, auth_user_id, first_name, last_name, email, phone, birthday, access_status, beauty_state, preferred_professional_id, communication_email, communication_sms, address_line1, address_line2, city, state, postal_code")
+      .select("id, auth_user_id, first_name, last_name, email, phone, whatsapp, birthday, access_status, beauty_state, preferred_professional_id, preferred_language, preferred_appointment_time, preferred_contact_method, profile_photo_url, communication_email, communication_sms, beauty_intelligence_enabled, partner_recommendations_enabled, rebooking_emails_enabled, product_recommendations_enabled, birthday_emails_enabled, salon_updates_enabled, address_line1, address_line2, city, state, postal_code, created_at")
       .eq("auth_user_id", user.id)
       .single();
 
@@ -78,28 +86,23 @@ export function AccessShell({ children }: { children: React.ReactNode }) {
       setProfile(null);
       setLoading(false);
       if (data?.access_status === "disabled") await supabase.auth.signOut();
-      if (!isPublicRoute) router.replace("/access/login");
+      router.replace("/access/login");
       return;
     }
 
     setProfile(data as ClientProfile);
     setLoading(false);
-    if (isPublicRoute) router.replace("/access");
   }
 
   useEffect(() => {
     refreshProfile();
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session && !isPublicRoute) router.replace("/access/login");
+      if (!session) router.replace("/access/login");
     });
     return () => listener.subscription.unsubscribe();
-  }, [pathname]);
+  }, []);
 
   const value = useMemo(() => ({ profile, loading, refreshProfile }), [profile, loading]);
-
-  if (isPublicRoute) {
-    return <div className="min-h-screen bg-ivory text-espresso">{children}</div>;
-  }
 
   if (loading) {
     return (
@@ -119,11 +122,17 @@ export function AccessShell({ children }: { children: React.ReactNode }) {
       <div className="min-h-screen bg-ivory text-espresso pb-24 md:pb-0">
         <header className="sticky top-0 z-40 border-b border-champagne/25 bg-ivory/95 backdrop-blur-md">
           <div className="max-w-[1180px] mx-auto px-5 md:px-8 h-[82px] flex items-center justify-between gap-6">
-            <Link href="/access" aria-label="Gloria Access home"><Logo className="h-[62px] w-auto" /></Link>
+            <Link href="/access" aria-label="Gloria Access home">
+              <Logo className="h-[62px] w-auto" />
+            </Link>
             <nav className="hidden md:flex items-center gap-7">
               {nav.map((item) => {
                 const active = pathname === item.href;
-                return <Link key={item.href} href={item.href} className={`text-[12px] transition-colors ${active ? "text-mocha font-semibold" : "text-taupe hover:text-espresso"}`}>{item.label}</Link>;
+                return (
+                  <Link key={item.href} href={item.href} className={`text-[12px] transition-colors ${active ? "text-mocha font-semibold" : "text-taupe hover:text-espresso"}`}>
+                    {item.label}
+                  </Link>
+                );
               })}
             </nav>
             <div className="text-right hidden sm:block">
