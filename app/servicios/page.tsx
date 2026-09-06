@@ -39,18 +39,11 @@ export default function ServiciosPage() {
           <div
             id={cat.slug}
             key={cat.slug}
-            className={`grid md:grid-cols-2 gap-9 md:gap-[70px] items-center py-12 md:py-[70px] border-t border-taupe/30 last:border-b scroll-mt-24 ${
-              i % 2 === 1 ? "" : ""
-            }`}
+            className="grid md:grid-cols-2 gap-9 md:gap-[70px] items-center py-12 md:py-[70px] border-t border-taupe/30 last:border-b scroll-mt-24"
           >
             <div className={i % 2 === 1 ? "md:order-2" : ""}>
               <div className="relative aspect-[5/4] overflow-hidden">
-                <Image
-                  src={cat.photo}
-                  alt={cat.name}
-                  fill
-                  className="object-cover"
-                />
+                <Image src={cat.photo} alt={cat.name} fill className="object-cover" />
               </div>
             </div>
 
@@ -58,35 +51,51 @@ export default function ServiciosPage() {
               <div className="text-xs tracking-[0.16em] text-taupe font-semibold mb-3.5">
                 {cat.index} · {cat.name.toUpperCase()}
               </div>
-              <h2 className="font-serif font-medium text-[clamp(34px,3.6vw,50px)]">
-                {cat.name}
-              </h2>
-              <p className="mt-3 text-[14.5px] text-mocha max-w-[360px] leading-relaxed">
-                {cat.tagline}
-              </p>
-              <ul className="mt-7 flex flex-col divide-y divide-taupe/20 max-w-[420px]">
-                {cat.items.map((item) => (
-                  <li
-                    key={item.name}
-                    className="flex items-baseline justify-between gap-4 py-3"
-                  >
-                    <div className="min-w-0">
-                      <div className="text-[13.5px] leading-snug">
-                        {item.name}
+              <h2 className="font-serif font-medium text-[clamp(34px,3.6vw,50px)]">{cat.name}</h2>
+              <p className="mt-3 text-[14.5px] text-mocha max-w-[360px] leading-relaxed">{cat.tagline}</p>
+
+              {cat.groups ? (
+                <div className="mt-7 max-w-[440px] border-y border-taupe/20">
+                  {cat.groups.map((group, index) => (
+                    <details key={group.slug} className="group border-b last:border-b-0 border-taupe/20" open={index === 0}>
+                      <summary className="list-none cursor-pointer py-4 flex items-center justify-between gap-5">
+                        <div>
+                          <p className="font-serif text-[25px] leading-none text-espresso">{group.name}</p>
+                          {group.description && (
+                            <p className="mt-1.5 text-[11px] leading-snug text-taupe">{group.description}</p>
+                          )}
+                        </div>
+                        <span className="shrink-0 h-8 w-8 rounded-full border border-champagne/55 flex items-center justify-center text-mocha text-[18px] leading-none transition-transform group-open:rotate-45">+</span>
+                      </summary>
+                      <ul className="pb-3 pl-1">
+                        {group.items.map((item) => (
+                          <li key={item.name} className="flex items-baseline justify-between gap-4 py-2.5 border-t border-taupe/10 first:border-t-0">
+                            <div className="min-w-0">
+                              <div className="text-[13px] leading-snug">{item.name}</div>
+                              <div className="text-[10.5px] text-taupe mt-0.5">{item.duration}</div>
+                            </div>
+                            <div className="font-serif italic text-[16px] text-mocha whitespace-nowrap shrink-0">{item.price}</div>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ))}
+                </div>
+              ) : (
+                <ul className="mt-7 flex flex-col divide-y divide-taupe/20 max-w-[420px]">
+                  {cat.items.map((item) => (
+                    <li key={item.name} className="flex items-baseline justify-between gap-4 py-3">
+                      <div className="min-w-0">
+                        <div className="text-[13.5px] leading-snug">{item.name}</div>
+                        <div className="text-[11px] text-taupe mt-0.5">{item.duration}</div>
                       </div>
-                      <div className="text-[11px] text-taupe mt-0.5">
-                        {item.duration}
-                      </div>
-                    </div>
-                    <div className="font-serif italic text-[17px] text-mocha whitespace-nowrap shrink-0">
-                      {item.price}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <UnderlineLink href="/reservar" className="mt-7 inline-block">
-                Ver disponibilidad
-              </UnderlineLink>
+                      <div className="font-serif italic text-[17px] text-mocha whitespace-nowrap shrink-0">{item.price}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <UnderlineLink href="/reservar" className="mt-7 inline-block">Ver disponibilidad</UnderlineLink>
             </div>
           </div>
         ))}
@@ -96,17 +105,10 @@ export default function ServiciosPage() {
         <h2 className="font-serif font-medium text-[clamp(30px,3.6vw,44px)] max-w-[640px] mx-auto leading-tight">
           Disponibilidad en tiempo real,
           <br />
-          <em className="italic text-champagne font-normal">
-            dentro de Gloria On Demand.
-          </em>
+          <em className="italic text-champagne font-normal">dentro de Gloria On Demand.</em>
         </h2>
-        <p className="mt-[18px] text-[13.5px] text-blush">
-          Selecciona tu servicio, tu profesional y el horario que mejor te
-          acomode.
-        </p>
-        <Button href="/reservar" variant="pill-dark" className="mt-9 !border-champagne">
-          RESERVA TU CITA
-        </Button>
+        <p className="mt-[18px] text-[13.5px] text-blush">Selecciona tu servicio, tu profesional y el horario que mejor te acomode.</p>
+        <Button href="/reservar" variant="pill-dark" className="mt-9 !border-champagne">RESERVA TU CITA</Button>
       </div>
 
       <Footer />
