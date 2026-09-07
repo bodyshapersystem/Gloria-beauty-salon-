@@ -3,41 +3,36 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CalendarRange, ChevronRight, LayoutDashboard, Menu, MessageCircle, PackageCheck, Plus, Scissors, Settings, ShoppingBag, TrendingUp, UserCircle, UserRound, UsersRound, X } from "lucide-react";
+import { CalendarDays, CalendarRange, LayoutDashboard, Menu, MoreHorizontal, Plus, Settings, TrendingUp, UserRound, UsersRound, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
 type HubUser={role:"owner"|"admin"|"staff";staff_id:string|null};
-type NavItem={label:string;href:string;icon:any;audience:"all"|"admin"|"staff";group:"today"|"clients"|"business"|"settings"};
+type NavItem={label:string;href:string;icon:any;audience:"admin"|"staff"|"all"};
 
-const nav:NavItem[]=[
-  {label:"Panel",href:"/hub",icon:LayoutDashboard,audience:"admin",group:"today"},
-  {label:"Mi Agenda",href:"/hub/my-agenda",icon:CalendarDays,audience:"staff",group:"today"},
-  {label:"Citas",href:"/hub/appointments",icon:CalendarDays,audience:"admin",group:"today"},
-  {label:"Calendario",href:"/hub/calendar",icon:CalendarRange,audience:"admin",group:"today"},
-  {label:"Clientas",href:"/hub/clients",icon:UsersRound,audience:"all",group:"clients"},
-  {label:"Mensajes",href:"/hub/messages",icon:MessageCircle,audience:"all",group:"clients"},
-  {label:"Mi Progreso",href:"/hub/progress",icon:TrendingUp,audience:"staff",group:"clients"},
-  {label:"Equipo",href:"/hub/team",icon:UserRound,audience:"admin",group:"business"},
-  {label:"Servicios",href:"/hub/services",icon:Scissors,audience:"admin",group:"business"},
-  {label:"Productos",href:"/hub/products",icon:ShoppingBag,audience:"admin",group:"business"},
-  {label:"Pedidos",href:"/hub/orders",icon:PackageCheck,audience:"admin",group:"business"},
-  {label:"Configuración",href:"/hub/settings/appointments",icon:Settings,audience:"admin",group:"settings"},
-  {label:"Mi Perfil",href:"/hub/profile",icon:UserCircle,audience:"all",group:"settings"},
+const adminNav:NavItem[]=[
+  {label:"Inicio",href:"/hub",icon:LayoutDashboard,audience:"admin"},
+  {label:"Calendario",href:"/hub/calendar",icon:CalendarRange,audience:"all"},
+  {label:"Citas",href:"/hub/appointments",icon:CalendarDays,audience:"admin"},
+  {label:"Clientas",href:"/hub/clients",icon:UsersRound,audience:"all"},
+  {label:"Equipo",href:"/hub/team",icon:UserRound,audience:"admin"},
+];
+const staffNav:NavItem[]=[
+  {label:"Calendario",href:"/hub/calendar",icon:CalendarRange,audience:"all"},
+  {label:"Mis Citas",href:"/hub/my-agenda",icon:CalendarDays,audience:"staff"},
+  {label:"Clientas",href:"/hub/clients",icon:UsersRound,audience:"all"},
+  {label:"Mi Progreso",href:"/hub/progress",icon:TrendingUp,audience:"staff"},
 ];
 
-const roleLabels:Record<string,string>={owner:"Dueña",admin:"Administradora",staff:"Staff"};
-const groupTitles:Record<string,string>={today:"Diario",clients:"Relaciones",business:"Negocio",settings:"Sistema"};
-
 function staffRouteAllowed(pathname:string){
-  if(pathname.startsWith("/hub/my-agenda")||pathname.startsWith("/hub/clients")||pathname.startsWith("/hub/progress")||pathname.startsWith("/hub/messages")||pathname.startsWith("/hub/profile"))return true;
+  if(pathname.startsWith("/hub/calendar")||pathname.startsWith("/hub/my-agenda")||pathname.startsWith("/hub/clients")||pathname.startsWith("/hub/progress")||pathname.startsWith("/hub/profile"))return true;
   return /^\/hub\/appointments\/[^/]+\/complete$/.test(pathname);
 }
 
 export function HubShell({children}:{children:React.ReactNode}){
   const [user,setUser]=useState<HubUser|null>(null);
   const [loading,setLoading]=useState(true);
-  const [open,setOpen]=useState(false);
+  const [moreOpen,setMoreOpen]=useState(false);
   const pathname=usePathname();
   const router=useRouter();
 
@@ -51,39 +46,66 @@ export function HubShell({children}:{children:React.ReactNode}){
   })()},[pathname,router]);
 
   const isStaff=user?.role==="staff";
-  const visibleNav=useMemo(()=>nav.filter(item=>item.audience==="all"||(isStaff?item.audience==="staff":item.audience==="admin")),[isStaff]);
+  const nav=useMemo(()=>isStaff?staffNav:adminNav,[isStaff]);
 
   if(loading)return <div className="min-h-screen bg-ivory flex items-center justify-center"><div className="text-center"><Logo className="h-20 w-auto mx-auto"/><p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-taupe">Abriendo Gloria Hub</p></div></div>;
   if(!user)return null;
 
-  return <div className="min-h-screen bg-[#F8F5EF] text-espresso md:grid md:grid-cols-[228px_1fr]">
-    <aside className="hidden md:flex min-h-screen border-r border-champagne/25 bg-[#F3EEE7]/90 px-4 py-5 flex-col sticky top-0 h-screen backdrop-blur-xl">
-      <div className="px-2"><Logo className="h-14 w-auto"/><div className="mt-5 rounded-[18px] border border-champagne/30 bg-white/55 p-4"><p className="text-[8px] uppercase tracking-[0.26em] text-mocha">{isStaff?"Gloria Team":"Gloria Hub"}</p><p className="mt-2 font-serif text-[20px] leading-[1.02]">{isStaff?"Tu día, de un vistazo.":"Tu salón, de un vistazo."}</p></div></div>
+  return <div className="min-h-screen bg-[#F7F3ED] text-espresso md:grid md:grid-cols-[220px_1fr] pb-[82px] md:pb-0">
+    <aside className="hidden md:flex min-h-screen bg-[#34261F] px-4 py-5 flex-col sticky top-0 h-screen text-ivory">
+      <div className="px-2"><Logo className="h-14 w-auto brightness-[4] grayscale"/><p className="mt-4 text-[8px] uppercase tracking-[0.28em] text-champagne/75">{isStaff?"Gloria Team":"Gloria Hub"}</p><p className="mt-2 font-serif text-[20px] leading-tight text-ivory/95">{isStaff?"Tu día, más simple.":"Beauty lives here."}</p></div>
 
-      {!isStaff&&<Link href="/hub/calendar?new=1" className="mx-2 mt-4 flex items-center justify-between rounded-[16px] bg-espresso px-4 py-3.5 text-ivory shadow-[0_10px_26px_rgba(46,39,36,.12)]"><span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em]"><Plus size={16}/> Nueva cita</span><ChevronRight size={15}/></Link>}
+      {!isStaff&&<Link href="/hub/calendar?new=1" className="mt-5 flex items-center justify-between rounded-[14px] bg-ivory px-4 py-3.5 text-espresso"><span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.13em]"><Plus size={16}/> Nueva cita</span></Link>}
 
-      <nav className="mt-5 overflow-y-auto pr-1">
-        {(["today","clients","business","settings"] as const).map(group=>{
-          const items=visibleNav.filter(x=>x.group===group);if(!items.length)return null;
-          return <div key={group} className="mb-5"><p className="px-3 mb-1.5 text-[8px] uppercase tracking-[0.24em] text-taupe/80">{groupTitles[group]}</p><div className="space-y-1">{items.map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link key={item.href} href={item.href} className={`group flex items-center gap-3 rounded-[14px] px-3 py-2.5 text-[11px] transition-all ${active?"bg-white text-espresso shadow-[0_4px_16px_rgba(46,39,36,.06)]":"text-taupe hover:bg-white/60 hover:text-espresso"}`}><span className={`grid h-8 w-8 place-items-center rounded-[10px] ${active?"bg-blush/55 text-mocha":"bg-transparent text-taupe group-hover:bg-blush/35 group-hover:text-mocha"}`}><Icon size={16} strokeWidth={1.55}/></span><span className="flex-1">{item.label}</span>{active&&<span className="h-1.5 w-1.5 rounded-full bg-mocha"/>}</Link>})}</div></div>
-        })}
-      </nav>
+      <nav className="mt-6 space-y-1.5">{nav.map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-[13px] px-3 py-3 text-[11px] transition-all ${active?"bg-white/12 text-white":"text-ivory/65 hover:bg-white/7 hover:text-white"}`}><Icon size={17} strokeWidth={1.55}/><span>{item.label}</span>{active&&<span className="ml-auto h-1.5 w-1.5 rounded-full bg-champagne"/>}</Link>})}</nav>
 
-      <div className="mt-auto px-2"><div className="rounded-[16px] border border-champagne/25 bg-white/45 px-3 py-3"><p className="text-[8px] uppercase tracking-[0.18em] text-taupe">Sesión iniciada</p><div className="mt-2 flex items-center gap-2"><div className="grid h-8 w-8 place-items-center rounded-full bg-blush/50 text-mocha"><UserRound size={15}/></div><div><p className="text-[11px]">{roleLabels[user.role]}</p><p className="text-[9px] text-taupe">Gloria Beauty Salon</p></div></div></div></div>
+      <div className="mt-auto space-y-2"><Link href="/hub/profile" className="flex items-center gap-3 rounded-[13px] px-3 py-3 text-[11px] text-ivory/65 hover:bg-white/7 hover:text-white"><UserRound size={17}/> Mi Perfil</Link>{!isStaff&&<Link href="/hub/settings/appointments" className="flex items-center gap-3 rounded-[13px] px-3 py-3 text-[11px] text-ivory/65 hover:bg-white/7 hover:text-white"><Settings size={17}/> Configuración</Link>}<div className="mx-2 mt-4 border-t border-white/10 pt-4"><p className="text-[8px] uppercase tracking-[0.22em] text-ivory/35">Gloria Beauty Salon</p><p className="mt-2 font-serif italic text-[14px] text-champagne/80">Organized beauty, happier people.</p></div></div>
     </aside>
 
     <div className="min-w-0">
-      <header className="sticky top-0 z-40 border-b border-champagne/20 bg-ivory/92 backdrop-blur-xl">
-        <div className="h-[70px] px-4 md:px-7 lg:px-9 flex items-center justify-between gap-4 max-w-[1580px] mx-auto">
+      <header className="sticky top-0 z-40 border-b border-champagne/20 bg-[#F7F3ED]/94 backdrop-blur-xl">
+        <div className="h-[68px] px-4 md:px-7 lg:px-9 flex items-center justify-between gap-4 max-w-[1580px] mx-auto">
           <div className="md:hidden"><Logo className="h-11 w-auto"/></div>
-          <div className="hidden md:block"><p className="text-[8px] uppercase tracking-[0.22em] text-taupe">{isStaff?"Gloria Team":"Gloria Hub"}</p><p className="mt-1 text-[11px] text-mocha">{isStaff?"Todo lo que necesitas para hoy":"Tu negocio de belleza, sin complicaciones"}</p></div>
-          <div className="flex items-center gap-2">{!isStaff&&<><Link href="/hub/appointments" className="hidden sm:inline-flex rounded-full border border-champagne/40 bg-white/50 px-4 py-2.5 text-[9px] uppercase tracking-[0.12em] text-mocha">Citas</Link><Link href="/hub/calendar?new=1" className="inline-flex items-center gap-2 rounded-full bg-espresso px-4 py-2.5 text-[9px] uppercase tracking-[0.12em] text-ivory"><Plus size={14}/> Nueva</Link></>}<button className="md:hidden grid h-10 w-10 place-items-center rounded-full border border-champagne/30 bg-white/50" onClick={()=>setOpen(v=>!v)} aria-label="Abrir menú">{open?<X size={21}/>:<Menu size={22}/>}</button></div>
+          <div className="hidden md:block"><p className="text-[8px] uppercase tracking-[0.24em] text-taupe">{isStaff?"Gloria Team":"Gloria Hub"}</p><p className="mt-1 text-[11px] text-mocha">{isStaff?"Agenda general + tus citas":"Todo lo importante, sin ruido"}</p></div>
+          <div className="flex items-center gap-2">{!isStaff&&<Link href="/hub/calendar?new=1" className="inline-flex items-center gap-2 rounded-full bg-[#4A352B] px-4 py-2.5 text-[9px] uppercase tracking-[0.13em] text-ivory"><Plus size={14}/> Nueva cita</Link>}<button className="md:hidden grid h-10 w-10 place-items-center rounded-full border border-champagne/35 bg-white/60" onClick={()=>setMoreOpen(true)} aria-label="Más opciones"><Menu size={21}/></button></div>
         </div>
       </header>
 
-      {open&&<div className="md:hidden fixed inset-0 top-[70px] z-50 bg-espresso/35" onClick={()=>setOpen(false)}><div className="w-[88%] max-w-[370px] h-full bg-ivory p-5 overflow-y-auto" onClick={e=>e.stopPropagation()}><p className="font-serif text-[28px]">{isStaff?"Mi espacio":"Gloria Hub"}</p><p className="mt-1 text-[10px] text-taupe">Elige qué quieres hacer.</p><nav className="mt-5 space-y-2">{visibleNav.map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link onClick={()=>setOpen(false)} key={item.href} href={item.href} className={`flex items-center gap-3 rounded-[16px] border px-4 py-3 ${active?"border-mocha/25 bg-blush/30":"border-champagne/25 bg-white/45"}`}><span className="grid h-9 w-9 place-items-center rounded-[11px] bg-blush/35 text-mocha"><Icon size={17}/></span><span className="flex-1 text-[13px]">{item.label}</span><ChevronRight size={15} className="text-taupe"/></Link>})}</nav></div></div>}
-
-      <main className="px-4 md:px-7 lg:px-9 py-6 md:py-8 max-w-[1580px] mx-auto">{children}</main>
+      <main className="px-4 md:px-7 lg:px-9 py-5 md:py-8 max-w-[1580px] mx-auto">{children}</main>
     </div>
+
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-champagne/30 bg-[#FBF8F3]/96 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(52,38,31,.06)]">
+      <div className="grid grid-cols-5 h-[72px]">
+        {(isStaff?staffMobile():adminMobile()).map(item=>{
+          if(item.action==="more")return <button key="more" onClick={()=>setMoreOpen(true)} className="flex flex-col items-center justify-center gap-1 text-taupe"><MoreHorizontal size={21}/><span className="text-[8px]">Más</span></button>;
+          if(item.action==="new")return <Link key="new" href="/hub/calendar?new=1" className="flex flex-col items-center justify-center gap-1"><span className="grid h-11 w-11 place-items-center -mt-5 rounded-full bg-[#4A352B] text-ivory shadow-[0_8px_20px_rgba(74,53,43,.25)]"><Plus size={22}/></span><span className="text-[8px] text-mocha">Nueva</span></Link>;
+          const Icon=item.icon!;const active=pathname===item.href||pathname.startsWith((item.href||"")+"/");return <Link key={item.href} href={item.href!} className={`flex flex-col items-center justify-center gap-1 ${active?"text-mocha":"text-taupe"}`}><Icon size={20} strokeWidth={active?1.9:1.4}/><span className="text-[8px]">{item.label}</span></Link>
+        })}
+      </div>
+    </nav>
+
+    {moreOpen&&<div className="md:hidden fixed inset-0 z-[80] bg-espresso/35 flex items-end" onClick={()=>setMoreOpen(false)}><div className="w-full rounded-t-[28px] bg-[#FBF8F3] p-5 pb-[calc(24px+env(safe-area-inset-bottom))]" onClick={e=>e.stopPropagation()}><div className="flex items-center justify-between"><div><p className="text-[9px] uppercase tracking-[0.22em] text-mocha">Gloria {isStaff?"Team":"Hub"}</p><h2 className="mt-1 font-serif text-[30px]">Más</h2></div><button onClick={()=>setMoreOpen(false)} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35"><X size={20}/></button></div><div className="mt-5 grid grid-cols-2 gap-3">{(isStaff?staffMore():adminMore()).map(item=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className="rounded-[18px] border border-champagne/30 bg-white/65 p-4"><Icon size={19} className="text-mocha"/><p className="mt-4 font-serif text-[21px]">{item.label}</p></Link>})}</div></div></div>}
   </div>
 }
+
+function adminMobile(){return [
+  {label:"Inicio",href:"/hub",icon:LayoutDashboard},
+  {label:"Calendario",href:"/hub/calendar",icon:CalendarRange},
+  {label:"Nueva",action:"new"},
+  {label:"Clientas",href:"/hub/clients",icon:UsersRound},
+  {label:"Más",action:"more"},
+]}
+function staffMobile(){return [
+  {label:"Calendario",href:"/hub/calendar",icon:CalendarRange},
+  {label:"Mis Citas",href:"/hub/my-agenda",icon:CalendarDays},
+  {label:"Clientas",href:"/hub/clients",icon:UsersRound},
+  {label:"Progreso",href:"/hub/progress",icon:TrendingUp},
+  {label:"Más",action:"more"},
+]}
+function adminMore(){return [
+  {label:"Citas",href:"/hub/appointments",icon:CalendarDays},
+  {label:"Equipo",href:"/hub/team",icon:UserRound},
+  {label:"Configuración",href:"/hub/settings/appointments",icon:Settings},
+  {label:"Mi Perfil",href:"/hub/profile",icon:UserRound},
+]}
+function staffMore(){return [{label:"Mi Perfil",href:"/hub/profile",icon:UserRound}]}
