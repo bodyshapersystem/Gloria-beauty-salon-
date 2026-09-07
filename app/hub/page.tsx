@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CalendarDays, ChevronRight, CircleDollarSign, Clock3, Plus, Sparkles, TrendingUp, UsersRound } from "lucide-react";
+import { CalendarDays, ChevronRight, Plus, Sparkles, TrendingUp, UsersRound } from "lucide-react";
+import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
 type Appt={id:string;client_name:string;start_at:string;status:string;price_cents:number|null;service:{name:string}|null;staff:{name:string}|null};
@@ -41,23 +42,32 @@ export default function HubHome(){
   if(loading)return <div className="py-20 text-center"><p className="font-serif text-[30px]">Preparando Gloria Hub...</p></div>;
 
   return <div className="pb-4">
-    <section className="relative overflow-hidden rounded-[30px] border border-[#D9C8BC] min-h-[260px] p-6 md:p-8" style={{backgroundImage:"radial-gradient(circle at 78% 12%,rgba(255,255,255,.88),transparent 27%),radial-gradient(circle at 18% 90%,rgba(123,60,72,.12),transparent 35%),linear-gradient(135deg,#FAF5EF 0%,#E8D7CF 58%,#D9C0B5 100%)"}}>
-      <div className="absolute -right-12 bottom-[-60px] h-48 w-72 rotate-[-18deg] rounded-[50%] bg-[#7B3C48]/15 blur-3xl"/>
-      <div className="relative grid gap-8 xl:grid-cols-[1fr_430px] xl:items-end">
-        <div>
-          <p className="text-[9px] uppercase tracking-[.28em] text-mocha">Gloria Hub</p>
-          <h1 className="mt-3 font-serif text-[50px] md:text-[68px] leading-[.9]">Hola, Gloria.<br/><span className="italic text-[#7B3C48]">Tu salón, más simple.</span></h1>
-          <p className="mt-4 max-w-[520px] text-[11px] leading-relaxed text-taupe">Agenda, clientas, equipo y números importantes, todo en un solo lugar.</p>
+    <section className="relative overflow-hidden rounded-[30px] border border-[#D7C4B7] min-h-[545px] px-5 py-6 md:min-h-[500px] md:px-9 md:py-8 shadow-[0_20px_55px_rgba(73,46,40,.10)]" style={{backgroundImage:hubCreamWineBg}}>
+      <HubMarble/>
+      <div className="relative z-10">
+        <div className="flex items-start justify-between">
+          <div><Logo className="h-[70px] w-auto"/><p className="-mt-1 ml-3 text-[8px] uppercase tracking-[.34em] text-[#5A352E]">Hub</p></div>
+          <span className="grid h-10 w-10 place-items-center rounded-full border border-[#8A6558]/20 bg-white/30 text-[#5B342D]"><Sparkles size={17}/></span>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <HeroCard href="/hub/calendar?new=1" label="Nueva cita" icon={<Plus size={18}/>} tone="wine"/>
-          <HeroCard href="/hub/calendar" label="Calendario" icon={<CalendarDays size={18}/>} tone="mocha"/>
-          <HeroCard href="/hub/clients" label="Clientas" icon={<UsersRound size={18}/>} tone="dust"/>
-          <HeroCard href="/hub/team" label="Equipo" icon={<Sparkles size={18}/>} tone="nude"/>
+
+        <div className="mt-10 md:mt-12">
+          <h1 className="font-serif text-[49px] md:text-[70px] leading-[.88] text-[#4A2824]">Hola,<br/>Gloria</h1>
+          <p className="mt-5 max-w-[300px] text-[9px] md:text-[10px] uppercase tracking-[.34em] leading-[1.8] text-[#5D3831]">Tu salón.<br/>Tu equipo.<br/>Más belleza.</p>
+          <p className="mt-7 text-[10px] text-[#6E5148]">{hubTodayLabel()}</p>
+        </div>
+
+        <Link href="/hub/calendar" className="mt-5 flex max-w-[360px] items-center justify-between rounded-[22px] border border-white/65 bg-[#FCF8F3]/82 p-4 shadow-[0_10px_28px_rgba(70,45,39,.08)] backdrop-blur-sm">
+          <div><p className="font-serif text-[34px] leading-none text-[#6D3938]">{upcoming.length}</p><p className="mt-2 text-[9px] text-taupe">Citas hoy</p></div><ChevronRight size={18} className="text-mocha"/>
+        </Link>
+
+        <div className="mt-4 grid grid-cols-4 gap-2 max-w-[560px]">
+          <HubGlassShortcut href="/hub/calendar" icon={<CalendarDays size={18}/>} label="Citas"/>
+          <HubGlassShortcut href="/hub/clients" icon={<UsersRound size={18}/>} label="Clientes"/>
+          <HubGlassShortcut href="/hub/team" icon={<Sparkles size={18}/>} label="Equipo"/>
+          <HubGlassShortcut href="/hub/progress" icon={<TrendingUp size={18}/>} label="Ingresos"/>
         </div>
       </div>
     </section>
-
     <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
       <StatCard value={String(upcoming.length)} label="Citas hoy" tone="cream"/>
       <StatCard value={String(clients)} label="Clientas" tone="dust"/>
@@ -111,3 +121,8 @@ function Mini({label,value}:{label:string;value:string}){return <div className="
 function Status({value}:{value:string}){return <span className="rounded-full border border-current/20 bg-white/10 px-2.5 py-1 text-[7px] uppercase tracking-[.08em]">{statusLabels[value]||value}</span>}
 function money(c:number){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format((c||0)/100)}
 function time(v:string){return new Date(v).toLocaleTimeString("es-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})}
+
+const hubCreamWineBg="radial-gradient(circle at 14% 12%,rgba(255,255,255,.94),transparent 28%),radial-gradient(ellipse at 88% 28%,rgba(115,54,61,.32),transparent 24%),radial-gradient(ellipse at 72% 64%,rgba(84,39,42,.34),transparent 27%),linear-gradient(145deg,#F8F0E7 0%,#E6CEC2 48%,#C9A69A 100%)";
+function HubMarble(){return <><span className="pointer-events-none absolute right-[-8%] top-[3%] h-[82%] w-[48%] rotate-[8deg] rounded-[58%_42%_62%_38%/43%_60%_40%_57%] border-[18px] border-white/25 bg-[linear-gradient(145deg,rgba(255,255,255,.42),rgba(108,46,51,.40),rgba(243,221,207,.48))] shadow-[inset_18px_0_30px_rgba(255,255,255,.26)] blur-[.2px]"/><span className="pointer-events-none absolute right-[10%] top-[8%] h-[78%] w-[12%] rotate-[22deg] rounded-[50%] bg-white/30 blur-xl"/><span className="pointer-events-none absolute right-[-3%] bottom-[-12%] h-[42%] w-[54%] rounded-[60%] bg-[#6E3038]/30 blur-3xl"/></>}
+function HubGlassShortcut({href,icon,label}:{href:string;icon:React.ReactNode;label:string}){return <Link href={href} className="flex min-h-[94px] flex-col items-center justify-center gap-2 rounded-[19px] border border-white/70 bg-[#FCF8F3]/78 text-[#5A352E] shadow-[0_8px_22px_rgba(73,46,40,.06)] backdrop-blur-sm"><span>{icon}</span><span className="text-center text-[8px] leading-tight">{label}</span></Link>}
+function hubTodayLabel(){return new Date().toLocaleDateString("es-US",{weekday:"long",day:"numeric",month:"long",timeZone:"America/New_York"})}
