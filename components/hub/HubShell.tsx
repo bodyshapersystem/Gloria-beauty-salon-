@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CalendarRange, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X } from "lucide-react";
+import { CalendarDays, CalendarRange, Inbox, LayoutDashboard, CalendarDays, CalendarRange, ChevronRight, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
@@ -54,7 +54,32 @@ export function HubShell({children}:{children:React.ReactNode}){
 
     <nav className="md:hidden fixed bottom-0 inset-x-0 z-50 border-t border-champagne/30 bg-[#FBF8F3]/96 backdrop-blur-xl pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(52,38,31,.06)]"><div className="grid grid-cols-5 h-[72px]">{(isStaff?staffMobile():adminMobile()).map(item=>{if(item.action==="more")return <button key="more" onClick={()=>setMoreOpen(true)} className="flex flex-col items-center justify-center gap-1 text-taupe"><MoreHorizontal size={21}/><span className="text-[8px]">Más</span></button>;if(item.action==="new")return <Link key="new" href="/hub/calendar?new=1" className="flex flex-col items-center justify-center gap-1"><span className="grid h-11 w-11 place-items-center -mt-5 rounded-full bg-[#6F3642] text-white shadow-[0_8px_20px_rgba(111,54,66,.25)]"><Plus size={22}/></span><span className="text-[8px] text-mocha">Nueva</span></Link>;const Icon=item.icon!;const active=pathname===item.href||pathname.startsWith((item.href||"")+"/");return <Link key={item.href} href={item.href!} className={`flex flex-col items-center justify-center gap-1 ${active?"text-mocha":"text-taupe"}`}><Icon size={20}/><span className="text-[8px]">{item.label}</span></Link>})}</div></nav>
 
-    {moreOpen&&<div className="md:hidden fixed inset-0 z-[80] bg-espresso/40 backdrop-blur-[2px] flex items-end" onClick={()=>setMoreOpen(false)}><div className="w-full rounded-t-[30px] bg-[#FBF8F3] p-5 pb-[calc(24px+env(safe-area-inset-bottom))] shadow-[0_-20px_50px_rgba(52,38,31,.12)]" onClick={e=>e.stopPropagation()}><div className="flex items-center justify-between"><div><p className="text-[9px] uppercase tracking-[0.22em] text-mocha">Gloria {isStaff?"Team":"Hub"}</p><h2 className="mt-1 font-serif text-[31px]">Más</h2></div><button onClick={()=>setMoreOpen(false)} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35 bg-white/60"><X size={20}/></button></div><div className="mt-5 grid grid-cols-2 gap-3">{(isStaff?staffMore():adminMore()).map((item,index)=>{const Icon=item.icon;return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className={`min-h-[130px] rounded-[22px] border p-4 shadow-[0_10px_24px_rgba(52,38,31,.06)] ${index%2===0?"border-[#7B3C48]/20 bg-[linear-gradient(135deg,#7B3C48,#4B2530)] text-white":"border-[#D5C0B1]/40 bg-[linear-gradient(135deg,#F8F0E8,#E7D2C3)] text-[#4A352B]"}`}><span className={`grid h-10 w-10 place-items-center rounded-full ${index%2===0?"bg-white/10":"bg-[#8B5E4B] text-white"}`}><Icon size={18}/></span><p className="mt-5 font-serif text-[23px] leading-none">{item.label}</p></Link>})}</div></div></div>}
+    {moreOpen&&<div className="md:hidden fixed inset-0 z-[80] bg-espresso/45 backdrop-blur-[2px]" onClick={()=>setMoreOpen(false)}>
+      <aside className="relative h-full w-[86%] max-w-[360px] overflow-y-auto bg-[#FBF8F3] shadow-[24px_0_60px_rgba(52,38,31,.16)]" onClick={e=>e.stopPropagation()}>
+        <div className="relative overflow-hidden border-b border-champagne/25 bg-[linear-gradient(145deg,#F5E9E0,#E6D2C4)] px-5 pb-6 pt-[calc(20px+env(safe-area-inset-top))]">
+          <div className="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full border-[20px] border-white/25"/>
+          <div className="relative flex items-start justify-between gap-4">
+            <div><Logo className="h-12 w-auto"/><p className="mt-5 text-[8px] uppercase tracking-[.24em] text-mocha">Gloria {isStaff?"Team":"Hub"}</p><h2 className="mt-1 font-serif text-[30px] leading-none">{isStaff?"Tu día, más simple.":"Beauty lives here."}</h2></div>
+            <button onClick={()=>setMoreOpen(false)} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-[#8B6F60]/25 bg-white/55"><X size={19}/></button>
+          </div>
+        </div>
+
+        <div className="p-4">
+          <Link href="/hub/calendar?new=1" onClick={()=>setMoreOpen(false)} className="mb-4 flex items-center justify-between rounded-[16px] bg-[#6F3642] px-4 py-3.5 text-white shadow-[0_8px_22px_rgba(111,54,66,.18)]"><span className="flex items-center gap-3 text-[9px] uppercase tracking-[.14em]"><Plus size={16}/> Nueva cita</span><ChevronRight size={16}/></Link>
+
+          <nav className="space-y-1">
+            {nav.map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link key={item.href} href={item.href} onClick={()=>setMoreOpen(false)} className={`flex items-center gap-3 rounded-[14px] px-3.5 py-3 text-[11px] transition ${active?"bg-[#EEE2D8] text-[#4A352B]":"text-taupe hover:bg-white/70 hover:text-espresso"}`}><span className={`grid h-9 w-9 place-items-center rounded-full ${active?"bg-[#6F3642] text-white":"bg-[#F1E6DD] text-mocha"}`}><Icon size={16}/></span><span className="flex-1">{item.label}</span><ChevronRight size={14} className="opacity-45"/></Link>})}
+          </nav>
+
+          <div className="mt-4 border-t border-champagne/30 pt-4 space-y-1">
+            <Link href="/hub/profile" onClick={()=>setMoreOpen(false)} className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 text-[11px] text-taupe hover:bg-white/70"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#F1E6DD] text-mocha"><UserRound size={16}/></span><span className="flex-1">Mi Perfil</span><ChevronRight size={14} className="opacity-45"/></Link>
+            {!isStaff&&<Link href="/hub/settings/appointments" onClick={()=>setMoreOpen(false)} className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 text-[11px] text-taupe hover:bg-white/70"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#F1E6DD] text-mocha"><Settings size={16}/></span><span className="flex-1">Configuración</span><ChevronRight size={14} className="opacity-45"/></Link>}
+          </div>
+
+          <p className="mt-8 px-3 font-serif text-[16px] italic text-mocha">Realza tu esencia, define tu estilo.</p>
+        </div>
+      </aside>
+    </div>}
   </div>
 }
 
