@@ -51,7 +51,7 @@ export function Nav() {
           <div className="hidden lg:flex items-center gap-4">
             <Link href="/access/login" className="text-[9px] uppercase tracking-[0.16em] text-mocha hover:text-espresso">Gloria Access</Link>
             <span className="h-3 w-px bg-taupe/35"/>
-            <Link href="/hub/login" className="text-[9px] uppercase tracking-[0.16em] text-[#6F3642] hover:text-espresso">Hub / Team</Link>
+            <Link href="/hub-login" className="text-[9px] uppercase tracking-[0.16em] text-[#6F3642] hover:text-espresso">Hub / Team</Link>
             <Button href="/reservar" variant="solid">RESERVA TU CITA</Button>
           </div>
 
@@ -78,7 +78,7 @@ export function Nav() {
               <div className="mt-3 grid grid-cols-3 gap-2">
                 <Link href="/reservar" onClick={() => setOpen(false)} className="flex min-h-[92px] flex-col justify-between rounded-xl border border-champagne/30 bg-white/45 px-3 py-3"><CalendarDays size={18} strokeWidth={1.35} className="text-mocha" /><span><span className="block font-serif text-[16px] leading-none">On Demand</span><span className="mt-1 block text-[7px] uppercase tracking-[0.1em] text-taupe">Reservar</span></span></Link>
                 <Link href="/access/login" onClick={() => setOpen(false)} className="flex min-h-[92px] flex-col justify-between rounded-xl border border-champagne/30 bg-white/45 px-3 py-3"><UserRound size={18} strokeWidth={1.35} className="text-mocha" /><span><span className="block font-serif text-[16px] leading-none">Access</span><span className="mt-1 block text-[7px] uppercase tracking-[0.1em] text-taupe">Clientas</span></span></Link>
-                <Link href="/hub/login" onClick={() => setOpen(false)} className="flex min-h-[92px] flex-col justify-between rounded-xl border border-[#7B3C48]/25 bg-[#6F3642] px-3 py-3 text-white"><UsersRound size={18} strokeWidth={1.35} /><span><span className="block font-serif text-[16px] leading-none">Hub</span><span className="mt-1 block text-[7px] uppercase tracking-[0.1em] text-white/60">Team + Admin</span></span></Link>
+                <Link href="/hub-login" onClick={() => setOpen(false)} className="flex min-h-[92px] flex-col justify-between rounded-xl border border-[#7B3C48]/25 bg-[#6F3642] px-3 py-3 text-white"><UsersRound size={18} strokeWidth={1.35} /><span><span className="block font-serif text-[16px] leading-none">Hub</span><span className="mt-1 block text-[7px] uppercase tracking-[0.1em] text-white/60">Team + Admin</span></span></Link>
               </div>
 
               <div className="mt-auto pt-3 flex items-center justify-between border-t border-champagne/30">
