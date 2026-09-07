@@ -10,12 +10,23 @@ type Staff={id:string;name:string};
 type Assignment={staff_id:string;service_id:string};
 type Slot={slot_start:string};
 
+const categoryMeta:Record<string,{label:string;soft:string;active:string;dot:string}> = {
+  hair:{label:"Hair",soft:"bg-[#F4E8E1] border-[#E3C9BC]",active:"bg-[#6B4F43] text-ivory border-[#6B4F43]",dot:"bg-[#6B4F43]"},
+  nails:{label:"Nails",soft:"bg-[#F7E4E2] border-[#E9C6C1]",active:"bg-[#B97870] text-white border-[#B97870]",dot:"bg-[#B97870]"},
+  lashes:{label:"Lashes",soft:"bg-[#EEE6F1] border-[#D7C6DD]",active:"bg-[#7E687F] text-white border-[#7E687F]",dot:"bg-[#7E687F]"},
+  brows:{label:"Brows + Wax",soft:"bg-[#F2E7DA] border-[#DFC9AE]",active:"bg-[#9B7455] text-white border-[#9B7455]",dot:"bg-[#9B7455]"},
+  makeup:{label:"Makeup",soft:"bg-[#F7E7EC] border-[#E6C8D1]",active:"bg-[#A56678] text-white border-[#A56678]",dot:"bg-[#A56678]"},
+  tanning:{label:"Glow",soft:"bg-[#F5E6D7] border-[#E4C8A6]",active:"bg-[#B77B49] text-white border-[#B77B49]",dot:"bg-[#B77B49]"}
+};
+const categoryOrder=["hair","nails","lashes","brows","makeup","tanning"];
+
 export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClose:()=>void;onCreated:()=>void}){
   const [clients,setClients]=useState<Client[]>([]);
   const [services,setServices]=useState<Service[]>([]);
   const [staff,setStaff]=useState<Staff[]>([]);
   const [assignments,setAssignments]=useState<Assignment[]>([]);
   const [clientId,setClientId]=useState("");
+  const [category,setCategory]=useState("hair");
   const [serviceId,setServiceId]=useState("");
   const [staffId,setStaffId]=useState("");
   const [date,setDate]=useState(new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"}));
@@ -38,6 +49,7 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
     setClients((c as Client[])||[]);setServices((s as Service[])||[]);setStaff((t as Staff[])||[]);setAssignments((a as Assignment[])||[]);
   })()},[open]);
 
+  useEffect(()=>{setServiceId("");setStaffId("");setSlot("");setSlots([])},[category]);
   useEffect(()=>{setStaffId("");setSlot("");setSlots([])},[serviceId]);
   useEffect(()=>{setSlot("");if(!serviceId||!staffId||!date){setSlots([]);return;}(async()=>{
     setLoadingSlots(true);setError(null);
@@ -48,6 +60,7 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
   })()},[serviceId,staffId,date]);
 
   const compatibleStaff=useMemo(()=>staff.filter(s=>assignments.some(a=>a.staff_id===s.id&&a.service_id===serviceId)),[staff,assignments,serviceId]);
+  const categoryServices=useMemo(()=>services.filter(s=>s.category===category),[services,category]);
   const filteredClients=useMemo(()=>{const needle=q.trim().toLowerCase();if(!needle)return clients.slice(0,8);return clients.filter(c=>`${c.first_name} ${c.last_name} ${c.email||""} ${c.phone||""}`.toLowerCase().includes(needle)).slice(0,8)},[clients,q]);
   const client=clients.find(c=>c.id===clientId)||null;
   const service=services.find(s=>s.id===serviceId)||null;
@@ -65,7 +78,7 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
     setLoading(false);
     if(error){setError(error.message);return;}
     setDone(true);
-    setTimeout(()=>{setDone(false);setClientId("");setServiceId("");setStaffId("");setSlot("");setNotes("");onCreated();onClose()},650);
+    setTimeout(()=>{setDone(false);setClientId("");setCategory("hair");setServiceId("");setStaffId("");setSlot("");setNotes("");onCreated();onClose()},650);
   }
 
   if(!open)return null;
@@ -85,9 +98,40 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
         </Step>
 
         <Step n="02" title="Servicio">
-          <select value={serviceId} onChange={e=>setServiceId(e.target.value)} className="w-full rounded-[15px] border border-champagne/35 bg-white/75 px-4 py-3.5 text-[12px] outline-none">
-            <option value="">Seleccionar servicio</option>{services.map(s=><option key={s.id} value={s.id}>{s.name} · {s.duration_minutes} min · {s.price_label}</option>)}
-          </select>
+          <div>
+            <p className="mb-2 text-[8px] uppercase tracking-[0.16em] text-taupe">Categoría</p>
+            <div className="grid grid-cols-3 gap-2">
+              {categoryOrder.filter(cat=>services.some(s=>s.category===cat)).map(cat=>{
+                const meta=categoryMeta[cat]||categoryMeta.hair;
+                const active=category===cat;
+                return <button key={cat} onClick={()=>setCategory(cat)} className={`rounded-[16px] border px-3 py-3 text-left transition-all ${active?meta.active:meta.soft}`}>
+                  <span className={`mb-2 block h-2 w-2 rounded-full ${active?"bg-white/80":meta.dot}`}/>
+                  <span className="block font-serif text-[17px] leading-none">{meta.label}</span>
+                </button>
+              })}
+            </div>
+          </div>
+
+          <div className="mt-4">
+            <p className="mb-2 text-[8px] uppercase tracking-[0.16em] text-taupe">{categoryMeta[category]?.label||"Servicios"}</p>
+            <div className="space-y-2">
+              {categoryServices.map(s=>{
+                const selected=serviceId===s.id;
+                const meta=categoryMeta[category]||categoryMeta.hair;
+                return <button key={s.id} onClick={()=>setServiceId(s.id)} className={`w-full rounded-[17px] border p-4 text-left transition-all ${selected?`${meta.active} shadow-[0_8px_20px_rgba(52,38,31,.08)]`:"border-champagne/25 bg-white/72 hover:bg-white"}`}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div>
+                      <p className="font-serif text-[21px] leading-none">{s.name}</p>
+                      <p className={`mt-2 text-[9px] ${selected?"text-white/70":"text-taupe"}`}>{s.duration_minutes} min · {s.price_label}</p>
+                    </div>
+                    <span className={`grid h-8 w-8 place-items-center rounded-full border ${selected?"border-white/25 bg-white/10":"border-champagne/30 bg-[#FBF8F3] text-mocha"}`}>
+                      <ChevronRight size={14}/>
+                    </span>
+                  </div>
+                </button>
+              })}
+            </div>
+          </div>
         </Step>
 
         <Step n="03" title="Profesional">
