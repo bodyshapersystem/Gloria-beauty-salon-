@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Plus, UserRound, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { NewAppointmentSheet } from "@/components/hub/NewAppointmentSheet";
 
 type View="day"|"week"|"month";
 type Staff={id:string;name:string;photo_url:string|null};
@@ -14,6 +16,8 @@ const statusLabels:Record<string,string>={pending:"Pendiente",confirmed:"Confirm
 const HOURS=[9,10,11,12,13,14,15,16,17];
 
 export default function HubCalendarPage(){
+  const router=useRouter();
+  const searchParams=useSearchParams();
   const [view,setView]=useState<View>("week");
   const [selectedDate,setSelectedDate]=useState(startOfDay(new Date()));
   const [appointments,setAppointments]=useState<Appointment[]>([]);
@@ -21,6 +25,7 @@ export default function HubCalendarPage(){
   const [user,setUser]=useState<HubUser|null>(null);
   const [selected,setSelected]=useState<Appointment|null>(null);
   const [loading,setLoading]=useState(true);
+  const newOpen=searchParams.get("new")==="1";
 
   async function load(){
     setLoading(true);
@@ -80,6 +85,8 @@ export default function HubCalendarPage(){
         </div>
       </div>
     </>}
+
+    <NewAppointmentSheet open={newOpen} onClose={()=>router.replace("/hub/calendar")} onCreated={load}/>
 
     {selected&&<div className="fixed inset-0 z-[90] bg-espresso/35 flex justify-end" onClick={()=>setSelected(null)}><aside className="h-full w-full max-w-[430px] bg-[#FBF8F3] p-6 overflow-y-auto" onClick={e=>e.stopPropagation()}><div className="flex items-start justify-between"><div><p className="text-[8px] uppercase tracking-[0.2em] text-mocha">Cita</p><h2 className="mt-2 font-serif text-[36px] leading-none">{selected.client_name}</h2><span className="mt-3 inline-flex rounded-full bg-[#DCE7D7] px-3 py-1.5 text-[8px] uppercase tracking-[0.1em] text-[#496047]">{statusLabels[selected.status]||selected.status}</span></div><button onClick={()=>setSelected(null)} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35"><X size={19}/></button></div><div className="mt-7 rounded-[20px] border border-champagne/30 bg-white/65 p-5 space-y-4"><Row icon={<CalendarDays size={16}/>} label="Fecha" value={new Date(selected.start_at).toLocaleDateString("es-US",{weekday:"long",month:"short",day:"numeric",timeZone:"America/New_York"})}/><Row icon={<Clock3 size={16}/>} label="Hora" value={`${fmtTime(selected.start_at)} – ${fmtTime(selected.end_at)}`}/><Row icon={<UserRound size={16}/>} label="Profesional" value={selected.staff_name||"Equipo"}/><div className="border-t border-champagne/25 pt-4"><p className="text-[9px] uppercase tracking-[0.16em] text-taupe">Servicio</p><p className="mt-2 font-serif text-[25px]">{selected.service_name||"Cita"}</p></div></div><Link href={isAdmin?"/hub/appointments":"/hub/my-agenda"} className="mt-5 flex items-center justify-center rounded-full bg-[#4A352B] px-5 py-3.5 text-[9px] uppercase tracking-[0.13em] text-ivory">{isAdmin?"Gestionar cita":"Ir a mis citas"}</Link></aside></div>}
   </div>
