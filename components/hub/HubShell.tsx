@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CalendarRange, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X } from "lucide-react";
+import { CalendarDays, CalendarRange, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
@@ -11,12 +11,12 @@ type HubUser={role:"owner"|"admin"|"staff";staff_id:string|null};
 type NavItem={label:string;href:string;icon:any};
 
 const adminNav:NavItem[]=[
-  {label:"Inicio",href:"/hub",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Citas",href:"/hub/appointments",icon:CalendarDays},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Equipo",href:"/hub/team",icon:UserRound},{label:"Servicios",href:"/hub/services",icon:Scissors}
+  {label:"Inicio",href:"/hub",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Citas",href:"/hub/appointments",icon:CalendarDays},{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Equipo",href:"/hub/team",icon:UserRound},{label:"Servicios",href:"/hub/services",icon:Scissors}
 ];
 const staffNav:NavItem[]=[
-  {label:"Inicio",href:"/hub/my-agenda",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Mi Progreso",href:"/hub/progress",icon:TrendingUp}
+  {label:"Inicio",href:"/hub/my-agenda",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Mi Progreso",href:"/hub/progress",icon:TrendingUp}
 ];
-function staffRouteAllowed(pathname:string){if(pathname.startsWith("/hub/calendar")||pathname.startsWith("/hub/my-agenda")||pathname.startsWith("/hub/clients")||pathname.startsWith("/hub/progress")||pathname.startsWith("/hub/profile"))return true;return /^\/hub\/appointments\/[^/]+\/complete$/.test(pathname)}
+function staffRouteAllowed(pathname:string){if(pathname.startsWith("/hub/calendar")||pathname.startsWith("/hub/my-agenda")||pathname.startsWith("/hub/inquiries")||pathname.startsWith("/hub/clients")||pathname.startsWith("/hub/progress")||pathname.startsWith("/hub/profile"))return true;return /^\/hub\/appointments\/[^/]+\/complete$/.test(pathname)}
 
 export function HubShell({children}:{children:React.ReactNode}){
   const [user,setUser]=useState<HubUser|null>(null);
@@ -60,5 +60,5 @@ export function HubShell({children}:{children:React.ReactNode}){
 
 function adminMobile(){return [{label:"Inicio",href:"/hub",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Nueva",action:"new"},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Más",action:"more"}]}
 function staffMobile(){return [{label:"Inicio",href:"/hub/my-agenda",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Nueva",action:"new"},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Más",action:"more"}]}
-function adminMore(){return [{label:"Servicios",href:"/hub/services",icon:Scissors},{label:"Equipo",href:"/hub/team",icon:UserRound},{label:"Configuración",href:"/hub/settings/appointments",icon:Settings},{label:"Mi Perfil",href:"/hub/profile",icon:UserRound}]}
-function staffMore(){return [{label:"Dashboard",href:"/hub/my-agenda",icon:LayoutDashboard},{label:"Nueva cita",href:"/hub/calendar?new=1",icon:Plus},{label:"Mi Progreso",href:"/hub/progress",icon:TrendingUp},{label:"Mi Perfil",href:"/hub/profile",icon:UserRound}]}
+function adminMore(){return [{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Servicios",href:"/hub/services",icon:Scissors},{label:"Equipo",href:"/hub/team",icon:UserRound},{label:"Configuración",href:"/hub/settings/appointments",icon:Settings},{label:"Mi Perfil",href:"/hub/profile",icon:UserRound}]}
+function staffMore(){return [{label:"Dashboard",href:"/hub/my-agenda",icon:LayoutDashboard},{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Nueva cita",href:"/hub/calendar?new=1",icon:Plus},{label:"Mi Progreso",href:"/hub/progress",icon:TrendingUp},{label:"Mi Perfil",href:"/hub/profile",icon:UserRound}]}
