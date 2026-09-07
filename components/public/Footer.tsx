@@ -18,7 +18,7 @@ export function Footer() {
       <div className="mx-auto max-w-[1220px] px-6 py-8 md:px-8 md:py-10">
         <div className="grid gap-7 md:grid-cols-[auto_1fr_auto] md:items-center">
           <div>
-            <Logo className="h-[54px] w-auto brightness-[4] grayscale" />
+            <Logo className="h-[54px] w-auto" />
           </div>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:justify-center">
