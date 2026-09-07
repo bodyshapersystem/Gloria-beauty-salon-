@@ -2,32 +2,151 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Check, ChevronLeft, Save } from "lucide-react";
+import { Check, ChevronLeft, Eye, EyeOff, Save, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 type Appointment={id:string;client_name:string;status:string;start_at:string;service_id:string;staff_id:string;client_id:string;service:{name:string;category:string}|null;staff:{name:string}|null};
-type Field={key:string;label:string;placeholder:string};
-const fields:Record<string,Field[]>={
-  hair:[{key:"tone",label:"Tono / Color",placeholder:"Beige miel / Neutro"},{key:"formula",label:"Fórmula",placeholder:"Fórmula de color / tonalizante / oxidante"},{key:"technique",label:"Técnica",placeholder:"Balayage, mechas, color de raíz..."},{key:"cut",label:"Corte / Largo",placeholder:"Capas, largo, enmarcado de rostro..."},{key:"style",label:"Acabado / Estilo",placeholder:"Ondas suaves, volumen en la raíz..."}],
-  nails:[{key:"shade",label:"Color / Tono",placeholder:"OPI Bubble Bath"},{key:"shape",label:"Forma",placeholder:"Almendra corta"},{key:"service_type",label:"Tipo",placeholder:"Gel, DIP, Aprés, acrílico..."},{key:"design",label:"Diseño / Acabado",placeholder:"Natural, cromado, francesa..."}],
-  brows:[{key:"shape",label:"Forma",placeholder:"Arco suave"},{key:"thickness",label:"Grosor",placeholder:"Natural / definido"},{key:"tone",label:"Tono de Henna",placeholder:"Si aplica"}],
-  lashes:[{key:"style",label:"Estilo",placeholder:"Híbrido"},{key:"effect",label:"Efecto",placeholder:"Ojo de gato / Natural"},{key:"curl",label:"Curvatura",placeholder:"Curva C"},{key:"length",label:"Largo",placeholder:"Largos / mapeo"}],
-  tanning:[{key:"type",label:"Tipo",placeholder:"Express / Regular"},{key:"tone",label:"Tono",placeholder:"Medio / Natural"},{key:"intensity",label:"Intensidad",placeholder:"Claro / Medio / Oscuro"},{key:"development",label:"Tiempo de desarrollo",placeholder:"Tiempo de enjuague recomendado"}],
-  makeup:[{key:"foundation",label:"Base / Tono",placeholder:"Tono + subtono"},{key:"finish",label:"Acabado",placeholder:"Natural / soft glam / full glam"},{key:"eyes",label:"Ojos",placeholder:"Look de ojos"},{key:"lips",label:"Tono de labios",placeholder:"Nude / rosa / rojo..."}],
+type Field={key:string;label:string;placeholder?:string;type?:"text"|"select";options?:string[]};
+type Section={title:string;subtitle:string;fields:Field[]};
+
+const configs:Record<string,Section[]>={
+  color:[
+    {title:"Color de hoy",subtitle:"La fórmula que queremos poder recrear.",fields:[
+      {key:"color_result",label:"Resultado / tono",placeholder:"Beige miel, chocolate frío, copper..."},
+      {key:"technique",label:"Técnica",type:"select",options:["Root color","Full color","Partial highlights","Full highlights","Balayage","Toner / gloss","Correction","Other"]},
+      {key:"formula",label:"Fórmula",placeholder:"Marca + tonos + mezcla"},
+      {key:"developer",label:"Oxidante",placeholder:"10 vol / 20 vol / proporción"},
+      {key:"toner",label:"Matizador / gloss",placeholder:"Tono y tiempo"},
+      {key:"processing_time",label:"Tiempo de proceso",placeholder:"Ej. 35 min"},
+    ]},
+    {title:"Preferencias",subtitle:"Detalles que hacen que el resultado se sienta como ella.",fields:[
+      {key:"warmth_preference",label:"Temperatura favorita",type:"select",options:["Frío","Neutro","Cálido","Depende del look"]},
+      {key:"brightness",label:"Nivel de luminosidad",type:"select",options:["Natural","Medio","Muy luminoso"]},
+      {key:"face_frame",label:"Face frame",placeholder:"Suave / marcado / no quiere"},
+    ]},
+  ],
+  blowdry:[
+    {title:"Su secado ideal",subtitle:"Cómo le gusta salir del salón.",fields:[
+      {key:"finish",label:"Acabado favorito",type:"select",options:["Liso","Ondas suaves","Ondas marcadas","Volumen","Puntas hacia arriba","Puntas hacia adentro"]},
+      {key:"part",label:"Partido",type:"select",options:["Centro","Derecha","Izquierda","Sin preferencia"]},
+      {key:"volume",label:"Volumen",type:"select",options:["Bajo","Natural","Alto"]},
+      {key:"brush_size",label:"Cepillo / técnica",placeholder:"Grande, mediano, round brush..."},
+      {key:"heat_notes",label:"Notas de calor",placeholder:"Sensibilidad, temperatura preferida..."},
+    ]},
+  ],
+  treatment:[
+    {title:"Tratamiento",subtitle:"Qué usamos y cómo respondió el cabello.",fields:[
+      {key:"treatment_type",label:"Tratamiento",type:"select",options:["Hair Botox","Keratin","Hydration","Repair","Protein","Other"]},
+      {key:"brand",label:"Marca / línea",placeholder:"TRUSS..."},
+      {key:"formula",label:"Producto / fórmula",placeholder:"Nombre exacto del producto"},
+      {key:"processing_time",label:"Tiempo de proceso",placeholder:"Ej. 45 min"},
+      {key:"result",label:"Resultado",placeholder:"Más brillo, menos frizz, fibra sellada..."},
+    ]},
+  ],
+  cut:[
+    {title:"Su corte",subtitle:"La forma exacta que le funciona.",fields:[
+      {key:"length",label:"Largo",placeholder:"Clavícula / medio / largo..."},
+      {key:"shape",label:"Forma",placeholder:"Recto, U, V, bob..."},
+      {key:"layers",label:"Capas",type:"select",options:["Sin capas","Suaves","Medias","Marcadas"]},
+      {key:"face_frame",label:"Marco del rostro",placeholder:"Dónde comienza / qué tan marcado"},
+      {key:"bangs",label:"Flequillo",placeholder:"Curtain bangs / recto / no usa"},
+    ]},
+  ],
+  styling:[
+    {title:"Estilismo",subtitle:"El look que podemos repetir.",fields:[
+      {key:"style",label:"Peinado",type:"select",options:["Braids","Waves","Updo","Half-up","Sleek","Ponytail","Other"]},
+      {key:"finish",label:"Acabado",placeholder:"Pulido, messy, soft glam..."},
+      {key:"part",label:"Partido",placeholder:"Centro / lateral"},
+      {key:"hold",label:"Fijación",type:"select",options:["Ligera","Media","Alta"]},
+    ]},
+  ],
+  extensions:[
+    {title:"Extensiones",subtitle:"Todo lo necesario para mantener el match perfecto.",fields:[
+      {key:"extension_type",label:"Tipo",type:"select",options:["Tape-in","Weft","Keratin bond","Clip-in","Other"]},
+      {key:"length",label:"Largo",placeholder:"18 in / 20 in / 22 in"},
+      {key:"color",label:"Color / mezcla",placeholder:"Número, tono o combinación"},
+      {key:"quantity",label:"Cantidad",placeholder:"Gramos / paquetes / tapes"},
+      {key:"placement",label:"Distribución",placeholder:"Laterales, nuca, full head..."},
+      {key:"maintenance_interval",label:"Mantenimiento",placeholder:"Ej. cada 6–8 semanas"},
+    ]},
+  ],
+  nails:[
+    {title:"Su manicure",subtitle:"Pequeños detalles que hacen que se sienta ella.",fields:[
+      {key:"service_type",label:"Técnica",type:"select",options:["Regular","Gel","DIP","Aprés","Polygel","Acrylic"]},
+      {key:"shape",label:"Forma",type:"select",options:["Square","Squoval","Round","Oval","Almond","Coffin","Stiletto"]},
+      {key:"length",label:"Largo",type:"select",options:["Extra short","Short","Medium","Long","XL"]},
+      {key:"color",label:"Color",placeholder:"Marca + nombre / código"},
+      {key:"finish",label:"Acabado",type:"select",options:["Solid","French","Chrome","Cat eye","Glitter","Nail art","Natural"]},
+      {key:"design_notes",label:"Diseño",placeholder:"Detalles que quiera repetir"},
+    ]},
+  ],
+  lashes:[
+    {title:"Mapa de pestañas",subtitle:"Para recrear su mirada sin empezar de cero.",fields:[
+      {key:"lash_type",label:"Tipo",type:"select",options:["Classic","Greek","Hybrid","Mega Volume"]},
+      {key:"effect",label:"Efecto",type:"select",options:["Natural","Cat eye","Doll eye","Wispy","Open eye","Squirrel"]},
+      {key:"curl",label:"Curl",type:"select",options:["B","C","CC","D","L","M","Mixed"]},
+      {key:"length_map",label:"Largos / mapping",placeholder:"8-9-10-11-12..."},
+      {key:"density",label:"Densidad",type:"select",options:["Soft","Medium","Full","Extra full"]},
+      {key:"adhesive_notes",label:"Notas",placeholder:"Sensibilidad, retención, ajustes..."},
+    ]},
+  ],
+  brows:[
+    {title:"Sus cejas",subtitle:"Forma y tono que favorecen su rostro.",fields:[
+      {key:"shape",label:"Shape",type:"select",options:["Soft arch","Defined arch","Straight","Rounded","Natural cleanup"]},
+      {key:"thickness",label:"Grosor",type:"select",options:["Natural","Medium","Defined"]},
+      {key:"tint_color",label:"Color / Henna",placeholder:"Marca + tono"},
+      {key:"waxing",label:"Depilación",type:"select",options:["Wax","Tweezers","Threading","Combination"]},
+      {key:"mapping_notes",label:"Mapping",placeholder:"Puntos o ajustes a recordar"},
+    ]},
+  ],
+  tanning:[{title:"Su glow",subtitle:"El tono que mejor le funciona.",fields:[{key:"type",label:"Tipo",type:"select",options:["Regular","Express"]},{key:"tone",label:"Tono",placeholder:"Natural / golden / bronze"},{key:"intensity",label:"Intensidad",type:"select",options:["Light","Medium","Dark","Extra dark"]},{key:"development",label:"Tiempo de desarrollo",placeholder:"Hora recomendada de enjuague"}]}],
+  makeup:[{title:"Su look",subtitle:"Tonos y acabados que sabemos que le funcionan.",fields:[{key:"foundation",label:"Base / tono",placeholder:"Marca + tono + subtono"},{key:"finish",label:"Acabado",type:"select",options:["Natural","Soft glam","Full glam","Matte","Glowy"]},{key:"eyes",label:"Ojos",placeholder:"Tonos / técnica"},{key:"lashes",label:"Pestaña usada",placeholder:"Modelo / número"},{key:"lips",label:"Labios",placeholder:"Liner + lipstick / gloss"}]}],
+  general:[{title:"Detalles de la visita",subtitle:"Guarda lo que valga la pena recordar.",fields:[{key:"details",label:"Detalles",placeholder:"¿Qué deberíamos recordar?"}]}],
 };
-const categoryLabels:Record<string,string>={hair:"cabello",nails:"uñas",brows:"cejas",lashes:"pestañas",tanning:"bronceado",makeup:"maquillaje",general:"general"};
 
 export default function CompleteVisitPage(){
-  const params=useParams<{id:string}>();const router=useRouter();const [appt,setAppt]=useState<Appointment|null>(null);const [loading,setLoading]=useState(true);const [values,setValues]=useState<Record<string,string>>({});const [summary,setSummary]=useState("");const [maintenance,setMaintenance]=useState("");const [products,setProducts]=useState("");const [visible,setVisible]=useState(true);const [saving,setSaving]=useState(false);const [message,setMessage]=useState<string|null>(null);const [done,setDone]=useState(false);
+  const params=useParams<{id:string}>();const router=useRouter();
+  const [appt,setAppt]=useState<Appointment|null>(null);const [loading,setLoading]=useState(true);const [values,setValues]=useState<Record<string,string>>({});
+  const [summary,setSummary]=useState("");const [maintenance,setMaintenance]=useState("");
+  const [products,setProducts]=useState({shampoo:"",conditioner:"",toner:"",treatment:"",styling:""});
+  const [visible,setVisible]=useState(true);const [saving,setSaving]=useState(false);const [message,setMessage]=useState<string|null>(null);const [done,setDone]=useState(false);
+
   useEffect(()=>{(async()=>{const {data}=await supabase.from("appointments").select("id,client_name,status,start_at,service_id,staff_id,client_id,service:service_id(name,category),staff:staff_id(name)").eq("id",params.id).maybeSingle();setAppt((data as Appointment|null)||null);setLoading(false)})()},[params.id]);
-  const category=appt?.service?.category||"general";const formFields=useMemo(()=>fields[category]||[{key:"details",label:"Detalles del servicio",placeholder:"¿Qué deberíamos recordar?"}],[category]);
-  async function save(){if(!appt)return;setSaving(true);setMessage(null);const details=Object.fromEntries(Object.entries(values).filter(([,v])=>v.trim()).map(([k,v])=>[k,v.trim()]));const productList=products.split(",").map(x=>x.trim()).filter(Boolean);const title=buildTitle(category,details,appt.service?.name||"Visita");const {error}=await supabase.rpc("save_and_complete_appointment",{p_appointment_id:appt.id,p_title:title,p_summary:summary||null,p_details:details,p_client_visible:visible,p_maintenance_notes:maintenance||null,p_products_used:productList});setSaving(false);if(error){setMessage(error.message);return;}setDone(true)}
-  if(loading)return <p className="text-[12px] text-taupe">Cargando visita...</p>;if(!appt)return <div><h1 className="font-serif text-[40px]">Cita no disponible.</h1><p className="mt-3 text-[12px] text-taupe">Puede que no tengas permiso para acceder a esta cita.</p></div>;
-  if(done)return <div className="max-w-[620px] py-8 text-center"><div className="mx-auto h-14 w-14 rounded-full bg-espresso text-ivory flex items-center justify-center"><Check size={24}/></div><h1 className="mt-6 font-serif text-[44px] leading-none">Visita guardada.</h1><p className="mt-4 text-[13px] text-taupe">La cita quedó completada y se actualizó la memoria de la clienta.</p><button onClick={()=>router.push("/hub/my-agenda")} className="mt-7 rounded-full bg-espresso px-6 py-3 text-[9px] uppercase tracking-[0.14em] text-ivory">Volver a Mi Agenda</button></div>;
-  return <div className="max-w-[850px]"><button onClick={()=>router.back()} className="inline-flex items-center gap-1 text-[11px] text-taupe"><ChevronLeft size={14}/>Volver</button><p className="mt-6 text-[10px] uppercase tracking-[0.26em] text-mocha">Actualizar memoria de la clienta</p><h1 className="mt-2 font-serif text-[46px] md:text-[56px] leading-none">Guardar y Completar</h1><p className="mt-3 text-[13px] text-taupe">{appt.client_name} · {appt.service?.name} · {appt.staff?.name}</p>
-    <section className="mt-8 rounded-[28px] border border-champagne/30 bg-white/45 p-6 md:p-8"><div className="flex items-center justify-between gap-4"><div><p className="text-[9px] uppercase tracking-[0.18em] text-mocha">Memoria de {categoryLabels[category]||category}</p><h2 className="mt-2 font-serif text-[32px]">Guarda solo lo que importa para la próxima visita.</h2></div><label className="flex items-center gap-2 text-[11px] text-taupe"><input type="checkbox" checked={visible} onChange={e=>setVisible(e.target.checked)}/> Visible en Access</label></div><div className="mt-6 grid gap-4 md:grid-cols-2">{formFields.map(f=><FieldInput key={f.key} field={f} value={values[f.key]||""} onChange={v=>setValues(x=>({...x,[f.key]:v}))}/>)}</div><div className="mt-5 grid gap-4"><Text label="Resumen para la clienta" value={summary} onChange={setSummary} placeholder="Ejemplo: Balayage miel neutro con mechones suaves enmarcando el rostro."/><Text label="Recomendación de mantenimiento" value={maintenance} onChange={setMaintenance} placeholder="¿Qué debería recordar la clienta o el equipo para el mantenimiento?"/><FieldInput field={{key:"products",label:"Productos usados",placeholder:"Separados por coma: Net Mask, Frizz Zero..."}} value={products} onChange={setProducts}/></div>{message&&<p className="mt-4 text-[12px] text-red-700">{message}</p>}<button disabled={saving} onClick={save} className="mt-7 inline-flex items-center gap-2 rounded-full bg-espresso px-6 py-3 text-[10px] uppercase tracking-[0.14em] text-ivory disabled:opacity-50"><Save size={15}/>{saving?"Guardando...":"Guardar y Completar"}</button></section>
+  const family=useMemo(()=>serviceFamily(appt?.service?.name||"",appt?.service?.category||"general"),[appt?.service?.name,appt?.service?.category]);
+  const sections=configs[family]||configs.general;
+
+  async function save(){if(!appt)return;setSaving(true);setMessage(null);
+    const details={service_family:family,...Object.fromEntries(Object.entries(values).filter(([,v])=>v.trim()).map(([k,v])=>[k,v.trim()]))};
+    const productList=Object.entries(products).filter(([,v])=>v.trim()).map(([type,name])=>({type,name:name.trim()}));
+    const title=buildTitle(family,details,appt.service?.name||"Visita");
+    const {error}=await supabase.rpc("save_and_complete_appointment",{p_appointment_id:appt.id,p_title:title,p_summary:summary||null,p_details:details,p_client_visible:visible,p_maintenance_notes:maintenance||null,p_products_used:productList});
+    setSaving(false);if(error){setMessage(error.message);return;}setDone(true)
+  }
+  if(loading)return <p className="text-[12px] text-taupe">Cargando visita...</p>;
+  if(!appt)return <div><h1 className="font-serif text-[40px]">Cita no disponible.</h1><p className="mt-3 text-[12px] text-taupe">Puede que no tengas permiso para acceder a esta cita.</p></div>;
+  if(done)return <div className="max-w-[620px] mx-auto py-10 text-center"><div className="mx-auto h-14 w-14 rounded-full bg-[#34261F] text-ivory flex items-center justify-center"><Check size={24}/></div><p className="mt-6 text-[9px] uppercase tracking-[.25em] text-mocha">Beauty memory updated</p><h1 className="mt-2 font-serif text-[46px] leading-none">Todo quedó guardado.</h1><p className="mt-4 text-[13px] text-taupe">La cita está completada y el perfil de {appt.client_name} ahora recuerda esta visita.</p><button onClick={()=>router.push("/hub/my-agenda")} className="mt-7 rounded-full bg-[#34261F] px-6 py-3 text-[9px] uppercase tracking-[0.14em] text-ivory">Volver a Mis Citas</button></div>;
+
+  return <div className="max-w-[980px] mx-auto pb-12">
+    <button onClick={()=>router.back()} className="inline-flex items-center gap-1 text-[11px] text-taupe"><ChevronLeft size={14}/>Volver</button>
+    <section className="mt-5 overflow-hidden rounded-[28px] bg-[#34261F] text-ivory shadow-[0_18px_50px_rgba(52,38,31,.12)]">
+      <div className="p-6 md:p-8"><div className="flex items-start justify-between gap-5"><div><p className="text-[9px] uppercase tracking-[.26em] text-champagne">Guardar + Completar</p><h1 className="mt-2 font-serif text-[42px] md:text-[54px] leading-none">{appt.client_name}</h1><p className="mt-3 text-[12px] text-ivory/65">{appt.service?.name} · {appt.staff?.name}</p></div><Sparkles className="text-champagne" size={24}/></div></div>
+      <div className="bg-[#F8F4EE] text-espresso px-6 py-4 flex items-center justify-between gap-4"><div><p className="text-[9px] uppercase tracking-[.18em] text-mocha">Lo que guardes aquí construye su Beauty Profile</p><p className="mt-1 text-[11px] text-taupe">Solo aparecen los campos relevantes para este servicio.</p></div><button onClick={()=>setVisible(v=>!v)} className="flex shrink-0 items-center gap-2 rounded-full border border-champagne/50 bg-white/70 px-3 py-2 text-[9px] text-mocha">{visible?<Eye size={14}/>:<EyeOff size={14}/>} {visible?"Visible para ella":"Solo interno"}</button></div>
+    </section>
+
+    <div className="mt-6 space-y-5">{sections.map((section,idx)=><section key={section.title} className="rounded-[24px] border border-champagne/35 bg-white/70 p-5 md:p-7 shadow-[0_8px_28px_rgba(52,38,31,.04)]"><div className="flex gap-4"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-blush/55 font-serif text-[15px] text-mocha">{idx+1}</span><div><h2 className="font-serif text-[30px] leading-none">{section.title}</h2><p className="mt-2 text-[11px] text-taupe">{section.subtitle}</p></div></div><div className="mt-6 grid gap-4 sm:grid-cols-2">{section.fields.map(f=><BeautyField key={f.key} field={f} value={values[f.key]||""} onChange={v=>setValues(x=>({...x,[f.key]:v}))}/>)}</div></section>)}
+
+      {(["color","blowdry","treatment","cut","styling","extensions"] as string[]).includes(family)&&<section className="rounded-[24px] border border-champagne/35 bg-[#EFE4DC]/45 p-5 md:p-7"><div><p className="text-[9px] uppercase tracking-[.2em] text-mocha">Productos usados hoy</p><h2 className="mt-2 font-serif text-[30px] leading-none">Su rutina, sin adivinar.</h2><p className="mt-2 text-[11px] text-taupe">Guarda solo lo que realmente usamos en ella.</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><ProductField label="Shampoo" value={products.shampoo} onChange={v=>setProducts(p=>({...p,shampoo:v}))}/><ProductField label="Acondicionador" value={products.conditioner} onChange={v=>setProducts(p=>({...p,conditioner:v}))}/><ProductField label="Matizador" value={products.toner} onChange={v=>setProducts(p=>({...p,toner:v}))}/><ProductField label="Tratamiento" value={products.treatment} onChange={v=>setProducts(p=>({...p,treatment:v}))}/><ProductField label="Styling / Finish" value={products.styling} onChange={v=>setProducts(p=>({...p,styling:v}))}/></div></section>}
+
+      <section className="rounded-[24px] border border-champagne/35 bg-white/70 p-5 md:p-7"><h2 className="font-serif text-[30px]">Cierre de visita</h2><div className="mt-5 grid gap-4"><Text label="Resumen bonito para la clienta" value={summary} onChange={setSummary} placeholder="Ej. Hoy dejamos tu balayage beige neutro y terminamos con ondas suaves."/><Text label="Mantenimiento / próxima visita" value={maintenance} onChange={setMaintenance} placeholder="Ej. Matizar en 6–8 semanas. No lavar por 48 h. Próximo mantenimiento de extensiones..."/></div></section>
+    </div>
+
+    {message&&<p className="mt-4 text-[12px] text-red-700">{message}</p>}
+    <div className="sticky bottom-[82px] md:bottom-4 mt-6 rounded-[20px] border border-champagne/35 bg-[#FBF8F3]/95 p-3 backdrop-blur-xl shadow-[0_10px_35px_rgba(52,38,31,.10)]"><button disabled={saving} onClick={save} className="w-full inline-flex items-center justify-center gap-2 rounded-[16px] bg-[#34261F] px-6 py-4 text-[10px] uppercase tracking-[0.14em] text-ivory disabled:opacity-50"><Save size={15}/>{saving?"Guardando...":"Guardar Beauty Profile + Completar cita"}</button></div>
   </div>
 }
-function FieldInput({field,value,onChange}:{field:Field;value:string;onChange:(v:string)=>void}){return <label><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">{field.label}</span><input value={value} onChange={e=>onChange(e.target.value)} placeholder={field.placeholder} className="mt-2 w-full rounded-xl border border-taupe/25 bg-ivory/70 px-3 py-3 text-[12px] outline-none"/></label>}
-function Text({label,value,onChange,placeholder}:{label:string;value:string;onChange:(v:string)=>void;placeholder:string}){return <label><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">{label}</span><textarea rows={3} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} className="mt-2 w-full rounded-xl border border-taupe/25 bg-ivory/70 px-3 py-3 text-[12px] outline-none"/></label>}
-function buildTitle(category:string,d:Record<string,string>,fallback:string){if(category==="hair")return d.tone||d.technique||fallback;if(category==="nails")return [d.shade,d.shape].filter(Boolean).join(" · ")||fallback;if(category==="lashes")return [d.style,d.effect].filter(Boolean).join(" · ")||fallback;if(category==="tanning")return [d.type,d.tone].filter(Boolean).join(" · ")||fallback;return Object.values(d)[0]||fallback}
+
+function BeautyField({field,value,onChange}:{field:Field;value:string;onChange:(v:string)=>void}){return <label><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">{field.label}</span>{field.type==="select"?<select value={value} onChange={e=>onChange(e.target.value)} className="mt-2 w-full rounded-[14px] border border-taupe/20 bg-[#FBF8F3] px-3 py-3.5 text-[12px] outline-none"><option value="">Seleccionar</option>{field.options?.map(o=><option key={o} value={o}>{o}</option>)}</select>:<input value={value} onChange={e=>onChange(e.target.value)} placeholder={field.placeholder} className="mt-2 w-full rounded-[14px] border border-taupe/20 bg-[#FBF8F3] px-3 py-3.5 text-[12px] outline-none focus:border-mocha/45"/>}</label>}
+function ProductField({label,value,onChange}:{label:string;value:string;onChange:(v:string)=>void}){return <label className="rounded-[16px] bg-white/65 p-3"><span className="text-[9px] uppercase tracking-[.14em] text-mocha">{label}</span><input value={value} onChange={e=>onChange(e.target.value)} placeholder="Marca + producto" className="mt-2 w-full bg-transparent text-[12px] outline-none placeholder:text-taupe/55"/></label>}
+function Text({label,value,onChange,placeholder}:{label:string;value:string;onChange:(v:string)=>void;placeholder:string}){return <label><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">{label}</span><textarea rows={3} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} className="mt-2 w-full rounded-[14px] border border-taupe/20 bg-[#FBF8F3] px-3 py-3 text-[12px] outline-none"/></label>}
+function serviceFamily(name:string,category:string){const n=name.toLowerCase();if(category==="nails")return "nails";if(category==="lashes")return "lashes";if(category==="brows")return "brows";if(category==="tanning")return "tanning";if(category==="makeup")return "makeup";if(n.includes("extension"))return "extensions";if(n.includes("blowdry"))return "blowdry";if(n.includes("botox")||n.includes("keratin"))return "treatment";if(n.includes("color")||n.includes("highlight")||n.includes("balayage"))return "color";if(n.includes("cut"))return "cut";if(n.includes("braid"))return "styling";return category==="hair"?"hair":"general"}
+function buildTitle(family:string,d:Record<string,unknown>,fallback:string){const pick=(...keys:string[])=>keys.map(k=>String(d[k]||"")).filter(Boolean).join(" · ");if(family==="color")return pick("color_result","technique")||fallback;if(family==="blowdry")return pick("finish","volume")||fallback;if(family==="nails")return pick("color","shape")||fallback;if(family==="lashes")return pick("lash_type","effect")||fallback;if(family==="brows")return pick("shape","tint_color")||fallback;if(family==="extensions")return pick("extension_type","length","color")||fallback;return pick("style","treatment_type","shape","tone")||fallback}
