@@ -2,16 +2,22 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CalendarDays, ChevronRight, CircleDollarSign, Clock3, Plus, Sparkles, TrendingUp, UserRoundCheck, UsersRound } from "lucide-react";
+import { CalendarDays, ChevronRight, CircleDollarSign, Clock3, Plus, Sparkles, TrendingUp, UsersRound } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 type Appt={id:string;client_name:string;start_at:string;status:string;price_cents:number|null;service:{name:string}|null;staff:{name:string}|null};
 type Metric={client_id:string;segment:string;lifetime_spend:number;completed_visits:number;last_visit:string|null};
 
-const statusLabels:Record<string,string>={pending:"Pendiente",confirmed:"Confirmada",in_progress:"En curso",completed:"Completada",cancelled:"Cancelada",no_show:"No se presentó"};
+const statusLabels:Record<string,string>={pending:"Pendiente",confirmed:"Confirmada",in_progress:"En curso",completed:"Completada",cancelled:"Cancelada",no_show:"No show"};
 
 export default function HubHome(){
-  const [today,setToday]=useState<Appt[]>([]);const [month,setMonth]=useState<Appt[]>([]);const [metrics,setMetrics]=useState<Metric[]>([]);const [ordersValue,setOrdersValue]=useState(0);const [clients,setClients]=useState(0);const [loading,setLoading]=useState(true);
+  const [today,setToday]=useState<Appt[]>([]);
+  const [month,setMonth]=useState<Appt[]>([]);
+  const [metrics,setMetrics]=useState<Metric[]>([]);
+  const [ordersValue,setOrdersValue]=useState(0);
+  const [clients,setClients]=useState(0);
+  const [loading,setLoading]=useState(true);
+
   useEffect(()=>{(async()=>{
     const now=new Date();const startDay=new Date(now);startDay.setHours(0,0,0,0);const endDay=new Date(startDay);endDay.setDate(endDay.getDate()+1);const startMonth=new Date(now.getFullYear(),now.getMonth(),1);const endMonth=new Date(now.getFullYear(),now.getMonth()+1,1);
     const [{data:t},{data:m},{data:v},{data:o},{count:c}]=await Promise.all([
@@ -24,50 +30,84 @@ export default function HubHome(){
     setToday(((t as unknown) as Appt[])||[]);setMonth(((m as unknown) as Appt[])||[]);setMetrics(((v as unknown) as Metric[])||[]);setOrdersValue((((o as unknown) as {total_cents:number}[])||[]).reduce((n,x)=>n+(x.total_cents||0),0));setClients(c||0);setLoading(false);
   })()},[]);
 
-  const completed=month.filter(x=>x.status==="completed");const recordedAppointmentRevenue=completed.reduce((n,x)=>n+(x.price_cents||0),0);const vip=metrics.filter(x=>x.segment==="vip").length;const atRisk=metrics.filter(x=>x.segment==="at_risk").length;const upcoming=today.filter(x=>["pending","confirmed","in_progress"].includes(x.status));const next=upcoming[0]||null;
+  const completed=month.filter(x=>x.status==="completed");
+  const revenue=completed.reduce((n,x)=>n+(x.price_cents||0),0)+ordersValue;
+  const upcoming=today.filter(x=>["pending","confirmed","in_progress"].includes(x.status));
+  const next=upcoming[0]||null;
+  const vip=metrics.filter(x=>x.segment==="vip").length;
+  const atRisk=metrics.filter(x=>x.segment==="at_risk").length;
   const topService=useMemo(()=>{const map=new Map<string,number>();month.filter(x=>x.status!=="cancelled").forEach(x=>{const name=x.service?.name;if(name)map.set(name,(map.get(name)||0)+1)});return [...map.entries()].sort((a,b)=>b[1]-a[1])[0]||null},[month]);
-  const completedPct=month.length?Math.round((completed.length/month.length)*100):0;
 
-  if(loading)return <div className="py-20 text-center"><p className="font-serif text-[30px]">Preparando tu día...</p><p className="mt-2 text-[11px] text-taupe">Cargando Gloria Hub</p></div>;
+  if(loading)return <div className="py-20 text-center"><p className="font-serif text-[30px]">Preparando Gloria Hub...</p></div>;
 
-  return <div>
-    <section className="relative overflow-hidden rounded-[30px] border border-champagne/25 bg-[linear-gradient(135deg,#F3E7DF_0%,#F8F5EF_48%,#EFE4D9_100%)] px-5 py-6 md:px-8 md:py-8">
-      <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full border border-white/60 bg-white/25"/><div className="absolute right-10 bottom-[-70px] h-44 w-44 rounded-full border border-mocha/10"/>
-      <div className="relative flex flex-col xl:flex-row xl:items-end xl:justify-between gap-7">
-        <div><p className="text-[9px] uppercase tracking-[0.28em] text-mocha">Hoy en Gloria</p><h1 className="mt-3 font-serif text-[46px] md:text-[64px] leading-[.92]">Todo lo que necesitas,<br/><span className="italic text-mocha">aquí mismo.</span></h1><p className="mt-4 max-w-[560px] text-[12px] md:text-[13px] leading-relaxed text-taupe">Empieza por hoy. Reserva una clienta, revisa la agenda o entra directo a lo que necesites.</p></div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-2 gap-2 xl:w-[420px]">
-          <Quick href="/hub/calendar?new=1" icon={Plus} label="Nueva cita" dark/><Quick href="/hub/calendar" icon={CalendarDays} label="Ver calendario"/><Quick href="/hub/clients" icon={UsersRound} label="Buscar clienta"/><Quick href="/hub/appointments" icon={Clock3} label="Administrar citas"/>
+  return <div className="pb-4">
+    <section className="relative overflow-hidden rounded-[30px] border border-[#D9C8BC] min-h-[260px] p-6 md:p-8" style={{backgroundImage:"radial-gradient(circle at 78% 12%,rgba(255,255,255,.88),transparent 27%),radial-gradient(circle at 18% 90%,rgba(123,60,72,.12),transparent 35%),linear-gradient(135deg,#FAF5EF 0%,#E8D7CF 58%,#D9C0B5 100%)"}}>
+      <div className="absolute -right-12 bottom-[-60px] h-48 w-72 rotate-[-18deg] rounded-[50%] bg-[#7B3C48]/15 blur-3xl"/>
+      <div className="relative grid gap-8 xl:grid-cols-[1fr_430px] xl:items-end">
+        <div>
+          <p className="text-[9px] uppercase tracking-[.28em] text-mocha">Gloria Hub</p>
+          <h1 className="mt-3 font-serif text-[50px] md:text-[68px] leading-[.9]">Hola, Gloria.<br/><span className="italic text-[#7B3C48]">Tu salón, más simple.</span></h1>
+          <p className="mt-4 max-w-[520px] text-[11px] leading-relaxed text-taupe">Agenda, clientas, equipo y números importantes, todo en un solo lugar.</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <HeroCard href="/hub/calendar?new=1" label="Nueva cita" icon={<Plus size={18}/>} tone="wine"/>
+          <HeroCard href="/hub/calendar" label="Calendario" icon={<CalendarDays size={18}/>} tone="mocha"/>
+          <HeroCard href="/hub/clients" label="Clientas" icon={<UsersRound size={18}/>} tone="dust"/>
+          <HeroCard href="/hub/team" label="Equipo" icon={<Sparkles size={18}/>} tone="nude"/>
         </div>
       </div>
     </section>
 
-    <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-      <MetricCard icon={CalendarDays} label="Hoy" value={String(upcoming.length)} sub={upcoming.length===1?"cita en la agenda":"citas en la agenda"}/>
-      <MetricCard icon={UsersRound} label="Clientas" value={String(clients)} sub="perfiles en Gloria Access"/>
-      <MetricCard icon={UserRoundCheck} label="Completadas" value={`${completedPct}%`} sub={`${completed.length} de ${month.length} reservas este mes`}/>
-      <MetricCard icon={CircleDollarSign} label="Registrado este mes" value={money(recordedAppointmentRevenue+ordersValue)} sub="citas + shop, montos registrados"/>
+    <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
+      <StatCard value={String(upcoming.length)} label="Citas hoy" tone="cream"/>
+      <StatCard value={String(clients)} label="Clientas" tone="dust"/>
+      <StatCard value={money(revenue)} label="Generado este mes" tone="wine"/>
+      <StatCard value={topService?.[0]||"—"} label="Servicio top" tone="mocha" small/>
     </div>
 
-    <div className="mt-5 grid gap-5 xl:grid-cols-[1.35fr_.85fr]">
-      <section className="rounded-[28px] border border-champagne/25 bg-white/55 p-5 md:p-6">
-        <div className="flex items-center justify-between gap-4"><div><p className="text-[8px] uppercase tracking-[0.22em] text-mocha">Tu día</p><h2 className="mt-2 font-serif text-[34px] leading-none">El flujo de hoy</h2></div><Link href="/hub/calendar" className="rounded-full border border-champagne/40 px-4 py-2 text-[9px] uppercase tracking-[0.12em] text-mocha">Calendario completo</Link></div>
-        {next&&<div className="mt-5 rounded-[22px] bg-espresso p-5 text-ivory"><div className="flex items-start justify-between gap-4"><div><p className="text-[8px] uppercase tracking-[0.18em] text-champagne">Sigue · {time(next.start_at)}</p><p className="mt-2 font-serif text-[30px] leading-none">{next.client_name}</p><p className="mt-2 text-[11px] text-ivory/70">{next.service?.name||"Cita"} · {next.staff?.name||"Equipo"}</p></div><Status value={next.status}/></div><Link href="/hub/appointments" className="mt-5 inline-flex items-center gap-2 text-[9px] uppercase tracking-[0.14em] text-champagne">Ver cita <ChevronRight size={14}/></Link></div>}
-        <div className="mt-3 space-y-2">{upcoming.length?upcoming.slice(next?1:0,6).map(a=><Link key={a.id} href="/hub/appointments" className="group flex items-center gap-3 rounded-[18px] border border-champagne/20 bg-ivory/45 px-4 py-3 transition hover:bg-blush/20"><div className="grid h-11 w-14 place-items-center rounded-[13px] bg-white/70 text-[11px] font-medium text-mocha">{time(a.start_at)}</div><div className="min-w-0 flex-1"><p className="font-serif text-[21px] leading-none truncate">{a.client_name}</p><p className="mt-1 text-[10px] text-taupe truncate">{a.service?.name||"Cita"} · {a.staff?.name||"Equipo"}</p></div><Status value={a.status}/><ChevronRight size={15} className="text-taupe group-hover:text-mocha"/></Link>):<EmptyAgenda/>}</div>
+    <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_.75fr]">
+      <section className="rounded-[28px] border border-[#DED0C6] bg-[#FCF9F5] p-5 md:p-6 shadow-[0_12px_34px_rgba(52,38,31,.05)]">
+        <div className="flex items-center justify-between gap-3">
+          <div><p className="text-[8px] uppercase tracking-[.2em] text-mocha">Hoy</p><h2 className="mt-1 font-serif text-[34px]">El flujo del salón</h2></div>
+          <Link href="/hub/calendar" className="rounded-full border border-[#D8C8BC] px-4 py-2 text-[8px] uppercase tracking-[.12em] text-mocha">Ver calendario</Link>
+        </div>
+
+        {next&&<div className="mt-5 relative overflow-hidden rounded-[24px] p-5 text-white" style={{backgroundImage:"radial-gradient(circle at 82% 18%,rgba(255,220,216,.18),transparent 28%),repeating-radial-gradient(ellipse at 30% 40%,rgba(255,255,255,.045) 0 1px,transparent 2px 10px),linear-gradient(135deg,#7A3C47,#4A2C2F)"}}>
+          <p className="text-[8px] uppercase tracking-[.2em] text-[#EFD8D5]">Sigue · {time(next.start_at)}</p>
+          <div className="mt-3 flex items-end justify-between gap-4"><div><p className="font-serif text-[32px]">{next.client_name}</p><p className="mt-1 text-[10px] text-white/70">{next.service?.name||"Cita"} · {next.staff?.name||"Equipo"}</p></div><Status value={next.status}/></div>
+        </div>}
+
+        <div className="mt-3 space-y-2">
+          {upcoming.length?upcoming.slice(next?1:0,6).map(a=><Link key={a.id} href="/hub/appointments" className="group flex items-center gap-3 rounded-[18px] border border-[#E4D7CD] bg-[#F8F1EB] px-4 py-3 hover:bg-[#F2E4DE]">
+            <div className="grid h-11 w-14 place-items-center rounded-[13px] bg-white/85 text-[10px] font-medium text-mocha">{time(a.start_at)}</div>
+            <div className="min-w-0 flex-1"><p className="font-serif text-[20px] truncate">{a.client_name}</p><p className="mt-1 text-[9px] text-taupe truncate">{a.service?.name||"Cita"} · {a.staff?.name||"Equipo"}</p></div>
+            <Status value={a.status}/><ChevronRight size={14} className="text-taupe"/>
+          </Link>):<div className="rounded-[20px] border border-dashed border-[#D8C8BC] px-5 py-8 text-center"><p className="font-serif text-[27px]">Tu día está libre.</p><Link href="/hub/calendar?new=1" className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#4A352B] px-4 py-2.5 text-[8px] uppercase tracking-[.12em] text-white"><Plus size={13}/> Agregar cita</Link></div>}
+        </div>
       </section>
 
       <div className="space-y-5">
-        <section className="rounded-[28px] border border-champagne/25 bg-white/55 p-5 md:p-6"><div className="flex items-center gap-2 text-mocha"><Sparkles size={16}/><p className="text-[8px] uppercase tracking-[0.2em]">Necesita tu atención</p></div><div className="mt-5 space-y-2"><Attention value={atRisk} label="Clientas en riesgo" note="Perfecto para un toque personal de rebooking" href="/hub/clients"/><Attention value={vip} label="Clientas VIP" note="Tus relaciones de más valor" href="/hub/clients"/><Attention value={topService?.[1]||0} label={topService?topService[0]:"Servicio top"} note="El servicio más reservado este mes" href="/hub/appointments"/></div></section>
-        <section className="rounded-[28px] bg-[linear-gradient(145deg,#6B4F43,#2E2724)] p-6 text-ivory"><TrendingUp size={18} className="text-champagne"/><p className="mt-4 text-[8px] uppercase tracking-[0.2em] text-champagne">Este mes</p><p className="mt-2 font-serif text-[36px] leading-none">{month.length} reservas</p><div className="mt-5 grid grid-cols-2 gap-2"><MiniStat label="Completadas" value={completed.length}/><MiniStat label="Canceladas" value={month.filter(x=>x.status==="cancelled").length}/><MiniStat label="No show" value={month.filter(x=>x.status==="no_show").length}/><MiniStat label="Activas" value={month.filter(x=>["pending","confirmed","in_progress"].includes(x.status)).length}/></div></section>
+        <section className="relative overflow-hidden rounded-[28px] border border-[#D9C7BB] bg-[#EAD7D2] p-6">
+          <div className="absolute -right-10 -top-8 h-32 w-32 rounded-full bg-white/55 blur-xl"/>
+          <p className="relative text-[8px] uppercase tracking-[.2em] text-[#7B3C48]">Necesita tu atención</p>
+          <div className="relative mt-5 space-y-3"><Alert value={atRisk} label="Clientas para rebooking"/><Alert value={vip} label="Clientas VIP"/><Alert value={month.filter(x=>x.status==="cancelled").length} label="Cancelaciones este mes"/></div>
+        </section>
+
+        <section className="relative overflow-hidden rounded-[28px] p-6 text-white" style={{backgroundImage:"radial-gradient(circle at 25% 20%,rgba(255,236,225,.14),transparent 28%),repeating-radial-gradient(ellipse at 70% 50%,rgba(255,255,255,.04) 0 1px,transparent 2px 12px),linear-gradient(135deg,#5B4036,#2F2522)"}}>
+          <TrendingUp size={18} className="text-[#E4C6B5]"/>
+          <p className="mt-4 text-[8px] uppercase tracking-[.2em] text-[#E4C6B5]">Este mes</p>
+          <p className="mt-2 font-serif text-[40px]">{month.length} reservas</p>
+          <div className="mt-5 grid grid-cols-2 gap-2"><Mini label="Completadas" value={String(completed.length)}/><Mini label="Activas" value={String(month.filter(x=>["pending","confirmed","in_progress"].includes(x.status)).length)}/><Mini label="Canceladas" value={String(month.filter(x=>x.status==="cancelled").length)}/><Mini label="No show" value={String(month.filter(x=>x.status==="no_show").length)}/></div>
+        </section>
       </div>
     </div>
   </div>
 }
 
-function Quick({href,icon:Icon,label,dark=false}:{href:string;icon:any;label:string;dark?:boolean}){return <Link href={href} className={`group flex min-h-[82px] flex-col justify-between rounded-[18px] border p-4 transition hover:-translate-y-0.5 ${dark?"border-espresso bg-espresso text-ivory":"border-champagne/30 bg-white/60 text-espresso"}`}><Icon size={18} className={dark?"text-champagne":"text-mocha"}/><div className="flex items-end justify-between gap-2"><span className="text-[11px] leading-tight">{label}</span><ChevronRight size={14} className="opacity-60 group-hover:translate-x-0.5 transition"/></div></Link>}
-function MetricCard({icon:Icon,label,value,sub}:{icon:any;label:string;value:string;sub:string}){return <div className="rounded-[22px] border border-champagne/25 bg-white/50 p-5"><div className="flex items-center justify-between"><span className="grid h-9 w-9 place-items-center rounded-[11px] bg-blush/40 text-mocha"><Icon size={16}/></span><span className="text-[8px] uppercase tracking-[0.18em] text-taupe">{label}</span></div><p className="mt-5 font-serif text-[34px] leading-none">{value}</p><p className="mt-2 text-[10px] leading-relaxed text-taupe">{sub}</p></div>}
-function Attention({value,label,note,href}:{value:number;label:string;note:string;href:string}){return <Link href={href} className="group flex items-center gap-3 rounded-[16px] border border-champagne/20 bg-ivory/40 px-3 py-3"><span className="grid h-10 w-10 place-items-center rounded-[12px] bg-blush/40 font-serif text-[21px] text-mocha">{value}</span><span className="min-w-0 flex-1"><span className="block text-[12px]">{label}</span><span className="mt-0.5 block text-[9px] text-taupe">{note}</span></span><ChevronRight size={14} className="text-taupe group-hover:text-mocha"/></Link>}
-function MiniStat({label,value}:{label:string;value:number}){return <div className="rounded-[14px] border border-ivory/10 bg-white/5 p-3"><p className="text-[8px] uppercase tracking-[0.14em] text-ivory/55">{label}</p><p className="mt-1 font-serif text-[24px] text-champagne">{value}</p></div>}
-function EmptyAgenda(){return <div className="rounded-[20px] border border-dashed border-champagne/45 px-5 py-8 text-center"><p className="font-serif text-[27px]">Tu día está libre.</p><p className="mt-2 text-[10px] text-taupe">No hay citas activas programadas para hoy.</p><Link href="/hub/calendar?new=1" className="mt-4 inline-flex items-center gap-2 rounded-full bg-espresso px-4 py-2.5 text-[9px] uppercase tracking-[0.12em] text-ivory"><Plus size={13}/> Agregar cita</Link></div>}
-function Status({value}:{value:string}){return <span className="inline-flex w-fit rounded-full border border-champagne/30 bg-ivory/10 px-2.5 py-1 text-[8px] uppercase tracking-[0.09em] text-current">{statusLabels[value]||value}</span>}
+function HeroCard({href,label,icon,tone}:{href:string;label:string;icon:React.ReactNode;tone:"wine"|"mocha"|"dust"|"nude"}){const style={wine:"linear-gradient(135deg,#783A47,#4B2830)",mocha:"linear-gradient(135deg,#6B4F43,#34261F)",dust:"radial-gradient(circle at 75% 20%,rgba(255,255,255,.8),transparent 28%),linear-gradient(135deg,#EBCFD0,#D7B5B9)",nude:"radial-gradient(circle at 70% 20%,rgba(255,255,255,.95),transparent 28%),linear-gradient(135deg,#F4E8DD,#DFC7B7)"}[tone];const dark=tone==="wine"||tone==="mocha";return <Link href={href} className={`relative min-h-[112px] overflow-hidden rounded-[22px] border border-white/35 p-4 shadow-[0_10px_24px_rgba(52,38,31,.07)] ${dark?"text-white":"text-[#4A352B]"}`} style={{backgroundImage:style}}><span className="relative grid h-9 w-9 place-items-center rounded-full bg-white/15">{icon}</span><p className="relative mt-6 font-serif text-[22px]">{label}</p></Link>}
+function StatCard({value,label,tone,small=false}:{value:string;label:string;tone:"cream"|"dust"|"wine"|"mocha";small?:boolean}){const styles={cream:"linear-gradient(135deg,#F8F1EA,#EEDFD5)",dust:"linear-gradient(135deg,#EFD8D5,#D8B8BA)",wine:"linear-gradient(135deg,#7B3C48,#512D35)",mocha:"linear-gradient(135deg,#6B4F43,#3D2C27)"};const dark=tone==="wine"||tone==="mocha";return <div className={`rounded-[22px] border border-white/35 p-4 shadow-[0_8px_24px_rgba(52,38,31,.05)] ${dark?"text-white":"text-[#4A352B]"}`} style={{backgroundImage:styles[tone]}}><p className={`font-serif leading-none ${small?"text-[18px]":"text-[30px]"}`}>{value}</p><p className="mt-2 text-[8px] uppercase tracking-[.14em] opacity-65">{label}</p></div>}
+function Alert({value,label}:{value:number;label:string}){return <Link href="/hub/clients" className="flex items-center gap-3 rounded-[16px] bg-white/55 px-4 py-3"><span className="grid h-10 w-10 place-items-center rounded-full bg-[#7B3C48] font-serif text-[20px] text-white">{value}</span><span className="flex-1 text-[10px] text-mocha">{label}</span><ChevronRight size={14} className="text-taupe"/></Link>}
+function Mini({label,value}:{label:string;value:string}){return <div className="rounded-[14px] border border-white/10 bg-white/5 p-3"><p className="text-[7px] uppercase tracking-[.12em] text-white/55">{label}</p><p className="mt-1 font-serif text-[24px]">{value}</p></div>}
+function Status({value}:{value:string}){return <span className="rounded-full border border-current/20 bg-white/10 px-2.5 py-1 text-[7px] uppercase tracking-[.08em]">{statusLabels[value]||value}</span>}
 function money(c:number){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format((c||0)/100)}
 function time(v:string){return new Date(v).toLocaleTimeString("es-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})}
