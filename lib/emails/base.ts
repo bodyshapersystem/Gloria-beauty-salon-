@@ -22,6 +22,12 @@ export const SITE = {
   address: "1130 SW 8th St, Miami, FL 33130",
   phone: "+1 (305) 781-5456",
   domain: "gloriabeautysalonmiami.com",
+  // Master "from" address for every automated email in the Gloria ecosystem
+  // (booking confirmations/reminders, Hub notifications, Access invites,
+  // rebooking/birthday sends). Sending-only — no inbox behind it, so never
+  // present this as a reply-to or support address.
+  fromAddress: "reservas@gloriabeautysalonmiami.com",
+  fromName: "Gloria Beauty Salon",
   logoUrl: "https://www.gloriabeautysalonmiami.com/images/gloria/logo/gloria-logo.png",
 };
 

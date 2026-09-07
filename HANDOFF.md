@@ -192,6 +192,11 @@ Never place secret keys/tokens in this file or chat.
 
 ## Deferred Until Core Product Is Stable
 - Resend/email automations
+  - Master sending address decided: reservas@gloriabeautysalonmiami.com
+    (source of truth: lib/emails/base.ts SITE.fromAddress). Sending-only,
+    no inbox — never present as a reply-to/support address.
+  - Domain (gloriabeautysalonmiami.com) still needs to be verified inside
+    Resend (SPF/DKIM/DMARC DNS records) before any send will work.
 - Access invitation automation
 - reminder/rebooking/birthday automation delivery
 - Stripe deposit automation
