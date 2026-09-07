@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import { CalendarDays, Mail, Pencil, Phone, Power, Scissors, X } from "lucide-react";
+import { CalendarDays, ImagePlus, Mail, Pencil, Phone, Power, Scissors, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 type Staff={id:string;name:string;role:string;photo_url:string|null;email:string|null;phone:string|null;active:boolean};
@@ -55,7 +54,7 @@ export default function TeamPage(){
     <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {stats.map(({staff:s,services:ss,appointments})=><article key={s.id} className="group overflow-hidden rounded-[26px] border border-champagne/25 bg-white/75 shadow-[0_10px_30px_rgba(52,38,31,.04)]">
         <div className="relative h-[210px] bg-[#EADFD7]">
-          {s.photo_url?<Image src={s.photo_url} alt={s.name} fill className="object-cover object-top"/>:<div className="grid h-full place-items-center font-serif text-[64px] text-mocha/35">{s.name.charAt(0)}</div>}
+          {s.photo_url?<img src={s.photo_url} alt={s.name} className="absolute inset-0 h-full w-full object-cover object-center"/>:<div className="grid h-full place-items-center font-serif text-[64px] text-mocha/35">{s.name.charAt(0)}</div>}
           <div className="absolute inset-0 bg-gradient-to-t from-[#34261F]/70 via-transparent to-transparent"/>
           <div className="absolute bottom-4 left-4 right-4 text-ivory"><p className="text-[8px] uppercase tracking-[.2em] text-champagne">{s.role}</p><h2 className="mt-1 font-serif text-[32px] leading-none">{s.name}</h2></div>
           <button onClick={()=>setEditing(s)} className="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-[#FBF8F3]/90 text-mocha shadow-sm" aria-label={`Editar ${s.name}`}><Pencil size={16}/></button>
@@ -90,17 +89,98 @@ export default function TeamPage(){
 }
 
 function EditTeamMember({staff,services,selectedIds,onClose,onSaved}:{staff:Staff;services:Service[];selectedIds:string[];onClose:()=>void;onSaved:()=>void}){
-  const [name,setName]=useState(staff.name);const [role,setRole]=useState(staff.role);const [email,setEmail]=useState(staff.email||"");const [phone,setPhone]=useState(staff.phone||"");const [photo,setPhoto]=useState(staff.photo_url||"");const [active,setActive]=useState(staff.active);const [ids,setIds]=useState<string[]>(selectedIds);const [saving,setSaving]=useState(false);const [error,setError]=useState<string|null>(null);
+  const [name,setName]=useState(staff.name);
+  const [role,setRole]=useState(staff.role);
+  const [email,setEmail]=useState(staff.email||"");
+  const [phone,setPhone]=useState(staff.phone||"");
+  const [photo,setPhoto]=useState(staff.photo_url||"");
+  const [photoFile,setPhotoFile]=useState<File|null>(null);
+  const [preview,setPreview]=useState(staff.photo_url||"");
+  const [zoom,setZoom]=useState(1);
+  const [positionY,setPositionY]=useState(50);
+  const [active,setActive]=useState(staff.active);
+  const [ids,setIds]=useState<string[]>(selectedIds);
+  const [saving,setSaving]=useState(false);
+  const [error,setError]=useState<string|null>(null);
+
   function flip(id:string){setIds(v=>v.includes(id)?v.filter(x=>x!==id):[...v,id])}
-  async function save(){setSaving(true);setError(null);const {error:e1}=await supabase.rpc("hub_update_staff_profile",{p_staff_id:staff.id,p_name:name,p_role:role,p_email:email||null,p_phone:phone||null,p_photo_url:photo||null,p_active:active});if(e1){setSaving(false);setError(e1.message);return;}const {error:e2}=await supabase.rpc("hub_set_staff_services",{p_staff_id:staff.id,p_service_ids:ids});setSaving(false);if(e2){setError(e2.message);return;}onSaved()}
+
+  function choosePhoto(file?:File){
+    if(!file)return;
+    if(!file.type.startsWith("image/")){setError("Selecciona una imagen.");return;}
+    if(file.size>5*1024*1024){setError("La foto debe pesar menos de 5 MB.");return;}
+    setError(null);
+    setPhotoFile(file);
+    setZoom(1);
+    setPositionY(50);
+    const url=URL.createObjectURL(file);
+    setPreview(url);
+  }
+
+  async function cropPhoto(file:File){
+    const src=URL.createObjectURL(file);
+    try{
+      const img=await new Promise<HTMLImageElement>((resolve,reject)=>{const el=new window.Image();el.onload=()=>resolve(el);el.onerror=reject;el.src=src});
+      const canvas=document.createElement("canvas");canvas.width=900;canvas.height=900;
+      const ctx=canvas.getContext("2d");if(!ctx)throw new Error("No se pudo preparar la foto.");
+      const base=Math.max(canvas.width/img.width,canvas.height/img.height);
+      const scale=base*zoom;
+      const dw=img.width*scale,dh=img.height*scale;
+      const x=(canvas.width-dw)/2;
+      const overflow=Math.max(0,dh-canvas.height);
+      const y=-(overflow*(positionY/100));
+      ctx.drawImage(img,x,y,dw,dh);
+      return await new Promise<Blob>((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error("No se pudo recortar la foto.")),"image/jpeg",.9));
+    } finally {URL.revokeObjectURL(src)}
+  }
+
+  async function uploadPhoto(){
+    if(!photoFile)return photo||null;
+    const blob=await cropPhoto(photoFile);
+    const path=`${staff.id}/profile-${Date.now()}.jpg`;
+    const {error}=await supabase.storage.from("staff-photos").upload(path,blob,{contentType:"image/jpeg",upsert:false});
+    if(error)throw error;
+    const {data}=supabase.storage.from("staff-photos").getPublicUrl(path);
+    return data.publicUrl;
+  }
+
+  async function save(){
+    setSaving(true);setError(null);
+    try{
+      const uploaded=await uploadPhoto();
+      const {error:e1}=await supabase.rpc("hub_update_staff_profile",{p_staff_id:staff.id,p_name:name,p_role:role,p_email:email||null,p_phone:phone||null,p_photo_url:uploaded,p_active:active});
+      if(e1)throw e1;
+      const {error:e2}=await supabase.rpc("hub_set_staff_services",{p_staff_id:staff.id,p_service_ids:ids});
+      if(e2)throw e2;
+      onSaved();
+    }catch(e:any){setError(e?.message||"No pudimos guardar los cambios.");}
+    finally{setSaving(false)}
+  }
+
   const grouped=useMemo(()=>Array.from(new Set(services.map(s=>s.category))).map(cat=>[cat,services.filter(s=>s.category===cat)] as const),[services]);
+
   return <div className="fixed inset-0 z-[100] bg-espresso/45 flex justify-end" onClick={onClose}><aside className="h-full w-full max-w-[560px] overflow-y-auto bg-[#FBF8F3] p-6" onClick={e=>e.stopPropagation()}>
     <div className="flex items-start justify-between"><div><p className="text-[8px] uppercase tracking-[.22em] text-mocha">Editar equipo</p><h2 className="mt-2 font-serif text-[36px]">{staff.name}</h2></div><button onClick={onClose} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35"><X size={18}/></button></div>
-    <div className="mt-6 grid gap-3 sm:grid-cols-2"><Field label="Nombre" value={name} set={setName}/><Field label="Especialidad / Rol" value={role} set={setRole}/><Field label="Email" value={email} set={setEmail} type="email"/><Field label="Teléfono" value={phone} set={setPhone} type="tel"/><div className="sm:col-span-2"><Field label="Foto (ruta o URL)" value={photo} set={setPhoto}/></div></div>
+
+    <section className="mt-6 rounded-[22px] border border-champagne/30 bg-white/65 p-4">
+      <div className="flex items-center justify-between gap-3"><div><p className="text-[8px] uppercase tracking-[.18em] text-taupe">Foto de perfil</p><p className="mt-1 font-serif text-[22px]">Encuadre</p></div><label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#4A352B] px-4 py-2.5 text-[8px] uppercase tracking-[.11em] text-ivory"><ImagePlus size={13}/>Adjuntar foto<input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e=>choosePhoto(e.target.files?.[0])}/></label></div>
+      <div className="mt-4 mx-auto relative aspect-square w-full max-w-[300px] overflow-hidden rounded-[24px] bg-[#EADFD7]">
+        {preview?<img src={preview} alt="Preview" className="absolute inset-0 h-full w-full object-cover" style={{transform:`scale(${zoom})`,objectPosition:`50% ${positionY}%`}}/>:<div className="grid h-full place-items-center font-serif text-[60px] text-mocha/30">{name.charAt(0)}</div>}
+        <div className="pointer-events-none absolute inset-0 rounded-[24px] ring-1 ring-inset ring-white/45"/>
+      </div>
+      {preview&&<div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <label><span className="mb-1.5 block text-[8px] uppercase tracking-[.14em] text-taupe">Zoom</span><input type="range" min="1" max="1.8" step=".02" value={zoom} onChange={e=>setZoom(Number(e.target.value))} className="w-full accent-[#6B4F43]"/></label>
+        <label><span className="mb-1.5 block text-[8px] uppercase tracking-[.14em] text-taupe">Subir / bajar encuadre</span><input type="range" min="0" max="100" step="1" value={positionY} onChange={e=>setPositionY(Number(e.target.value))} className="w-full accent-[#6B4F43]"/></label>
+      </div>}
+      <p className="mt-3 text-[9px] leading-relaxed text-taupe">La foto se guarda cuadrada y centrada para que no se corte mal en las tarjetas.</p>
+    </section>
+
+    <div className="mt-6 grid gap-3 sm:grid-cols-2"><Field label="Nombre" value={name} set={setName}/><Field label="Especialidad / Rol" value={role} set={setRole}/><Field label="Email" value={email} set={setEmail} type="email"/><Field label="Teléfono" value={phone} set={setPhone} type="tel"/></div>
     <label className="mt-4 flex items-center gap-2 text-[11px] text-mocha"><input type="checkbox" checked={active} onChange={e=>setActive(e.target.checked)}/> Profesional activa</label>
     <div className="mt-6"><p className="text-[8px] uppercase tracking-[.18em] text-taupe">Servicios que puede realizar</p><div className="mt-3 space-y-4">{grouped.map(([cat,list])=><div key={cat}><p className="font-serif text-[20px] capitalize">{cat}</p><div className="mt-2 flex flex-wrap gap-2">{list.map(s=><button type="button" key={s.id} onClick={()=>flip(s.id)} className={`rounded-full border px-3 py-2 text-[8px] ${ids.includes(s.id)?"border-mocha bg-[#4A352B] text-ivory":"border-champagne/35 bg-white/70 text-mocha"}`}>{s.name}</button>)}</div></div>)}</div></div>
     {error&&<p className="mt-4 text-[10px] text-red-700">{error}</p>}
     <button disabled={saving||!name.trim()||!role.trim()} onClick={save} className="mt-7 w-full rounded-full bg-[#4A352B] px-5 py-4 text-[9px] uppercase tracking-[.14em] text-ivory disabled:opacity-40">{saving?"Guardando…":"Guardar cambios"}</button>
   </aside></div>
 }
+
 function Field({label,value,set,type="text"}:{label:string;value:string;set:(v:string)=>void;type?:string}){return <label><span className="mb-1.5 block text-[8px] uppercase tracking-[.15em] text-taupe">{label}</span><input type={type} value={value} onChange={e=>set(e.target.value)} className="w-full rounded-[14px] border border-champagne/35 bg-white/75 px-3.5 py-3 text-[12px] outline-none"/></label>}
