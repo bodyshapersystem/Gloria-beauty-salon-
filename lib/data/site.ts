@@ -21,4 +21,5 @@ export const navLinks = [
   { label: "Equipo", href: "/equipo" },
   { label: "Shop", href: "/shop" },
   { label: "Contacto", href: "/#contacto" },
+  { label: "Hub Access", href: "/hub-login" },
 ];
