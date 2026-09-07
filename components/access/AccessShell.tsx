@@ -59,11 +59,14 @@ const nav = [
   { label: "Profile", href: "/access/profile", icon: UserRound },
 ];
 
+const publicAccessRoutes = new Set(["/access/login", "/access/create-account"]);
+
 export function AccessShell({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<ClientProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const isPublicAuthRoute = publicAccessRoutes.has(pathname);
 
   async function refreshProfile() {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -71,7 +74,7 @@ export function AccessShell({ children }: { children: React.ReactNode }) {
     if (!user) {
       setProfile(null);
       setLoading(false);
-      router.replace("/access/login");
+      if (!isPublicAuthRoute) router.replace("/access/login");
       return;
     }
 
@@ -86,23 +89,42 @@ export function AccessShell({ children }: { children: React.ReactNode }) {
       setProfile(null);
       setLoading(false);
       if (data?.access_status === "disabled") await supabase.auth.signOut();
-      router.replace("/access/login");
+      if (!isPublicAuthRoute) router.replace("/access/login");
       return;
     }
 
     setProfile(data as ClientProfile);
     setLoading(false);
+
+    if (isPublicAuthRoute) {
+      router.replace("/access");
+    }
   }
 
   useEffect(() => {
-    refreshProfile();
+    if (isPublicAuthRoute) {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session) {
+          refreshProfile();
+        } else {
+          setLoading(false);
+        }
+      });
+    } else {
+      refreshProfile();
+    }
+
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) router.replace("/access/login");
+      if (!session && !isPublicAuthRoute) router.replace("/access/login");
     });
     return () => listener.subscription.unsubscribe();
-  }, []);
+  }, [pathname]);
 
   const value = useMemo(() => ({ profile, loading, refreshProfile }), [profile, loading]);
+
+  if (isPublicAuthRoute && !profile && !loading) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
