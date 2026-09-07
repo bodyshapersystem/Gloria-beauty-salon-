@@ -17,6 +17,7 @@ export const navLinks = [
   { label: "Inicio", href: "/" },
   { label: "Servicios", href: "/servicios" },
   { label: "Galería", href: "/galeria" },
+  { label: "Memberships", href: "/memberships" },
   { label: "Sobre Gloria", href: "/#sobre" },
   { label: "Equipo", href: "/equipo" },
   { label: "Shop", href: "/shop" },
