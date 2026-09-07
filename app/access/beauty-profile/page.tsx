@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, LockKeyhole, ShoppingBag, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronRight, LockKeyhole, ShoppingBag, Sparkles } from "lucide-react";
 import { useAccess } from "@/components/access/AccessShell";
 import { supabase } from "@/lib/supabase/client";
 
@@ -24,12 +24,16 @@ export default function BeautyProfilePage(){
     supabase.from("client_photos").select("id,image_url,caption,photo_type,taken_at").eq("client_id",profile.id).eq("visibility","client_visible").order("taken_at",{ascending:false}),
   ];if(profile.product_recommendations_enabled)queries.push(supabase.from("client_product_recommendations").select("id,product_slug,reason").eq("client_id",profile.id).eq("client_visible",true).in("status",["approved","published","accepted"]).order("created_at",{ascending:false}).limit(8));const r=await Promise.all(queries);setMemory((r[0].data as Memory[])||[]);setFirst((r[1].data as FirstAppointment|null)||null);setPhotos((r[2].data as Photo[])||[]);if(profile.product_recommendations_enabled)setProducts((r[3]?.data as ProductRecommendation[])||[]);setLoading(false)})()},[profile?.id,profile?.product_recommendations_enabled]);
   const families=useMemo(()=>{const map=new Map<string,Memory[]>();memory.forEach(m=>{const family=String(m.details?.service_family||m.category||"general");if(!map.has(family))map.set(family,[]);map.get(family)!.push(m)});return [...map.entries()]},[memory]);
+  const hairMemory=useMemo(()=>memory.filter(m=>["hair","color","blowdry","cut","treatment","styling","extensions"].includes(String(m.details?.service_family||m.category||"general"))),[memory]);
+  const nailMemory=useMemo(()=>memory.filter(m=>String(m.details?.service_family||m.category)==="nails"),[memory]);
+  const lashMemory=useMemo(()=>memory.filter(m=>String(m.details?.service_family||m.category)==="lashes"),[memory]);
+  const browMemory=useMemo(()=>memory.filter(m=>String(m.details?.service_family||m.category)==="brows"),[memory]);
   if(!profile)return null;
   return <div className="pb-12">
     <section className="overflow-hidden rounded-[28px] bg-[#34261F] text-ivory shadow-[0_18px_50px_rgba(52,38,31,.12)]"><div className="p-6 md:p-9"><p className="text-[9px] uppercase tracking-[.28em] text-champagne">Gloria Access</p><h1 className="mt-2 font-serif text-[43px] md:text-[56px] leading-none">My Beauty Profile</h1><p className="mt-4 max-w-[620px] text-[13px] leading-relaxed text-ivory/65">Tu color, tus fórmulas, tus acabados, tus tonos y los pequeños detalles que hacen que tu próxima visita empiece donde terminó la anterior.</p></div><div className="border-t border-white/10 bg-white/[.04] px-6 py-4 md:px-9"><p className="font-serif italic text-[18px] text-champagne">Beauty that remembers you.</p></div></section>
 
     {loading?<p className="mt-8 text-[12px] text-taupe">Preparando tu Beauty Profile…</p>:profile.beauty_state==="no_appointment_history"?<Locked/>:memory.length===0?<Started first={first}/>:<>
-      <section className="mt-7"><div className="flex items-end justify-between gap-4"><div><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Your beauty memory</p><h2 className="mt-1 font-serif text-[36px] leading-none">Todo lo que ya sabemos que te gusta.</h2></div><span className="hidden sm:block text-[10px] text-taupe">{families.length} áreas guardadas</span></div><div className="mt-5 grid gap-4 lg:grid-cols-2">{families.map(([family,items])=><BeautyCard key={family} family={family} items={items}/>)}</div></section>
+      <section className="mt-7"><div className="flex items-end justify-between gap-4"><div><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Your beauty memory</p><h2 className="mt-1 font-serif text-[36px] leading-none">Tu look, construido detalle por detalle.</h2></div><span className="hidden sm:block text-[10px] text-taupe">{families.length} áreas guardadas</span></div><BeautyBlueprint hair={hairMemory} brows={browMemory} lashes={lashMemory} nails={nailMemory}/><div className="mt-5 grid gap-4 lg:grid-cols-2">{families.map(([family,items])=><BeautyCard key={family} family={family} items={items}/>)}</div></section>
 
       {photos.length>0&&<section className="mt-9"><p className="text-[9px] uppercase tracking-[.22em] text-mocha">My Looks</p><h2 className="mt-2 font-serif text-[34px]">Resultados que vale la pena recordar.</h2><div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">{photos.slice(0,8).map(p=><figure key={p.id} className="overflow-hidden rounded-[20px] border border-champagne/25 bg-white/60"><div className="relative aspect-[4/5]"><Image src={p.image_url} alt={p.caption||"Gloria Beauty Salon result"} fill className="object-cover"/></div>{p.caption&&<figcaption className="p-3 text-[11px] text-taupe">{p.caption}</figcaption>}</figure>)}</div></section>}
 
@@ -45,3 +49,58 @@ function uniqueProducts(memory:Memory[]){const out:{type:string;name:string}[]=[
 function human(v:string){return v.replaceAll("_"," ").replaceAll("-"," ").replace(/\b\w/g,c=>c.toUpperCase())}
 function formatValue(v:unknown){if(Array.isArray(v))return v.join(", ");if(v===null||v===undefined)return "—";return String(v)}
 function date(v:string){return new Date(v).toLocaleDateString("es-US",{month:"long",day:"numeric",year:"numeric",timeZone:"America/New_York"})}
+
+function BeautyBlueprint({hair,brows,lashes,nails}:{hair:Memory[];brows:Memory[];lashes:Memory[];nails:Memory[]}){
+  const [active,setActive]=useState<"hair"|"brows"|"lashes"|"nails">("hair");
+  const hairData=mergeDetails(hair);
+  const browData=mergeDetails(brows);
+  const lashData=mergeDetails(lashes);
+  const nailData=mergeDetails(nails);
+  const tabs=[
+    {key:"hair",label:"Cabello",ready:hair.length>0},
+    {key:"brows",label:"Cejas",ready:brows.length>0},
+    {key:"lashes",label:"Pestañas",ready:lashes.length>0},
+    {key:"nails",label:"Uñas",ready:nails.length>0}
+  ] as const;
+  return <div className="mt-5 overflow-hidden rounded-[28px] border border-[#DDCEC3] bg-[#FBF7F2] shadow-[0_16px_40px_rgba(52,38,31,.06)]">
+    <div className="grid grid-cols-4 border-b border-[#E8DDD4]">
+      {tabs.map(t=><button key={t.key} onClick={()=>setActive(t.key)} className={`relative px-2 py-4 text-center transition ${active===t.key?"bg-[#F0E2DA]":"bg-white/35"}`}><span className={`mx-auto mb-2 block h-2 w-2 rounded-full ${t.ready?"bg-[#7B3C48]":"bg-[#D8C7BC]"}`}/><span className="text-[8px] uppercase tracking-[.12em] text-mocha">{t.label}</span>{active===t.key&&<span className="absolute inset-x-5 bottom-0 h-px bg-[#7B3C48]"/>}</button>)}
+    </div>
+    {active==="hair"?<HairInteractive data={hairData} ready={hair.length>0}/>:active==="brows"?<FaceDetail kind="brows" data={browData} ready={brows.length>0}/>:active==="lashes"?<FaceDetail kind="lashes" data={lashData} ready={lashes.length>0}/>:<NailInteractive data={nailData} ready={nails.length>0}/>}
+  </div>
+}
+
+function HairInteractive({data,ready}:{data:Record<string,unknown>;ready:boolean}){
+  const [tab,setTab]=useState<"length"|"texture"|"color"|"highlights"|"blowdry">("length");
+  const options={
+    length:[["Corto","Short"],["Medio","Medium"],["Largo","Long"],["XL","XL"]],
+    texture:[["Lacio","Straight"],["Ondulado","Wavy"],["Rizado","Curly"]],
+    highlights:[["Sin mechas","None"],["Balayage","Balayage"],["Highlights","Highlights"],["Money piece","Money Piece"]],
+    blowdry:[["Liso","Straight"],["Ondas suaves","Soft Waves"],["Ondas marcadas","Defined Waves"],["Blowout clásico","Classic Blowout"],["Volumen en raíz","Root Volume"],["Puntas adentro","Ends In"],["Puntas afuera","Ends Out"],["Sleek","Sleek"]]
+  } as const;
+  const current={
+    length:String(data.length||data.preferred_length||""),
+    texture:String(data.texture||data.hair_texture||""),
+    highlights:String(data.technique||data.highlights||data.mecha||""),
+    blowdry:String(data.finish||data.blowdry_preference||data.usual_style||"")
+  };
+  return <div className="grid gap-0 md:grid-cols-[.9fr_1.1fr]">
+    <div className="relative min-h-[390px] overflow-hidden bg-[linear-gradient(155deg,#EEE1D8,#D9BDB1)]">
+      <div className="absolute inset-0 opacity-80" style={{backgroundImage:"repeating-radial-gradient(ellipse at 48% 22%,rgba(81,53,44,.15) 0 2px,transparent 3px 13px)"}}/>
+      <div className="absolute left-1/2 top-9 h-[310px] w-[185px] -translate-x-1/2 rounded-[48%_48%_42%_42%/22%_22%_78%_78%] bg-[linear-gradient(90deg,#4D342B,#7C5746_28%,#B88C6D_55%,#6A4638_78%,#3F2B26)] shadow-[0_25px_55px_rgba(66,42,34,.22)]"/>
+      <div className="absolute left-1/2 top-14 h-[280px] w-[145px] -translate-x-1/2 rounded-[48%_48%_42%_42%/22%_22%_78%_78%] opacity-50" style={{backgroundImage:"repeating-linear-gradient(100deg,rgba(255,220,190,.18) 0 2px,transparent 3px 10px)"}}/>
+      <div className="absolute bottom-5 left-5"><p className="text-[8px] uppercase tracking-[.2em] text-[#6F4C42]">Tu cabello</p><p className="mt-1 font-serif text-[28px] text-[#4A352B]">{ready?String(data.current_color||data.color||"Tu look guardado"):"Empieza aquí"}</p></div>
+    </div>
+    <div className="p-5 md:p-6">
+      <div className="flex gap-1 overflow-x-auto pb-2">{[["length","Largo"],["texture","Textura"],["color","Color"],["highlights","Mechas"],["blowdry","Secado"]].map(([k,l])=><button key={k} onClick={()=>setTab(k as any)} className={`whitespace-nowrap rounded-full px-3 py-2 text-[8px] uppercase tracking-[.1em] ${tab===k?"bg-[#4A352B] text-white":"bg-[#EEE4DC] text-mocha"}`}>{l}</button>)}</div>
+      {!ready?<EmptyVisual/>:tab==="color"?<ColorVisual data={data}/>:<div className="mt-5"><p className="font-serif text-[29px]">{tab==="blowdry"?"¿Cómo te gusta tu secado?":tab==="highlights"?"Tus mechas":"Tu "+(tab==="length"?"largo":"textura")}</p><p className="mt-1 text-[9px] text-taupe">Tu preferencia habitual guardada por el team.</p><div className={`mt-5 grid gap-3 ${tab==="blowdry"?"grid-cols-2 sm:grid-cols-3":"grid-cols-2"}`}>{(options[tab as keyof typeof options]||[]).map(([label,val],i)=>{const selected=current[tab as keyof typeof current]?.toLowerCase().includes(val.toLowerCase())||current[tab as keyof typeof current]?.toLowerCase().includes(label.toLowerCase());return <div key={label} className={`relative overflow-hidden rounded-[18px] border p-3 text-center ${selected?"border-[#7B3C48] bg-[#EEDDD8] shadow-[0_8px_22px_rgba(123,60,72,.10)]":"border-[#E2D5CB] bg-white/65"}`}><HairGlyph variant={tab==="blowdry"?i:i%4}/><p className="mt-2 text-[9px] text-mocha">{label}</p>{selected&&<span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#7B3C48]"/>}</div>})}</div>{current[tab as keyof typeof current]&&<div className="mt-5 rounded-[18px] bg-[#F1E4DE] p-4"><p className="text-[8px] uppercase tracking-[.15em] text-taupe">Tu selección</p><p className="mt-1 font-serif text-[23px]">{current[tab as keyof typeof current]}</p></div>}</div>}
+    </div>
+  </div>
+}
+
+function HairGlyph({variant=0}:{variant?:number}){const curves=[18,28,38,12,32,22,42,8];return <div className="mx-auto flex h-20 w-14 items-end justify-center gap-[3px] rounded-t-[28px] bg-[#E9D8CF] px-2 pt-3">{[0,1,2,3,4].map((x)=><span key={x} className="block w-[4px] rounded-full bg-[linear-gradient(#5A3D32,#A67C62)]" style={{height:`${48+((curves[(variant+x)%curves.length])%26)}px`,transform:`rotate(${(x-2)*(variant%3===0?1.5:3)}deg)`}}/>)}</div>}
+function ColorVisual({data}:{data:Record<string,unknown>}){const color=String(data.current_color||data.color||data.tone||"Color guardado");return <div className="mt-5"><p className="font-serif text-[29px]">Tu color</p><p className="mt-1 text-[9px] text-taupe">{color}</p><div className="mt-5 flex gap-3">{["#4A3128","#6A4637","#9B715A","#C49A7C","#D8B697"].map((c,i)=><span key={c} className={`h-12 w-12 rounded-full border-2 ${i===2?"border-[#7B3C48] ring-2 ring-[#7B3C48]/15":"border-white"}`} style={{background:c}}/>)}</div>{data.technique&&<div className="mt-5 rounded-[18px] bg-[#F1E4DE] p-4"><p className="text-[8px] uppercase tracking-[.15em] text-taupe">Técnica</p><p className="mt-1 font-serif text-[23px]">{String(data.technique)}</p></div>}</div>}
+function FaceDetail({kind,data,ready}:{kind:"brows"|"lashes";data:Record<string,unknown>;ready:boolean}){return <div className="grid md:grid-cols-[1fr_.9fr]"><div className="relative min-h-[360px] overflow-hidden bg-[linear-gradient(160deg,#E9CCC6,#D7AFA9)]"><div className="absolute left-1/2 top-[105px] h-[85px] w-[220px] -translate-x-1/2 rounded-[50%] bg-[#D7A997] shadow-[inset_0_0_0_18px_rgba(255,255,255,.08)]"/><div className="absolute left-1/2 top-[128px] h-[42px] w-[120px] -translate-x-1/2 rounded-[50%] bg-[#5C4238]"/><div className="absolute left-1/2 top-[135px] h-[28px] w-[28px] -translate-x-1/2 rounded-full bg-[#1F1917] ring-[10px] ring-[#9A765F]"/>{kind==="lashes"&&<div className="absolute left-1/2 top-[111px] h-[44px] w-[155px] -translate-x-1/2 border-t-[4px] border-[#3B2924] rounded-[50%]"/>}{kind==="brows"&&<div className="absolute left-1/2 top-[88px] h-[20px] w-[155px] -translate-x-1/2 border-t-[7px] border-[#4A332A] rounded-[50%]"/>}</div><div className="p-6"><p className="text-[8px] uppercase tracking-[.2em] text-mocha">{kind==="brows"?"Cejas":"Pestañas"}</p><h3 className="mt-2 font-serif text-[32px]">{ready?(kind==="brows"?"Tu shape":"Tu mapping"):"Aún sin datos"}</h3>{ready?<dl className="mt-5 space-y-4">{Object.entries(data).filter(([k,v])=>k!=="service_family"&&v!==""&&v!=null).slice(0,6).map(([k,v])=><div key={k}><dt className="text-[8px] uppercase tracking-[.13em] text-taupe">{human(k)}</dt><dd className="mt-1 font-serif text-[20px]">{formatValue(v)}</dd></div>)}</dl>:<EmptyVisual/>}</div></div>}
+function NailInteractive({data,ready}:{data:Record<string,unknown>;ready:boolean}){return <div className="grid md:grid-cols-[1.1fr_.9fr]"><div className="relative min-h-[360px] overflow-hidden bg-[linear-gradient(145deg,#F0DDD8,#D9B8B2)]"><div className="absolute left-[20%] top-[50px] h-[250px] w-[150px] rotate-[-12deg] rounded-[48%_48%_42%_42%] bg-[#D8A58F]"/>{[0,1,2,3].map(i=><div key={i} className="absolute h-[92px] w-[26px] rounded-[18px] bg-[#D8A58F]" style={{left:`${39+i*31}%`,top:`${72+i*7}px`,transform:`rotate(${-8+i*4}deg)`}}><span className="absolute left-[3px] top-[2px] h-[32px] w-[20px] rounded-[12px] bg-[#D8B3A8] border border-white/45"/></div>)}</div><div className="p-6"><p className="text-[8px] uppercase tracking-[.2em] text-mocha">Uñas</p><h3 className="mt-2 font-serif text-[32px]">{ready?"Tu forma + color":"Tu nail profile"}</h3>{ready?<><div className="mt-5 grid grid-cols-2 gap-3">{["Almond","Square","Coffin","Round"].map(x=><div key={x} className={`rounded-[17px] border p-4 text-center ${String(data.shape||"").toLowerCase().includes(x.toLowerCase())?"border-[#7B3C48] bg-[#EEDDD8]":"border-[#E2D5CB] bg-white/60"}`}><span className="mx-auto block h-10 w-5 rounded-[12px] border border-[#8A655D] bg-[#E7C7C0]"/><p className="mt-2 text-[8px]">{x}</p></div>)}</div><div className="mt-5"><p className="text-[8px] uppercase tracking-[.15em] text-taupe">Color</p><p className="mt-1 font-serif text-[23px]">{String(data.shade||data.color||"Guardado")}</p></div></>:<EmptyVisual/>}</div></div>}
+function EmptyVisual(){return <div className="mt-5 rounded-[18px] border border-dashed border-[#D8C8BC] bg-white/45 p-5 text-center"><span className="mx-auto grid h-10 w-10 place-items-center rounded-full bg-[#EFE2DB] text-mocha">+</span><p className="mt-3 text-[9px] text-taupe">El team irá completando esta parte con tus visitas.</p></div>}
+function mergeDetails(items:Memory[]){const out:Record<string,unknown>={};[...items].reverse().forEach(m=>Object.assign(out,m.details||{}));return out}
