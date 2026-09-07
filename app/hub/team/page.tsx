@@ -5,8 +5,14 @@ import { CalendarDays, Power, Scissors, UserRound } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 type Staff={id:string;name:string;role:string;photo_url:string|null;active:boolean};
-type Assignment={staff_id:string;service:{name:string;category:string}|null};
+type ServiceRel={name:string;category:string};
+type Assignment={staff_id:string;service:ServiceRel|null};
 type Appointment={id:string;staff_id:string;start_at:string;client_name:string;service:{name:string}|null};
+
+type RawAssignment={staff_id:string;service:ServiceRel|ServiceRel[]|null};
+type RawAppointment={id:string;staff_id:string;start_at:string;client_name:string;service:{name:string}|{name:string}[]|null};
+
+function one<T>(value:T|T[]|null|undefined):T|null{return Array.isArray(value)?(value[0]||null):(value||null)}
 
 export default function TeamPage(){
   const [staff,setStaff]=useState<Staff[]>([]);const [assignments,setAssignments]=useState<Assignment[]>([]);const [today,setToday]=useState<Appointment[]>([]);const [message,setMessage]=useState<string|null>(null);
@@ -14,7 +20,10 @@ export default function TeamPage(){
     supabase.from("staff").select("id,name,role,photo_url,active").order("name"),
     supabase.from("staff_services").select("staff_id,service:service_id(name,category)"),
     supabase.from("appointments").select("id,staff_id,start_at,client_name,service:service_id(name)").gte("start_at",start.toISOString()).lt("start_at",end.toISOString()).in("status",["pending","confirmed","in_progress"]).order("start_at")
-  ]);setStaff((s as Staff[])||[]);setAssignments((a as Assignment[])||[]);setToday((t as Appointment[])||[])}
+  ]);
+  setStaff(((s||[]) as Staff[]));
+  setAssignments(((a||[]) as unknown as RawAssignment[]).map(x=>({staff_id:x.staff_id,service:one(x.service)})));
+  setToday(((t||[]) as unknown as RawAppointment[]).map(x=>({id:x.id,staff_id:x.staff_id,start_at:x.start_at,client_name:x.client_name,service:one(x.service)})))}
   useEffect(()=>{load()},[]);
   const stats=useMemo(()=>staff.map(s=>({staff:s,services:assignments.filter(a=>a.staff_id===s.id),appointments:today.filter(a=>a.staff_id===s.id)})),[staff,assignments,today]);
   async function toggle(s:Staff){setMessage(null);const {error}=await supabase.rpc("hub_update_staff_active",{p_staff_id:s.id,p_active:!s.active});if(error){setMessage(error.message);return;}await load()}
