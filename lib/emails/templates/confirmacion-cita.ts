@@ -2,14 +2,25 @@ import { emailShell, heading, greeting, paragraph, detailsCard, button } from ".
 
 export type AppointmentEmailParams = {
   clientName: string;
-  dateLabel: string; // e.g. "Jueves, 12 de Septiembre, 2024"
-  timeLabel: string; // e.g. "10:00 AM"
+  dateLabel: string;
+  timeLabel: string;
   serviceName: string;
   staffName: string;
-  manageUrl: string; // link to view/reschedule the appointment
+  manageUrl: string;
+  accessActivationUrl?: string | null;
 };
 
 export function confirmacionDeCitaEmail(p: AppointmentEmailParams) {
+  const accessBlock = p.accessActivationUrl
+    ? `
+      <div style="height:1px;background:#A68F7B33;margin:30px 0 24px 0;"></div>
+      ${heading("Tu belleza,", "todo en un solo lugar")}
+      ${paragraph("Si quieres, puedes activar Gloria Access y tener tus citas, reprogramaciones, Beauty Profile interactivo, recomendaciones y productos favoritos siempre contigo.")}
+      ${paragraph("Es completamente opcional y no necesitas una cuenta para reservar con nosotros.")}
+      ${button("Activar Gloria Access", p.accessActivationUrl)}
+    `
+    : "";
+
   const body = `
     ${heading("Tu cita está", "confirmada")}
     ${greeting(p.clientName)}
@@ -27,6 +38,7 @@ export function confirmacionDeCitaEmail(p: AppointmentEmailParams) {
     ${paragraph(
       "Si necesitas hacer algún cambio, puedes reprogramar tu cita en cualquier momento."
     )}
+    ${accessBlock}
   `;
 
   return emailShell({
