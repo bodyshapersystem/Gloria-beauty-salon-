@@ -2,11 +2,11 @@
 
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Download, Plus, Search, Upload, UserPlus, X } from "lucide-react";
+import { Download, Pencil, Search, Trash2, Upload, UserPlus, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 type Client={id:string;first_name:string;last_name:string;email:string|null;phone:string|null;birthday:string|null;access_status:string;beauty_state:string;created_at:string};
-type Role="owner"|"admin"|"staff"|null;
+type Role="owner"|"admin"|"manager"|"staff"|null;
 type ImportRow={first_name:string;last_name:string;email:string;phone:string;birthday:string};
 const accessLabels:Record<string,string>={invited:"Invitada",active:"Activa",inactive:"Sin Access",disabled:"Deshabilitada"};
 const beautyLabels:Record<string,string>={no_appointment_history:"Sin historial",appointment_confirmed:"Cita confirmada",beauty_profile_active:"Beauty Profile activo"};
@@ -21,6 +21,7 @@ export default function HubClients(){
   const [importRows,setImportRows]=useState<ImportRow[]>([]);
   const [importName,setImportName]=useState("");
   const [message,setMessage]=useState<string|null>(null);
+  const [editing,setEditing]=useState<Client|null>(null);
   const fileRef=useRef<HTMLInputElement>(null);
 
   async function load(){
@@ -36,7 +37,8 @@ export default function HubClients(){
   }
   useEffect(()=>{load()},[]);
 
-  const isAdmin=role==="owner"||role==="admin";
+  const isAdmin=role==="owner"||role==="admin"||role==="manager";
+  const isOwner=role==="owner";
   const filtered=useMemo(()=>clients.filter(c=>`${c.first_name} ${c.last_name} ${c.email||""} ${c.phone||""}`.toLowerCase().includes(q.toLowerCase())),[clients,q]);
 
   function exportCsv(){
@@ -54,6 +56,16 @@ export default function HubClients(){
     const headers=parsed[0].map(normalizeHeader);
     const rows=parsed.slice(1).map(cols=>mapImportRow(headers,cols)).filter(r=>r.first_name);
     setImportRows(rows);setImportName(file.name);setImportOpen(true);e.target.value="";
+  }
+
+  async function deleteClient(c:Client){
+    if(!isOwner)return;
+    if(!window.confirm("¿Eliminar a "+c.first_name+" "+c.last_name+"? Esta acción no se puede deshacer."))return;
+    setMessage(null);
+    const {error}=await supabase.rpc("hub_delete_client",{p_client_id:c.id});
+    if(error){setMessage(error.message);return;}
+    setMessage("Clienta eliminada.");
+    await load();
   }
 
   async function importClients(){
@@ -79,17 +91,23 @@ export default function HubClients(){
     {message&&<p className="mt-4 rounded-[16px] bg-blush/35 px-4 py-3 text-[11px] text-mocha">{message}</p>}
 
     {loading?<p className="mt-8 text-[12px] text-taupe">Cargando clientas…</p>:filtered.length===0?<div className="mt-6 rounded-[24px] border border-dashed border-champagne/40 bg-white/45 p-8 text-center"><UserPlus size={23} className="mx-auto text-champagne"/><p className="mt-4 font-serif text-[27px]">Todavía no hay clientas aquí.</p>{isAdmin&&<button onClick={()=>setAddOpen(true)} className="mt-4 rounded-full bg-[#4A352B] px-5 py-3 text-[9px] uppercase tracking-[0.12em] text-ivory">Agregar primera clienta</button>}</div>:<>
-      <div className="md:hidden mt-5 space-y-2">{filtered.map(c=><ClientCard key={c.id} c={c}/>)}</div>
-      <div className="hidden md:block mt-5 overflow-hidden rounded-[22px] border border-champagne/30 bg-white/60 shadow-[0_8px_30px_rgba(52,38,31,.04)]"><div className="grid grid-cols-[1.15fr_1fr_.75fr_.85fr_36px] gap-4 border-b border-champagne/25 px-5 py-3 text-[8px] uppercase tracking-[0.17em] text-taupe"><span>Clienta</span><span>Contacto</span><span>Access</span><span>Beauty Profile</span><span/></div>{filtered.map(c=><Link href={`/hub/clients/${c.id}`} key={c.id} className="grid grid-cols-[1.15fr_1fr_.75fr_.85fr_36px] items-center gap-4 border-b last:border-0 border-champagne/20 px-5 py-4 hover:bg-[#FBF8F3]"><div><p className="font-serif text-[22px] leading-none">{c.first_name||"Clienta"} {c.last_name}</p><p className="mt-1 text-[9px] text-taupe">Desde {new Date(c.created_at).toLocaleDateString("es-US",{month:"short",year:"numeric"})}</p></div><div className="text-[10px] text-taupe"><p>{c.phone||"Sin teléfono"}</p><p className="mt-1 truncate">{c.email||"Sin email"}</p></div><span className="w-fit rounded-full bg-[#EFE5DC] px-2.5 py-1 text-[8px] text-mocha">{accessLabels[c.access_status]||c.access_status}</span><span className="text-[9px] text-taupe">{beautyLabels[c.beauty_state]||c.beauty_state}</span><span className="text-[20px] text-champagne">›</span></Link>)}</div>
+      <div className="md:hidden mt-5 space-y-2">{filtered.map(c=><ClientCard key={c.id} c={c} canEdit={isAdmin} canDelete={isOwner} onEdit={()=>setEditing(c)} onDelete={()=>deleteClient(c)}/>)}</div>
+      <div className="hidden md:block mt-5 overflow-hidden rounded-[22px] border border-champagne/30 bg-white/60 shadow-[0_8px_30px_rgba(52,38,31,.04)]"><div className="grid grid-cols-[1.15fr_1fr_.75fr_.85fr_100px] gap-4 border-b border-champagne/25 px-5 py-3 text-[8px] uppercase tracking-[0.17em] text-taupe"><span>Clienta</span><span>Contacto</span><span>Access</span><span>Beauty Profile</span><span>Acciones</span></div>{filtered.map(c=><div key={c.id} className="grid grid-cols-[1.15fr_1fr_.75fr_.85fr_100px] items-center gap-4 border-b last:border-0 border-champagne/20 px-5 py-4 hover:bg-[#FBF8F3]"><Link href={`/hub/clients/${c.id}`} className="contents"><div><p className="font-serif text-[22px] leading-none">{c.first_name||"Clienta"} {c.last_name}</p><p className="mt-1 text-[9px] text-taupe">Desde {new Date(c.created_at).toLocaleDateString("es-US",{month:"short",year:"numeric"})}</p></div><div className="text-[10px] text-taupe"><p>{c.phone||"Sin teléfono"}</p><p className="mt-1 truncate">{c.email||"Sin email"}</p></div><span className="w-fit rounded-full bg-[#EFE5DC] px-2.5 py-1 text-[8px] text-mocha">{accessLabels[c.access_status]||c.access_status}</span><span className="text-[9px] text-taupe">{beautyLabels[c.beauty_state]||c.beauty_state}</span></Link><div className="flex items-center justify-end gap-1">{isAdmin&&<button onClick={()=>setEditing(c)} className="grid h-9 w-9 place-items-center rounded-full border border-champagne/35 bg-white text-mocha" aria-label="Editar clienta"><Pencil size={14}/></button>}{isOwner&&<button onClick={()=>deleteClient(c)} className="grid h-9 w-9 place-items-center rounded-full border border-[#7B3C48]/20 bg-white text-[#7B3C48]" aria-label="Eliminar clienta"><Trash2 size={14}/></button>}</div></div>)}</div>
     </>}
 
+    {editing&&<EditClientModal client={editing} onClose={()=>setEditing(null)} onSaved={async()=>{setEditing(null);setMessage("Clienta actualizada.");await load()}}/>}
     {addOpen&&<AddClientModal onClose={()=>setAddOpen(false)} onSaved={async()=>{setAddOpen(false);setMessage("Clienta agregada correctamente.");await load()}}/>}
     {importOpen&&<div className="fixed inset-0 z-[90] bg-espresso/35 flex items-end sm:items-center justify-center p-0 sm:p-5" onClick={()=>setImportOpen(false)}><div className="w-full sm:max-w-[520px] rounded-t-[28px] sm:rounded-[28px] bg-[#FBF8F3] p-6" onClick={e=>e.stopPropagation()}><div className="flex items-start justify-between"><div><p className="text-[8px] uppercase tracking-[0.2em] text-mocha">Importar CSV</p><h2 className="mt-2 font-serif text-[32px]">{importRows.length} clientas detectadas</h2><p className="mt-2 text-[10px] text-taupe">{importName}</p></div><button onClick={()=>setImportOpen(false)} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35"><X size={19}/></button></div><div className="mt-5 max-h-[260px] overflow-y-auto rounded-[18px] border border-champagne/30 bg-white/65 divide-y divide-champagne/20">{importRows.slice(0,25).map((r,i)=><div key={i} className="px-4 py-3"><p className="font-serif text-[19px]">{r.first_name} {r.last_name}</p><p className="mt-1 text-[9px] text-taupe">{r.phone||r.email||"Sin contacto"}</p></div>)}</div>{importRows.length>25&&<p className="mt-2 text-[9px] text-taupe">+ {importRows.length-25} más</p>}<p className="mt-4 text-[10px] leading-relaxed text-taupe">Si ya existe una clienta con el mismo email o teléfono, actualizaremos sus datos en vez de duplicarla.</p><button onClick={importClients} className="mt-5 w-full rounded-full bg-[#4A352B] px-5 py-3.5 text-[9px] uppercase tracking-[0.13em] text-ivory">Importar clientas</button></div></div>}
   </div>
 }
 
-function ClientCard({c}:{c:Client}){return <Link href={`/hub/clients/${c.id}`} className="block rounded-[20px] border border-champagne/30 bg-white/70 p-4 shadow-[0_6px_20px_rgba(52,38,31,.035)]"><div className="flex items-start justify-between gap-3"><div><p className="font-serif text-[24px] leading-none">{c.first_name} {c.last_name}</p><p className="mt-2 text-[10px] text-taupe">{c.phone||"Sin teléfono"}</p><p className="mt-1 text-[9px] text-taupe">{c.email||"Sin email"}</p></div><span className="text-[24px] text-champagne">›</span></div><div className="mt-4 flex flex-wrap gap-2"><span className="rounded-full bg-[#EFE5DC] px-2.5 py-1 text-[8px] text-mocha">{accessLabels[c.access_status]||c.access_status}</span><span className="rounded-full bg-blush/35 px-2.5 py-1 text-[8px] text-mocha">{beautyLabels[c.beauty_state]||c.beauty_state}</span></div></Link>}
+function ClientCard({c,canEdit,canDelete,onEdit,onDelete}:{c:Client;canEdit:boolean;canDelete:boolean;onEdit:()=>void;onDelete:()=>void}){return <div className="relative rounded-[20px] border border-champagne/30 bg-white/70 p-4 shadow-[0_6px_20px_rgba(52,38,31,.035)]"><Link href={`/hub/clients/${c.id}`} className="block"><div className="flex items-start justify-between gap-3"><div><p className="font-serif text-[24px] leading-none">{c.first_name} {c.last_name}</p><p className="mt-2 text-[10px] text-taupe">{c.phone||"Sin teléfono"}</p><p className="mt-1 text-[9px] text-taupe">{c.email||"Sin email"}</p></div><span className="text-[24px] text-champagne">›</span></div><div className="mt-4 flex flex-wrap gap-2"><span className="rounded-full bg-[#EFE5DC] px-2.5 py-1 text-[8px] text-mocha">{accessLabels[c.access_status]||c.access_status}</span><span className="rounded-full bg-blush/35 px-2.5 py-1 text-[8px] text-mocha">{beautyLabels[c.beauty_state]||c.beauty_state}</span></div></Link>{(canEdit||canDelete)&&<div className="mt-3 flex gap-2 border-t border-champagne/20 pt-3">{canEdit&&<button onClick={onEdit} className="inline-flex items-center gap-2 rounded-full border border-champagne/35 bg-white px-3 py-2 text-[8px] text-mocha"><Pencil size={12}/> Editar</button>}{canDelete&&<button onClick={onDelete} className="inline-flex items-center gap-2 rounded-full border border-[#7B3C48]/20 bg-white px-3 py-2 text-[8px] text-[#7B3C48]"><Trash2 size={12}/> Eliminar</button>}</div>}</div>}
 
+function EditClientModal({client,onClose,onSaved}:{client:Client;onClose:()=>void;onSaved:()=>void}){
+  const [first,setFirst]=useState(client.first_name||"");const [last,setLast]=useState(client.last_name||"");const [email,setEmail]=useState(client.email||"");const [phone,setPhone]=useState(client.phone||"");const [birthday,setBirthday]=useState(client.birthday||"");const [saving,setSaving]=useState(false);const [error,setError]=useState<string|null>(null);
+  async function save(){if(!first.trim())return;setSaving(true);setError(null);const {error:e}=await supabase.rpc("hub_update_client_profile",{p_client_id:client.id,p_first_name:first.trim(),p_last_name:last.trim(),p_email:email.trim()||null,p_phone:phone.trim()||null,p_birthday:birthday||null});setSaving(false);if(e){setError(e.message);return;}onSaved()}
+  return <div className="fixed inset-0 z-[95] bg-espresso/35 flex items-end sm:items-center justify-center p-0 sm:p-5" onClick={onClose}><div className="w-full sm:max-w-[520px] rounded-t-[28px] sm:rounded-[28px] bg-[#FBF8F3] p-6" onClick={e=>e.stopPropagation()}><div className="flex items-start justify-between"><div><p className="text-[8px] uppercase tracking-[0.2em] text-mocha">Editar clienta</p><h2 className="mt-2 font-serif text-[34px]">{client.first_name} {client.last_name}</h2></div><button onClick={onClose} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35"><X size={19}/></button></div><div className="mt-5 grid grid-cols-2 gap-3"><Field label="Nombre" value={first} set={setFirst} required/><Field label="Apellido" value={last} set={setLast}/><div className="col-span-2"><Field label="Teléfono" value={phone} set={setPhone} type="tel"/></div><div className="col-span-2"><Field label="Email" value={email} set={setEmail} type="email"/></div><div className="col-span-2"><Field label="Cumpleaños" value={birthday} set={setBirthday} type="date"/></div></div>{error&&<p className="mt-4 text-[10px] text-red-700">{error}</p>}<button disabled={saving||!first.trim()} onClick={save} className="mt-5 w-full rounded-full bg-[#4A352B] px-5 py-3.5 text-[9px] uppercase tracking-[0.13em] text-ivory disabled:opacity-40">{saving?"Guardando…":"Guardar cambios"}</button></div></div>
+}
 function AddClientModal({onClose,onSaved}:{onClose:()=>void;onSaved:()=>void}){
   const [first,setFirst]=useState("");const [last,setLast]=useState("");const [email,setEmail]=useState("");const [phone,setPhone]=useState("");const [birthday,setBirthday]=useState("");const [saving,setSaving]=useState(false);const [error,setError]=useState<string|null>(null);
   async function save(){if(!first.trim())return;setSaving(true);setError(null);const {error:e}=await supabase.rpc("hub_create_client",{p_first_name:first.trim(),p_last_name:last.trim(),p_email:email.trim()||null,p_phone:phone.trim()||null,p_birthday:birthday||null});setSaving(false);if(e){setError(e.message);return;}onSaved()}
