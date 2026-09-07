@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarCheck2, ChevronRight, DollarSign, Pencil, Sparkles, TrendingUp, UsersRound, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
-type Appointment={id:string;status:string;start_at:string;price_cents:number|null;client_name:string;service:{name:string}|null};
+type Appointment={id:string;staff_id:string;service_id:string|null;service_category:string|null;status:string;start_at:string;price_cents:number|null;client_name:string;service:{name:string;category:string}|null};
 type StaffInfo={id:string;name:string;photo_url:string|null;salon_percentage:number};
+type Profile={role:"owner"|"admin"|"staff";staff_id:string|null};
+type Rule={staff_id:string;scope_type:"category"|"service";category:string|null;service_id:string|null;salon_percentage:number};
 
 type Period="week"|"month"|"year";
 
@@ -15,6 +17,9 @@ const mocha="#4A352B";
 export default function ProgressPage(){
   const [items,setItems]=useState<Appointment[]>([]);
   const [staff,setStaff]=useState<StaffInfo|null>(null);
+  const [profile,setProfile]=useState<Profile|null>(null);
+  const [allStaff,setAllStaff]=useState<StaffInfo[]>([]);
+  const [rules,setRules]=useState<Rule[]>([]);
   const [period,setPeriod]=useState<Period>("week");
   const [loading,setLoading]=useState(true);
   const [agreementOpen,setAgreementOpen]=useState(false);
@@ -23,15 +28,23 @@ export default function ProgressPage(){
     setLoading(true);
     const {data:{session}}=await supabase.auth.getSession();
     if(!session){setLoading(false);return;}
-    const {data:profile}=await supabase.from("user_profiles").select("staff_id").eq("auth_user_id",session.user.id).maybeSingle();
-    const staffId=profile?.staff_id;
-    if(staffId){
-      const [{data:s},{data:a}]=await Promise.all([
-        supabase.from("staff").select("id,name,photo_url,salon_percentage").eq("id",staffId).single(),
-        supabase.from("appointments").select("id,status,start_at,price_cents,client_name,service:service_id(name)").eq("staff_id",staffId).gte("start_at",new Date(new Date().getFullYear(),0,1).toISOString()).order("start_at",{ascending:false})
+    const {data:profileRow}=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();
+    const prof=(profileRow as Profile)||null;
+    setProfile(prof);
+    if(prof){
+      const [{data:s},{data:r},{data:a}]=await Promise.all([
+        supabase.from("staff").select("id,name,photo_url,salon_percentage").eq("active",true).order("name"),
+        supabase.from("staff_commission_rules").select("staff_id,scope_type,category,service_id,salon_percentage"),
+        supabase.from("appointments").select("id,staff_id,service_id,service_category,status,start_at,price_cents,client_name,service:service_id(name,category)").gte("start_at",new Date(new Date().getFullYear()-1,0,1).toISOString()).order("start_at",{ascending:false})
       ]);
-      setStaff((s as StaffInfo)||null);
-      setItems(((a as unknown) as Appointment[])||[]);
+      const staffRows=(((s as unknown) as StaffInfo[])||[]).map(x=>({...x,salon_percentage:Number(x.salon_percentage||0)}));
+      const ruleRows=(((r as unknown) as Rule[])||[]).map(x=>({...x,salon_percentage:Number(x.salon_percentage||0)}));
+      const appts=(((a as unknown) as Appointment[])||[]);
+      setAllStaff(staffRows);
+      setRules(ruleRows);
+      const staffId=prof.staff_id;
+      setStaff(staffId?staffRows.find(x=>x.id===staffId)||null:null);
+      setItems(prof.role==="staff"&&staffId?appts.filter(x=>x.staff_id===staffId):appts);
     }
     setLoading(false);
   }
@@ -41,22 +54,23 @@ export default function ProgressPage(){
   const current=useMemo(()=>items.filter(x=>{const d=new Date(x.start_at);return d>=range.start&&d<range.end}),[items,range]);
   const previous=useMemo(()=>items.filter(x=>{const d=new Date(x.start_at);return d>=range.prevStart&&d<range.start}),[items,range]);
 
-  const stats=useMemo(()=>compute(current,staff?.salon_percentage??30),[current,staff]);
-  const prevStats=useMemo(()=>compute(previous,staff?.salon_percentage??30),[previous,staff]);
+  const stats=useMemo(()=>compute(current,allStaff,rules),[current,allStaff,rules]);
+  const prevStats=useMemo(()=>compute(previous,allStaff,rules),[previous,allStaff,rules]);
   const delta=prevStats.revenue?Math.round(((stats.revenue-prevStats.revenue)/prevStats.revenue)*100):0;
 
   if(loading)return <div className="py-20 text-center"><p className="font-serif text-[30px]">Preparando tu semana...</p></div>;
-  if(!staff)return <div className="py-20 text-center"><p className="font-serif text-[30px]">No encontramos tu perfil de equipo.</p></div>;
+  if(!profile)return <div className="py-20 text-center"><p className="font-serif text-[30px]">No encontramos tu perfil.</p></div>;
+  const isSalon=profile.role==="owner"||profile.role==="admin";
 
   return <div className="pb-5">
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-center gap-3">
         <div className="h-12 w-12 overflow-hidden rounded-full bg-[#EADFD7]">
-          {staff.photo_url?<img src={staff.photo_url} alt={staff.name} className="h-full w-full object-cover"/>:<div className="grid h-full place-items-center font-serif text-[22px]">{staff.name[0]}</div>}
+          {staff?.photo_url?<img src={staff.photo_url} alt={staff.name} className="h-full w-full object-cover"/>:<div className="grid h-full place-items-center font-serif text-[22px]">{isSalon?"G":staff?.name?.[0]||"T"}</div>}
         </div>
-        <div><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Gloria Team</p><h1 className="mt-1 font-serif text-[34px] md:text-[48px] leading-none">Hola, {staff.name}</h1></div>
+        <div><p className="text-[9px] uppercase tracking-[.22em] text-mocha">{isSalon?"Gloria Hub":"Gloria Team"} · Progress</p><h1 className="mt-1 font-serif text-[34px] md:text-[48px] leading-none">{isSalon?"El pulso del salón":`Hola, ${staff?.name||"Team"}`}</h1></div>
       </div>
-      <button onClick={()=>setAgreementOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-[#D8C5B5] bg-white/70 px-4 py-2.5 text-[9px] text-mocha"><Pencil size={13}/> Mi acuerdo</button>
+      {!isSalon&&staff&&<button onClick={()=>setAgreementOpen(true)} className="inline-flex items-center gap-2 rounded-full border border-[#D8C5B5] bg-white/70 px-4 py-2.5 text-[9px] text-mocha"><Pencil size={13}/> Mi acuerdo</button>}
     </div>
 
     <div className="mt-5 inline-flex rounded-full bg-[#EDE4DC] p-1">
@@ -65,16 +79,16 @@ export default function ProgressPage(){
 
     <section className="mt-5 relative overflow-hidden rounded-[28px] border border-[#7D4A4F]/25 p-6 md:p-7 text-white shadow-[0_18px_45px_rgba(83,38,46,.18)]" style={{backgroundImage:"radial-gradient(circle at 18% 15%, rgba(255,225,218,.28), transparent 30%), radial-gradient(circle at 85% 80%, rgba(255,255,255,.10), transparent 28%), repeating-radial-gradient(ellipse at 20% 30%, rgba(255,255,255,.055) 0 1px, transparent 2px 11px), linear-gradient(135deg,#7B3C48 0%,#5B2936 44%,#3F2B2B 100%)"}}>
       <div className="absolute -right-8 -bottom-14 h-40 w-56 rotate-[-16deg] rounded-[48%] bg-[#D9A7A6]/20 blur-2xl"/>
-      <p className="relative text-[9px] uppercase tracking-[.24em] text-[#EFD9D5]">Tu corte</p>
+      <p className="relative text-[9px] uppercase tracking-[.24em] text-[#EFD9D5]">{isSalon?"Resumen del salón":"Tu corte"}</p>
       <div className="relative mt-4 grid gap-5 md:grid-cols-[1fr_auto] md:items-end">
         <div>
           <p className="font-serif text-[52px] md:text-[64px] leading-none">{money(stats.revenue)}</p>
           <p className="mt-2 text-[10px] text-white/65">generado en servicios completados</p>
         </div>
         <div className="rounded-[20px] border border-white/12 bg-black/10 px-5 py-4 md:min-w-[250px]">
-          <Row label={`Para Gloria (${fmtPct(staff.salon_percentage)})`} value={"− "+money(stats.salonCut)} light/>
+          <Row label={isSalon?"Para el salón":"Para Gloria / salón"} value={money(stats.salonCut)} light/>
           <div className="my-3 h-px bg-white/12"/>
-          <Row label="Para ti" value={money(stats.staffCut)} strong light/>
+          <Row label={isSalon?"Para el team":"Para ti"} value={money(stats.staffCut)} strong light/>
         </div>
       </div>
       <div className="relative mt-5 flex flex-wrap gap-2">
@@ -118,7 +132,7 @@ export default function ProgressPage(){
       </div>
     </div>
 
-    {agreementOpen&&<AgreementModal staff={staff} onClose={()=>setAgreementOpen(false)} onSaved={async()=>{setAgreementOpen(false);await load()}}/>}
+    {agreementOpen&&staff&&<AgreementModal staff={staff} onClose={()=>setAgreementOpen(false)} onSaved={async()=>{setAgreementOpen(false);await load()}}/>}
   </div>
 }
 
@@ -146,9 +160,10 @@ function AgreementModal({staff,onClose,onSaved}:{staff:StaffInfo;onClose:()=>voi
   </div>
 }
 
-function compute(items:Appointment[],pct:number){
+function compute(items:Appointment[],staffRows:StaffInfo[],rules:Rule[]){
   const completed=items.filter(x=>x.status==="completed");
   const revenue=completed.reduce((s,x)=>s+(x.price_cents||0),0);
+  const salonCut=completed.reduce((sum,a)=>{const st=staffRows.find(s=>s.id===a.staff_id);if(!st)return sum;return sum+Math.round((a.price_cents||0)*(effectivePct(st,a,rules)/100))},0);
   const clients=new Set(completed.map(x=>x.client_name.trim().toLowerCase()).filter(Boolean)).size;
   const avg=completed.length?Math.round(revenue/completed.length):0;
   const map=new Map<string,{count:number,value:number}>();
@@ -156,7 +171,7 @@ function compute(items:Appointment[],pct:number){
   const byService=[...map.entries()].map(([name,v])=>({name,...v})).sort((a,b)=>b.value-a.value);
   const dailyBase=[{label:"L",day:1},{label:"M",day:2},{label:"X",day:3},{label:"J",day:4},{label:"V",day:5},{label:"S",day:6},{label:"D",day:0}];
   const daily=dailyBase.map(d=>({label:d.label,value:completed.filter(x=>new Date(x.start_at).getDay()===d.day).reduce((s,x)=>s+(x.price_cents||0),0)}));
-  return {completed,revenue,clients,avg,top:byService[0],byService,daily,maxDaily:Math.max(1,...daily.map(x=>x.value)),salonCut:Math.round(revenue*(pct/100)),staffCut:Math.round(revenue*(1-pct/100)),cancelled:items.filter(x=>x.status==="cancelled").length,noShow:items.filter(x=>x.status==="no_show").length};
+  return {completed,revenue,clients,avg,top:byService[0],byService,daily,maxDaily:Math.max(1,...daily.map(x=>x.value)),salonCut,staffCut:revenue-salonCut,cancelled:items.filter(x=>x.status==="cancelled").length,noShow:items.filter(x=>x.status==="no_show").length};
 }
 function periodRange(period:Period){const now=new Date();if(period==="week"){const start=new Date(now);const day=(start.getDay()+6)%7;start.setDate(start.getDate()-day);start.setHours(0,0,0,0);const end=new Date(start);end.setDate(end.getDate()+7);const prevStart=new Date(start);prevStart.setDate(prevStart.getDate()-7);return{start,end,prevStart}}if(period==="month"){const start=new Date(now.getFullYear(),now.getMonth(),1);const end=new Date(now.getFullYear(),now.getMonth()+1,1);const prevStart=new Date(now.getFullYear(),now.getMonth()-1,1);return{start,end,prevStart}}const start=new Date(now.getFullYear(),0,1);const end=new Date(now.getFullYear()+1,0,1);const prevStart=new Date(now.getFullYear()-1,0,1);return{start,end,prevStart}}
 function PrettyStat({value,label,tone,small=false}:{value:string;label:string;tone:"nude"|"dust"|"cream"|"wine";small?:boolean}){const cls={nude:"bg-[#EEE0D5]",dust:"bg-[#E8D0CF]",cream:"bg-[#F5ECE3]",wine:"bg-[#6F3642] text-white"}[tone];return <div className={`relative overflow-hidden rounded-[22px] border border-white/35 p-4 shadow-[0_8px_24px_rgba(52,38,31,.04)] ${cls}`}><span className="absolute -right-8 -bottom-8 h-20 w-24 rounded-full bg-white/20 blur-xl"/><p className={`relative font-serif leading-none ${small?"text-[18px]":"text-[30px]"}`}>{value}</p><p className="relative mt-2 text-[8px] uppercase tracking-[.14em] opacity-65">{label}</p></div>}
@@ -164,3 +179,5 @@ function Mini({label,value}:{label:string;value:string}){return <div className="
 function Row({label,value,strong=false,light=false}:{label:string;value:string;strong?:boolean;light?:boolean}){return <div className="mt-2 flex items-center justify-between gap-4"><span className={`text-[10px] ${light?"text-white/65":"text-taupe"}`}>{label}</span><span className={`${strong?"font-serif text-[24px]":"text-[12px] font-medium"} ${light?"text-white":""}`}>{value}</span></div>}
 function money(cents:number){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format((cents||0)/100)}
 function fmtPct(n:number){return Number.isInteger(Number(n))?String(Number(n)):Number(n).toFixed(1)}
+
+function effectivePct(staff:StaffInfo,a:Appointment,rules:Rule[]){const sr=rules.find(r=>r.staff_id===staff.id&&r.scope_type==="service"&&r.service_id===a.service_id);if(sr)return Number(sr.salon_percentage||0);const cat=a.service_category||a.service?.category||null;const cr=rules.find(r=>r.staff_id===staff.id&&r.scope_type==="category"&&r.category===cat);if(cr)return Number(cr.salon_percentage||0);return Number(staff.salon_percentage||0)}
