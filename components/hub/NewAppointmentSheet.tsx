@@ -75,8 +75,21 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
       p_client_phone:client.phone||"",p_client_email:client.email||null,
       p_notes_internal:notes.trim()||null,p_source:"gloria_hub"
     });
+    if(error){setLoading(false);setError(error.message);return;}
+    if(client.email){
+      try{
+        const response=await fetch("/api/send-confirmation",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+          clientName:`${client.first_name} ${client.last_name}`.trim(),
+          clientEmail:client.email,
+          serviceId,
+          staffId,
+          startAt:slot
+        })});
+        const emailResult=await response.json();
+        if(!emailResult?.ok) setError("La cita se guardó, pero el correo de confirmación no pudo enviarse.");
+      }catch{setError("La cita se guardó, pero el correo de confirmación no pudo enviarse.");}
+    }
     setLoading(false);
-    if(error){setError(error.message);return;}
     setDone(true);
     setTimeout(()=>{setDone(false);setClientId("");setCategory("hair");setServiceId("");setStaffId("");setSlot("");setNotes("");onCreated();onClose()},650);
   }
