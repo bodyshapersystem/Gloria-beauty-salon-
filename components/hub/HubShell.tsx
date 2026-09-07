@@ -3,11 +3,12 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CalendarRange, ChevronRight, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X } from "lucide-react";
+import { CalendarDays, CalendarRange, ChevronRight, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X, LogOut } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
 type HubUser={role:"owner"|"admin"|"staff";staff_id:string|null};
+type Identity={name:string;photo_url:string|null};
 type NavItem={label:string;href:string;icon:any};
 
 const adminNav:NavItem[]=[
@@ -21,6 +22,7 @@ function staffRouteAllowed(pathname:string){if(pathname.startsWith("/hub/calenda
 export function HubShell({children}:{children:React.ReactNode}){
   const [user,setUser]=useState<HubUser|null>(null);
   const [loading,setLoading]=useState(true);
+  const [identity,setIdentity]=useState<Identity>({name:"Gloria",photo_url:null});
   const [moreOpen,setMoreOpen]=useState(false);
   const pathname=usePathname();
   const router=useRouter();
@@ -31,9 +33,13 @@ export function HubShell({children}:{children:React.ReactNode}){
     const {data}=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();
     if(!data||!["owner","admin","staff"].includes(data.role)){setLoading(false);router.replace("/access");return;}
     if(data.role==="staff"&&!staffRouteAllowed(pathname)){setUser(data as HubUser);setLoading(false);router.replace("/hub/my-agenda");return;}
-    setUser(data as HubUser);setLoading(false);
+    setUser(data as HubUser);
+    if(data.staff_id){const {data:st}=await supabase.from("staff").select("name,photo_url").eq("id",data.staff_id).maybeSingle();if(st)setIdentity({name:st.name||"Team",photo_url:st.photo_url||null});}else{setIdentity({name:"Gloria",photo_url:null});}
+    setLoading(false);
   })()},[pathname,router]);
 
+  async function logout(){await supabase.auth.signOut();router.replace("/hub-login");router.refresh();}
+  const hour=new Date().getHours();const greeting=hour<12?"Buenos días":hour<19?"Buenas tardes":"Buenas noches";
   const isStaff=user?.role==="staff";
   const nav=useMemo(()=>isStaff?staffNav:adminNav,[isStaff]);
   if(loading)return <div className="min-h-screen bg-ivory flex items-center justify-center"><div className="text-center"><Logo className="h-20 w-auto mx-auto"/><p className="mt-4 text-[10px] uppercase tracking-[0.3em] text-taupe">Abriendo Gloria {isStaff?"Team":"Hub"}</p></div></div>;
@@ -44,11 +50,16 @@ export function HubShell({children}:{children:React.ReactNode}){
       <div className="px-2"><Logo className="h-11 w-auto brightness-[4] grayscale"/><p className="mt-4 text-[7px] uppercase tracking-[0.28em] text-champagne/70">{isStaff?"Gloria Team":"Gloria Hub"}</p><p className="mt-1.5 font-serif text-[18px] leading-tight text-ivory/95">{isStaff?"Tu día, más simple.":"Beauty lives here."}</p></div>
       <Link href="/hub/calendar?new=1" className="mt-4 flex items-center rounded-[13px] bg-ivory px-3.5 py-3 text-espresso"><span className="flex items-center gap-2 text-[9px] uppercase tracking-[0.13em]"><Plus size={15}/> Nueva cita</span></Link>
       <nav className="mt-4 space-y-1">{nav.map(item=>{const Icon=item.icon;const active=pathname===item.href||pathname.startsWith(item.href+"/");return <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-[10px] transition-all ${active?"bg-white/12 text-white":"text-ivory/65 hover:bg-white/7 hover:text-white"}`}><Icon size={16}/><span>{item.label}</span>{active&&<span className="ml-auto h-1.5 w-1.5 rounded-full bg-champagne"/>}</Link>})}</nav>
-      <div className="mt-auto border-t border-white/10 pt-3"><Link href="/hub/profile" className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-[10px] text-ivory/60 hover:bg-white/7 hover:text-white"><UserRound size={16}/> Mi Perfil</Link>{!isStaff&&<Link href="/hub/settings/appointments" className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-[10px] text-ivory/60 hover:bg-white/7 hover:text-white"><Settings size={16}/> Configuración</Link>}</div>
+      <div className="mt-auto border-t border-white/10 pt-3">
+        <Link href="/hub/profile" className="mb-2 flex items-center gap-3 rounded-[14px] bg-white/[.06] px-3 py-3">
+          <span className="h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/15 bg-white/10">{identity.photo_url?<img src={identity.photo_url} alt={identity.name} className="h-full w-full object-cover"/>:<span className="grid h-full place-items-center font-serif text-[16px] text-champagne">{identity.name[0]}</span>}</span>
+          <span className="min-w-0"><span className="block text-[7px] uppercase tracking-[.15em] text-ivory/45">{greeting}</span><span className="mt-0.5 block truncate font-serif text-[16px] text-ivory">{identity.name}</span></span>
+        </Link>
+        <Link href="/hub/profile" className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-[10px] text-ivory/60 hover:bg-white/7 hover:text-white"><UserRound size={16}/> Mi Perfil</Link>{!isStaff&&<Link href="/hub/settings/appointments" className="flex items-center gap-3 rounded-[12px] px-3 py-2.5 text-[10px] text-ivory/60 hover:bg-white/7 hover:text-white"><Settings size={16}/> Configuración</Link>}<button onClick={logout} className="flex w-full items-center gap-3 rounded-[12px] px-3 py-2.5 text-[10px] text-ivory/50 hover:bg-white/7 hover:text-white"><LogOut size={16}/> Cerrar sesión</button></div>
     </aside>
 
     <div className="min-w-0">
-      <header className="sticky top-0 z-40 border-b border-champagne/20 bg-[#F7F3ED]/94 backdrop-blur-xl"><div className="h-[66px] px-4 md:px-7 lg:px-9 flex items-center justify-between gap-4 max-w-[1580px] mx-auto"><div className="md:hidden"><Logo className="h-11 w-auto"/></div><div className="hidden md:block"><p className="text-[8px] uppercase tracking-[0.24em] text-taupe">{isStaff?"Gloria Team":"Gloria Hub"}</p><p className="mt-1 text-[11px] text-mocha">{isStaff?"Agenda + clientas + progreso":"Todo lo importante, sin ruido"}</p></div><div className="flex items-center gap-2"><Link href="/hub/calendar?new=1" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[#6F3642] px-4 py-2.5 text-[9px] uppercase tracking-[0.13em] text-white"><Plus size={14}/> Nueva cita</Link><button className="md:hidden grid h-10 w-10 place-items-center rounded-full border border-champagne/35 bg-white/60" onClick={()=>setMoreOpen(true)} aria-label="Más opciones"><Menu size={21}/></button></div></div></header>
+      <header className="sticky top-0 z-40 border-b border-champagne/20 bg-[#F7F3ED]/94 backdrop-blur-xl"><div className="h-[66px] px-4 md:px-7 lg:px-9 flex items-center justify-between gap-4 max-w-[1580px] mx-auto"><div className="md:hidden"><Logo className="h-11 w-auto"/></div><div className="hidden md:flex items-center gap-3"><span className="h-9 w-9 overflow-hidden rounded-full border border-champagne/40 bg-[#EADDD4]">{identity.photo_url?<img src={identity.photo_url} alt={identity.name} className="h-full w-full object-cover"/>:<span className="grid h-full place-items-center font-serif text-[15px] text-mocha">{identity.name[0]}</span>}</span><div><p className="text-[8px] uppercase tracking-[0.2em] text-taupe">{greeting}</p><p className="mt-0.5 font-serif text-[17px] leading-none text-mocha">{identity.name}</p></div></div><div className="flex items-center gap-2"><Link href="/hub/calendar?new=1" className="hidden sm:inline-flex items-center gap-2 rounded-full bg-[#6F3642] px-4 py-2.5 text-[9px] uppercase tracking-[0.13em] text-white"><Plus size={14}/> Nueva cita</Link><button className="md:hidden grid h-10 w-10 place-items-center rounded-full border border-champagne/35 bg-white/60" onClick={()=>setMoreOpen(true)} aria-label="Más opciones"><Menu size={21}/></button></div></div></header>
       <main className="px-4 md:px-7 lg:px-9 py-5 md:py-8 max-w-[1580px] mx-auto">{children}</main>
     </div>
 
@@ -64,7 +75,7 @@ export function HubShell({children}:{children:React.ReactNode}){
           </div>
         </div>
 
-        <div className="p-4">
+        <div className="p-4"><Link href="/hub/profile" onClick={()=>setMoreOpen(false)} className="mb-4 flex items-center gap-3 rounded-[17px] border border-champagne/25 bg-white/55 p-3"><span className="h-11 w-11 overflow-hidden rounded-full bg-[#EADDD4]">{identity.photo_url?<img src={identity.photo_url} alt={identity.name} className="h-full w-full object-cover"/>:<span className="grid h-full place-items-center font-serif text-[18px] text-mocha">{identity.name[0]}</span>}</span><span><span className="block text-[7px] uppercase tracking-[.16em] text-taupe">{greeting}</span><span className="mt-1 block font-serif text-[19px] text-mocha">{identity.name}</span></span></Link>
           <Link href="/hub/calendar?new=1" onClick={()=>setMoreOpen(false)} className="mb-4 flex items-center justify-between rounded-[16px] bg-[#6F3642] px-4 py-3.5 text-white shadow-[0_8px_22px_rgba(111,54,66,.18)]"><span className="flex items-center gap-3 text-[9px] uppercase tracking-[.14em]"><Plus size={16}/> Nueva cita</span><ChevronRight size={16}/></Link>
 
           <nav className="space-y-1">
@@ -76,7 +87,7 @@ export function HubShell({children}:{children:React.ReactNode}){
             {!isStaff&&<Link href="/hub/settings/appointments" onClick={()=>setMoreOpen(false)} className="flex items-center gap-3 rounded-[14px] px-3.5 py-3 text-[11px] text-taupe hover:bg-white/70"><span className="grid h-9 w-9 place-items-center rounded-full bg-[#F1E6DD] text-mocha"><Settings size={16}/></span><span className="flex-1">Configuración</span><ChevronRight size={14} className="opacity-45"/></Link>}
           </div>
 
-          <p className="mt-8 px-3 font-serif text-[16px] italic text-mocha">Realza tu esencia, define tu estilo.</p>
+          <button onClick={logout} className="mt-6 flex w-full items-center gap-3 rounded-[14px] border border-[#DCCFC5] px-4 py-3 text-[10px] text-taupe"><LogOut size={16}/> Cerrar sesión</button><p className="mt-6 px-3 font-serif text-[16px] italic text-mocha">Realza tu esencia, define tu estilo.</p>
         </div>
       </aside>
     </div>}
