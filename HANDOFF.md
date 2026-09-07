@@ -195,6 +195,10 @@ Never place secret keys/tokens in this file or chat.
   - Master sending address decided: reservas@gloriabeautysalonmiami.com
     (source of truth: lib/emails/base.ts SITE.fromAddress). Sending-only,
     no inbox — never present as a reply-to/support address.
+  - Reply-to inbox: gloriabeauty.hello@gmail.com (SITE.replyToAddress) —
+    a real Gmail inbox Gloria checks. Client replies to automated emails
+    land here. Gmail can't be the "from" address itself (Resend requires
+    DNS-verified domain ownership, which isn't possible for gmail.com).
   - Domain (gloriabeautysalonmiami.com) still needs to be verified inside
     Resend (SPF/DKIM/DMARC DNS records) before any send will work.
 - Access invitation automation

@@ -28,6 +28,10 @@ export const SITE = {
   // present this as a reply-to or support address.
   fromAddress: "reservas@gloriabeautysalonmiami.com",
   fromName: "Gloria Beauty Salon",
+  // Real inbox Gloria can check. Resend can't send "from" a gmail.com
+  // address (no DNS control to verify it), so this is set as reply-to
+  // instead: client replies to any automated email land here.
+  replyToAddress: "gloriabeauty.hello@gmail.com",
   logoUrl: "https://www.gloriabeautysalonmiami.com/images/gloria/logo/gloria-logo.png",
 };
 
