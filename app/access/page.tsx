@@ -5,7 +5,6 @@ import Link from "next/link";
 import { CalendarDays, ChevronRight, ShoppingBag, Sparkles, UserRound } from "lucide-react";
 import { useAccess } from "@/components/access/AccessShell";
 import { GloriaDashboardCover } from "@/components/ui/GloriaDashboardCover";
-import { gloriaWineCardArt } from "@/lib/ui/gloriaArt";
 import { supabase } from "@/lib/supabase/client";
 
 type Appointment={id:string;start_at:string;end_at:string;status:string;service:{name:string;duration_minutes:number}|null;staff:{name:string}|null};
@@ -30,6 +29,7 @@ export default function AccessHomePage(){
     </div></section>
   </div>
 }
-function WineCard({href,title,sub}:{href:string;title:string;sub:string}){return <Link href={href} className="relative min-h-[165px] overflow-hidden rounded-[23px] border border-white/20 p-5 text-white shadow-[0_12px_30px_rgba(92,43,50,.16)]" style={{backgroundImage:`linear-gradient(rgba(72,22,28,.18),rgba(72,22,28,.18)),url("${gloriaWineCardArt}")`,backgroundSize:"cover",backgroundPosition:"center"}}><p className="relative font-serif text-[27px] leading-none">{title}</p><p className="relative mt-3 max-w-[220px] text-[9px] leading-relaxed text-white/75">{sub}</p><span className="absolute bottom-5 right-5 grid h-9 w-9 place-items-center rounded-full border border-white/30 bg-white/10"><ChevronRight size={15}/></span></Link>}
+function WineCard({href,title,sub}:{href:string;title:string;sub:string}){return <Link href={href} className="relative min-h-[165px] overflow-hidden rounded-[23px] border border-white/20 p-5 text-white shadow-[0_12px_30px_rgba(92,43,50,.16)]" style={{backgroundImage:wineBackground}}><span className="pointer-events-none absolute -right-8 -top-10 h-32 w-40 rotate-[12deg] rounded-[58%_42%_64%_36%/48%_58%_42%_52%] bg-white/10 blur-[2px]"/><span className="pointer-events-none absolute -right-12 bottom-[-22%] h-28 w-44 rounded-[55%] bg-[#D99A9E]/20 blur-2xl"/><p className="relative font-serif text-[27px] leading-none">{title}</p><p className="relative mt-3 max-w-[220px] text-[9px] leading-relaxed text-white/75">{sub}</p><span className="absolute bottom-5 right-5 grid h-9 w-9 place-items-center rounded-full border border-white/30 bg-white/10"><ChevronRight size={15}/></span></Link>}
 function SoftCard({href,title,sub}:{href:string;title:string;sub:string}){return <Link href={href} className="relative min-h-[165px] overflow-hidden rounded-[23px] border border-[#DDCDC1] bg-[linear-gradient(135deg,#F5E9DF,#DEC7BA)] p-5 text-[#4A352B] shadow-[0_10px_26px_rgba(52,38,31,.05)]"><p className="font-serif text-[27px] leading-none">{title}</p><p className="mt-3 max-w-[220px] text-[9px] leading-relaxed text-taupe">{sub}</p><span className="absolute bottom-5 right-5 grid h-9 w-9 place-items-center rounded-full bg-white/60"><ChevronRight size={15}/></span></Link>}
+const wineBackground="radial-gradient(circle at 18% 16%,rgba(255,215,218,.18),transparent 22%),radial-gradient(ellipse at 84% 18%,rgba(255,242,236,.14),transparent 26%),radial-gradient(ellipse at 70% 92%,rgba(196,115,125,.20),transparent 36%),linear-gradient(145deg,#7B3C48 0%,#602F39 45%,#45222B 100%)";
 function formatTime(v:string){return new Date(v).toLocaleTimeString("es-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})}
