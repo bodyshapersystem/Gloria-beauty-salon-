@@ -35,6 +35,7 @@ function normalizeCategory(s:Service){
 }
 
 export default function ServicesPage(){
+  const [isStaff,setIsStaff]=useState(false);
   const [items,setItems]=useState<Service[]>([]);
   const [selected,setSelected]=useState<string|null>(null);
   const [editing,setEditing]=useState<Service|null>(null);
@@ -46,7 +47,7 @@ export default function ServicesPage(){
     const {data}=await supabase.from("services").select("id,name,category,duration_minutes,price_label,active").order("name");
     setItems((data as Service[])||[]);
   }
-  useEffect(()=>{load()},[]);
+  useEffect(()=>{load();(async()=>{const {data:{session}}=await supabase.auth.getSession();if(!session)return;const {data:p}=await supabase.from("user_profiles").select("role").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();setIsStaff(p?.role==="staff")})()},[]);
 
   const groups=useMemo(()=>{
     const m=new Map<string,Service[]>();
@@ -65,7 +66,7 @@ export default function ServicesPage(){
       <div className="absolute -right-12 -bottom-16 h-48 w-64 rounded-[50%] bg-[#7B3C48]/14 blur-3xl"/>
       <div className="relative flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div><p className="text-[9px] uppercase tracking-[.26em] text-mocha">Gloria Hub</p><h1 className="mt-2 font-serif text-[48px] md:text-[60px] leading-none">Servicios</h1><p className="mt-3 max-w-[540px] text-[11px] leading-relaxed text-taupe">Tu catálogo, organizado como una carta editorial. Entra por categoría y edita solo lo que necesitas.</p></div>
-        <button onClick={()=>setCreating(true)} className="inline-flex items-center gap-2 self-start rounded-full bg-[#4A352B] px-5 py-3 text-[9px] uppercase tracking-[.13em] text-ivory"><Plus size={14}/> Agregar servicio</button>
+        {!isStaff&&<button onClick={()=>setCreating(true)} className="inline-flex items-center gap-2 self-start rounded-full bg-[#4A352B] px-5 py-3 text-[9px] uppercase tracking-[.13em] text-ivory"><Plus size={14}/> Agregar servicio</button>}
       </div>
     </section>
 
@@ -86,7 +87,7 @@ export default function ServicesPage(){
           {open&&<div className="divide-y divide-[#E9DDD4]">
             {list.map(s=><div key={s.id} className="flex items-center gap-3 px-4 py-4 md:px-5">
               <div className="min-w-0 flex-1"><div className="flex items-center gap-2"><p className="truncate font-serif text-[21px]">{s.name}</p><span className={`rounded-full px-2 py-1 text-[7px] uppercase tracking-[.08em] ${s.active?"bg-[#DFE8D9] text-[#4A6045]":"bg-[#EEE6E1] text-taupe"}`}>{s.active?"Activo":"Inactivo"}</span></div><p className="mt-1 text-[9px] text-taupe">{s.price_label} · {s.duration_minutes} min</p></div>
-              <button onClick={()=>setEditing(s)} className="grid h-10 w-10 place-items-center rounded-full border border-[#D8C8BC] bg-[#FBF8F3] text-mocha"><MoreHorizontal size={17}/></button>
+              {!isStaff&&<button onClick={()=>setEditing(s)} className="grid h-10 w-10 place-items-center rounded-full border border-[#D8C8BC] bg-[#FBF8F3] text-mocha"><MoreHorizontal size={17}/></button>}
             </div>)}
           </div>}
         </section>
