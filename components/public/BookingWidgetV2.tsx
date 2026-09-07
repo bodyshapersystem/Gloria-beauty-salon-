@@ -26,6 +26,7 @@ export function BookingWidgetV2(){
   const [staff,setStaff]=useState<Staff[]>([]);
   const [staffChoice,setStaffChoice]=useState<Staff|"any"|null>(null);
   const [preferredStaffSlug,setPreferredStaffSlug]=useState<string|null>(null);
+  const [preferredCategory,setPreferredCategory]=useState<string|null>(null);
   const [date,setDate]=useState(today());
   const [preferredTime,setPreferredTime]=useState("");
   const [slots,setSlots]=useState<Slot[]>([]);
@@ -46,16 +47,21 @@ export function BookingWidgetV2(){
       supabase.from("staff_services").select("staff_id,service_id")
     ]);
     setServices((s as Service[])||[]);setAllStaff((t as Staff[])||[]);setAssignments((a as Assignment[])||[]);
-    if(typeof window!=="undefined")setPreferredStaffSlug(new URLSearchParams(window.location.search).get("staff"));
+    if(typeof window!=="undefined"){const params=new URLSearchParams(window.location.search);setPreferredStaffSlug(params.get("staff"));setPreferredCategory(params.get("category"));}
   })()},[]);
 
   const visibleServices=useMemo(()=>{
-    if(!preferredStaffSlug)return services;
+    let rows=services;
+    if(preferredCategory){
+      const cats=preferredCategory.split(",").map(x=>x.trim()).filter(Boolean);
+      rows=rows.filter(s=>cats.includes(s.category));
+    }
+    if(!preferredStaffSlug)return rows;
     const person=allStaff.find(s=>s.slug===preferredStaffSlug);
-    if(!person)return services;
+    if(!person)return rows;
     const ids=new Set(assignments.filter(a=>a.staff_id===person.id).map(a=>a.service_id));
-    return services.filter(s=>ids.has(s.id));
-  },[services,allStaff,assignments,preferredStaffSlug]);
+    return rows.filter(s=>ids.has(s.id));
+  },[services,allStaff,assignments,preferredStaffSlug,preferredCategory]);
 
   useEffect(()=>{if(!service)return;const rows=allStaff.filter(s=>assignments.some(a=>a.staff_id===s.id&&a.service_id===service.id));setStaff(rows);const preferred=preferredStaffSlug?rows.find(s=>s.slug===preferredStaffSlug):null;if(preferred)setStaffChoice(preferred)},[service?.id,allStaff,assignments,preferredStaffSlug]);
 
@@ -75,7 +81,7 @@ export function BookingWidgetV2(){
     <div className="mb-7 rounded-[18px] border border-[#DCCFC5] bg-[#F7EFE9] p-4"><div className="flex gap-3"><Sparkles size={17} className="mt-0.5 shrink-0 text-[#7B3C48]"/><p className="text-[11px] leading-relaxed text-mocha"><strong>Reserva inmediata:</strong> secados, cejas y wax. <strong>Otros servicios:</strong> se envían como solicitud y son confirmados por nuestro team según disponibilidad.</p></div></div>
     <div className="flex flex-wrap gap-2 mb-9 text-[10px] uppercase tracking-[0.13em] text-taupe">{["Servicio","Profesional","Fecha","Datos"].map((x,i)=><span key={x} className={step===i+1?"text-espresso font-semibold":step>i+1?"text-mocha":"text-taupe/45"}>{i+1}. {x}{i<3?"  —  ":""}</span>)}</div>
 
-    {step===1&&<div className="space-y-8">{preferredStaffSlug&&<p className="text-[11px] text-taupe">Mostrando servicios disponibles con <strong className="text-mocha">{allStaff.find(s=>s.slug===preferredStaffSlug)?.name||"esta profesional"}</strong>.</p>}{grouped.map(([cat,list])=><section key={cat}><p className="mb-3 text-[10px] uppercase tracking-[0.18em] text-mocha">{labels[cat]||cat}</p><div className="border-y border-champagne/30 divide-y divide-champagne/20">{list.map(s=><button key={s.id} onClick={()=>{setService(s);setStaffChoice(null);setStep(2)}} className="w-full flex items-center justify-between gap-4 py-4 text-left hover:bg-blush/25"><div><p className="text-[14px]">{s.name}</p><p className="mt-1 text-[11px] text-taupe">{duration(s.duration_minutes)} · {isInstantService(s)?"Reserva inmediata":"Solicitud sujeta a confirmación"}</p></div><p className="font-serif italic text-[17px] text-mocha">{s.price_label}</p></button>)}</div></section>)}</div>}
+    {step===1&&<div className="space-y-8">{preferredStaffSlug&&<p className="text-[11px] text-taupe">Mostrando servicios disponibles con <strong className="text-mocha">{allStaff.find(s=>s.slug===preferredStaffSlug)?.name||"esta profesional"}</strong>.</p>}{preferredCategory&&<p className="text-[11px] text-taupe">Mostrando la categoría seleccionada. <button onClick={()=>setPreferredCategory(null)} className="font-semibold text-mocha underline underline-offset-2">Ver todos los servicios</button></p>}{grouped.map(([cat,list])=><section key={cat}><p className="mb-3 text-[10px] uppercase tracking-[0.18em] text-mocha">{labels[cat]||cat}</p><div className="border-y border-champagne/30 divide-y divide-champagne/20">{list.map(s=><button key={s.id} onClick={()=>{setService(s);setStaffChoice(null);setStep(2)}} className="w-full flex items-center justify-between gap-4 py-4 text-left hover:bg-blush/25"><div><p className="text-[14px]">{s.name}</p><p className="mt-1 text-[11px] text-taupe">{duration(s.duration_minutes)} · {isInstantService(s)?"Reserva inmediata":"Solicitud sujeta a confirmación"}</p></div><p className="font-serif italic text-[17px] text-mocha">{s.price_label}</p></button>)}</div></section>)}</div>}
 
     {step===2&&service&&<div><button onClick={()=>setStep(1)} className="flex items-center gap-1 text-[12px] text-taupe"><ChevronLeft size={14}/> Cambiar servicio</button><div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">{!preferredStaffSlug&&<button onClick={()=>{setStaffChoice("any");setStep(3)}} className="border border-champagne/35 p-5 text-center hover:border-mocha"><div className="mx-auto h-16 w-16 rounded-full bg-blush flex items-center justify-center text-[10px] text-mocha">ANY</div><p className="mt-3 text-[13px]">Primera disponible</p></button>}{staff.map(s=><button key={s.id} onClick={()=>{setStaffChoice(s);setStep(3)}} className="border border-champagne/35 p-5 text-center hover:border-mocha"><div className="relative mx-auto h-16 w-16 overflow-hidden rounded-full bg-blush">{s.photo_url&&<Image src={s.photo_url} alt={s.name} fill className="object-cover"/>}</div><p className="mt-3 text-[13px]">{s.name}</p><p className="mt-1 text-[10px] text-taupe">{s.role}</p></button>)}</div></div>}
 
