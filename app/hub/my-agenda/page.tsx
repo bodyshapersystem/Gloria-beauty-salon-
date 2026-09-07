@@ -7,16 +7,27 @@ import { GloriaDashboardCover } from "@/components/ui/GloriaDashboardCover";
 import { supabase } from "@/lib/supabase/client";
 
 type Appointment={id:string;client_name:string;client_phone:string;start_at:string;end_at:string;status:string;service:{name:string;category:string}|null};
-type Staff={id:string;name:string;photo_url:string|null};
+type Staff={id:string;name:string;photo_url:string|null;role:string|null};
 const statusLabels:Record<string,string>={pending:"Pendiente",confirmed:"Confirmada",in_progress:"En curso",completed:"Completada",cancelled:"Cancelada",no_show:"No se presentó"};
 
 export default function MyAgendaPage(){
   const [items,setItems]=useState<Appointment[]>([]);const [staff,setStaff]=useState<Staff|null>(null);const [loading,setLoading]=useState(true);
-  useEffect(()=>{(async()=>{const {data:{session}}=await supabase.auth.getSession();let staffId:string|null=null;if(session){const {data:p}=await supabase.from("user_profiles").select("staff_id").eq("auth_user_id",session.user.id).maybeSingle();staffId=p?.staff_id||null;if(staffId){const {data:s}=await supabase.from("staff").select("id,name,photo_url").eq("id",staffId).maybeSingle();setStaff((s as Staff|null)||null)}}const start=new Date();start.setHours(0,0,0,0);const end=new Date(start);end.setDate(end.getDate()+1);let q=supabase.from("appointments").select("id,client_name,client_phone,start_at,end_at,status,service:service_id(name,category)").gte("start_at",start.toISOString()).lt("start_at",end.toISOString()).order("start_at");if(staffId)q=q.eq("staff_id",staffId);const {data}=await q;setItems(((data as unknown) as Appointment[])||[]);setLoading(false)})()},[]);
-  const active=useMemo(()=>items.filter(x=>!["cancelled","no_show"].includes(x.status)),[items]);const name=staff?.name||"Team";
+  useEffect(()=>{(async()=>{const {data:{session}}=await supabase.auth.getSession();let staffId:string|null=null;if(session){const {data:p}=await supabase.from("user_profiles").select("staff_id").eq("auth_user_id",session.user.id).maybeSingle();staffId=p?.staff_id||null;if(staffId){const {data:s}=await supabase.from("staff").select("id,name,photo_url,role").eq("id",staffId).maybeSingle();setStaff((s as Staff|null)||null)}}const start=new Date();start.setHours(0,0,0,0);const end=new Date(start);end.setDate(end.getDate()+1);let q=supabase.from("appointments").select("id,client_name,client_phone,start_at,end_at,status,service:service_id(name,category)").gte("start_at",start.toISOString()).lt("start_at",end.toISOString()).order("start_at");if(staffId)q=q.eq("staff_id",staffId);const {data}=await q;setItems(((data as unknown) as Appointment[])||[]);setLoading(false)})()},[]);
+  const active=useMemo(()=>items.filter(x=>!["cancelled","no_show"].includes(x.status)),[items]);
+  const completed=useMemo(()=>items.filter(x=>x.status==="completed"),[items]);
+  const revenue=useMemo(()=>completed.reduce((n,x)=>n+(Number((x as any).price_cents)||0),0),[completed]);
+  const clients=useMemo(()=>new Set(active.map(x=>x.client_name.trim().toLowerCase())).size,[active]);
+  const attendance=active.length?Math.round((completed.length/active.length)*100):100;
+  const name=staff?.name||"Team";
+  const message=professionMessage(name,staff?.role||"");
 
   return <div className="pb-5">
-    <GloriaDashboardCover role="TEAM" name={name} tagline={["Tu talento","hace la diferencia."]} metricValue={loading?"…":String(active.length)} metricLabel="Citas hoy" metricHref="/hub/my-agenda" shortcuts={[
+    <GloriaDashboardCover role="HUB - TEAM" name={name} photoUrl={staff?.photo_url} professionMessage={message} tagline={["Same girls.","Higher standards."]} businessMetrics={[
+      {label:"Citas hoy",value:loading?"…":String(active.length)},
+      {label:"Ingresos hoy",value:money(revenue)},
+      {label:"Clientas",value:String(clients)},
+      {label:"Asistencia",value:String(attendance)+"%"}
+    ]} metricValue={loading?"…":String(active.length)} metricLabel="Citas hoy" metricHref="/hub/my-agenda" shortcuts={[
       {label:"Mis Citas",href:"/hub/my-agenda",icon:<CalendarDays size={19}/>},
       {label:"Mis Clientes",href:"/hub/clients",icon:<UsersRound size={19}/>},
       {label:"Calendario",href:"/hub/calendar",icon:<Scissors size={19}/>},
@@ -28,3 +39,13 @@ export default function MyAgendaPage(){
 }
 function time(v:string){return new Date(v).toLocaleTimeString("es-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})}
 function minutes(a:string,b:string){return Math.round((+new Date(b)-+new Date(a))/60000)}
+
+function professionMessage(name:string,role:string){
+  const key=(name+" "+role).toLowerCase();
+  if(key.includes("caro")||key.includes("lash"))return "Lashes change everything.";
+  if(key.includes("diana")||key.includes("nail")||key.includes("brow")||key.includes("makeup"))return "Beauty is in the details.";
+  if(key.includes("emmy")||key.includes("tan"))return "Sun-kissed confidence, every day.";
+  if(key.includes("nudis")||key.includes("hair")||key.includes("color"))return "Great hair changes everything.";
+  return "Beauty creates confidence.";
+}
+function money(c:number){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format((c||0)/100)}
