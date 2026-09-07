@@ -27,7 +27,7 @@ export function HubShell({children}:{children:React.ReactNode}){
 
   useEffect(()=>{(async()=>{
     const {data:{session}}=await supabase.auth.getSession();
-    if(!session){setLoading(false);router.replace("/hub/login");return;}
+    if(!session){setLoading(false);router.replace("/hub-login");return;}
     const {data}=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();
     if(!data||!["owner","admin","staff"].includes(data.role)){setLoading(false);router.replace("/access");return;}
     if(data.role==="staff"&&!staffRouteAllowed(pathname)){setUser(data as HubUser);setLoading(false);router.replace("/hub/my-agenda");return;}
