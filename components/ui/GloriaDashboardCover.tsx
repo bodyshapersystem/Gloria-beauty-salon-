@@ -56,7 +56,7 @@ export function GloriaDashboardCover({
       </div>
 
       <div className="mt-auto">
-        {businessMetrics?.length?<div className="rounded-[24px] border border-white/70 bg-[#FCF8F5]/92 p-4 shadow-[0_14px_34px_rgba(74,45,38,.10)] backdrop-blur-md md:max-w-[760px]">
+        {businessMetrics?.length?<div className="rounded-[24px] border border-white/70 bg-[#6A493F]/60 p-4 shadow-[0_14px_34px_rgba(74,45,38,.18)] backdrop-blur-xl md:max-w-[760px]">
           <div className="flex items-center justify-between gap-4">
             <h2 className="font-serif text-[26px] text-[#4A2A26]">Today&apos;s Business</h2>
             <span className="h-px flex-1 bg-[#B77B7B]/45"/>
