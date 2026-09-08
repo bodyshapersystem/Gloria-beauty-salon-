@@ -197,15 +197,17 @@ Never place secret keys/tokens in this file or chat.
 
 ## Deferred Until Core Product Is Stable
 - reminder/rebooking/birthday automation delivery
-- compliant SMS appointment notifications (Twilio):
+- compliant RCS + SMS appointment notifications and two-way Hub chat (Twilio):
   - provision a dedicated US number and Twilio Messaging Service
+  - verify the Gloria Beauty Salon RCS sender so supported phones display the salon name, logo, rich cards and action buttons
   - register Gloria Beauty Salon as an A2P 10DLC Low-Volume Standard Brand/Campaign
   - capture and store explicit SMS consent, source, timestamp and opt-out status for every client
   - never assume imported Vagaro contacts consented unless their consent can be documented
   - send confirmation, reschedule, cancellation, 24-hour reminder and optional 2-hour reminder messages
+  - use branded RCS with Confirm, Reschedule, Cancel and Pay Deposit actions when supported, with automatic SMS fallback
   - add deposit/payment-link and payment-received notifications when Stripe is connected
   - support STOP, START and HELP and record Twilio delivery callbacks/failures in Supabase
-  - show message delivery status in Hub and use email only as a secondary channel when available
+  - show inbound/outbound client conversations and message delivery status in Hub; use email only as a secondary channel when available
 - Stripe payments end to end:
   - connect the Gloria Stripe account and production webhooks
   - let clients buy Shop products directly on the site with Stripe Checkout
