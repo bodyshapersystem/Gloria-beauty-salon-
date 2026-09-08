@@ -72,8 +72,8 @@ export function GloriaDashboardCover({
             <div><p className="font-serif text-[36px] leading-none text-[#5B302E]">{metricValue}</p><p className="mt-2 text-[10px] text-[#6E574F]">{metricLabel}</p></div><ChevronRight size={20} className="text-[#6B413A]"/>
           </Link>
         </>}
-        <div className="mt-3 grid grid-cols-4 gap-2 md:max-w-[620px] md:gap-3">
-          {shortcuts.slice(0,4).map(s=><Link key={s.href+s.label} href={s.href} className="flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[18px] border border-white/75 bg-[#FCF9F5]/88 px-2 text-[#5A352E] shadow-[0_10px_24px_rgba(73,46,40,.06)] backdrop-blur-md transition hover:-translate-y-0.5"><span>{s.icon}</span><span className="text-center text-[8px] leading-tight">{s.label}</span></Link>)}
+        <div className="mt-3 grid grid-cols-4 gap-2 rounded-[22px] border border-white/45 bg-[#6A493F]/50 p-2.5 shadow-[0_12px_30px_rgba(74,45,38,.15)] backdrop-blur-xl md:max-w-[620px] md:gap-3">
+          {shortcuts.slice(0,4).map(s=><Link key={s.href+s.label} href={s.href} className="flex min-h-[88px] flex-col items-center justify-center gap-2 rounded-[18px] border border-white/45 bg-white/16 px-2 text-white shadow-[0_10px_24px_rgba(73,46,40,.08)] backdrop-blur-md transition hover:-translate-y-0.5"><span>{s.icon}</span><span className="text-center text-[8px] leading-tight">{s.label}</span></Link>)}
         </div>
       </div>
     </div>
