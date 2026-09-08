@@ -52,6 +52,11 @@ lashes:{Design:{Natural:"lashes-hybrid.webp","Cat Eye":"lashes-cat-eye.webp",Wis
 const anchor={hair:"Length",nails:"Shape",brows:"Shape",lashes:"Type"};
 function img(group,category=cat){return A+files[category][group][s[category][group]]}
 function slug(value){return value.toLowerCase().replace(/\+/g,"plus").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+const exactNails=new Set([
+  "short/round/red","short/round/french","short/round/funny-bunny",
+  "medium/almond/burgundy","medium/almond/mocha-chrome","medium/square/funny-bunny",
+  "long/almond/funny-bunny","long/coffin/funny-bunny"
+]);
 function comboImg(category=cat){
   if(category==="hair"&&s.hair.Length==="Long"&&s.hair.Texture==="Straight"&&s.hair.Color==="Black")return "/beauty-dna-package/matrix/hair/long/straight/black.webp";
   if(category==="hair"&&s.hair.Length==="Short"&&s.hair.Texture==="Straight"){
@@ -60,6 +65,10 @@ function comboImg(category=cat){
   }
   if(category==="hair"&&s.hair.Length==="Medium"&&s.hair.Texture==="Straight"){
     return "/beauty-dna-package/matrix/hair/medium/straight/"+slug(s.hair.Color)+".webp";
+  }
+  if(category==="nails"){
+    const key=[s.nails.Length,s.nails.Shape,s.nails.Color].map(slug).join("/");
+    if(exactNails.has(key))return "/beauty-dna-package/matrix/nails/"+key+".webp";
   }
   return img(activeGroup[category],category)
 }
