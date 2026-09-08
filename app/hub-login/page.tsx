@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
@@ -11,6 +12,7 @@ export default function HubLoginPage(){
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const [loading,setLoading]=useState(false);
+  const [showPassword,setShowPassword]=useState(false);
   const [error,setError]=useState<string|null>(null);
 
   async function submit(e:FormEvent){
@@ -32,7 +34,7 @@ export default function HubLoginPage(){
       </div>
       <form onSubmit={submit} className="px-7 py-7 md:px-10 md:py-9 space-y-4">
         <label className="block"><span className="mb-2 block text-[9px] uppercase tracking-[.16em] text-taupe">Email</span><input type="email" required value={email} onChange={e=>setEmail(e.target.value)} className="w-full rounded-[14px] border border-[#DCCCBF] bg-white/80 px-4 py-3.5 text-[14px] outline-none focus:border-mocha"/></label>
-        <label className="block"><div className="mb-2 flex items-center justify-between gap-3"><span className="block text-[9px] uppercase tracking-[.16em] text-taupe">Contraseña</span><Link href="/hub-forgot-password" className="text-[10px] text-[#7B3C48] underline underline-offset-4">¿La olvidaste?</Link></div><input type="password" required value={password} onChange={e=>setPassword(e.target.value)} className="w-full rounded-[14px] border border-[#DCCCBF] bg-white/80 px-4 py-3.5 text-[14px] outline-none focus:border-mocha"/></label>
+        <label className="block"><div className="mb-2 flex items-center justify-between gap-3"><span className="block text-[9px] uppercase tracking-[.16em] text-taupe">Contraseña</span><Link href="/hub-forgot-password" className="text-[10px] text-[#7B3C48] underline underline-offset-4">¿La olvidaste?</Link></div><div className="relative"><input type={showPassword?"text":"password"} required value={password} onChange={e=>setPassword(e.target.value)} className="w-full rounded-[14px] border border-[#DCCCBF] bg-white/80 px-4 py-3.5 pr-12 text-[14px] outline-none focus:border-mocha"/><button type="button" onClick={()=>setShowPassword(v=>!v)} className="absolute right-3 top-1/2 -translate-y-1/2 grid h-8 w-8 place-items-center rounded-full text-taupe hover:bg-[#EFE4DB]" aria-label={showPassword?"Ocultar contraseña":"Mostrar contraseña"}>{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></div></label>
         {error&&<p className="rounded-[14px] bg-[#EAD6D1]/55 px-4 py-3 text-[11px] text-mocha">{error}</p>}
         <button disabled={loading} className="w-full rounded-full bg-[#4A352B] px-5 py-4 text-[9px] uppercase tracking-[.16em] text-ivory disabled:opacity-50">{loading?"Entrando…":"Entrar a Gloria Hub"}</button>
         <div className="pt-2 text-center"><Link href="/access/login" className="text-[10px] text-taupe underline underline-offset-4">Soy clienta · Gloria Access</Link></div>
