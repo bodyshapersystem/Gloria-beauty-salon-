@@ -54,9 +54,12 @@ function img(group,category=cat){return A+files[category][group][s[category][gro
 function slug(value){return value.toLowerCase().replace(/\+/g,"plus").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
 function comboImg(category=cat){
   if(category==="hair"&&s.hair.Length==="Long"&&s.hair.Texture==="Straight"&&s.hair.Color==="Black")return "/beauty-dna-package/matrix/hair/long/straight/black.webp";
-  if(category==="hair"&&s.hair.Length==="Short"){
+  if(category==="hair"&&s.hair.Length==="Short"&&s.hair.Texture==="Straight"){
     if(s.hair.Color==="Dark Brown")return A+"hair-length-short.webp";
     return "/beauty-dna-package/matrix/hair/short/straight/"+slug(s.hair.Color)+".png";
+  }
+  if(category==="hair"&&s.hair.Length==="Medium"&&s.hair.Texture==="Straight"){
+    return "/beauty-dna-package/matrix/hair/medium/straight/"+slug(s.hair.Color)+".webp";
   }
   return img(activeGroup[category],category)
 }
