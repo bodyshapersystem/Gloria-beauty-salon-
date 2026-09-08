@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarCheck2, ChevronRight, DollarSign, Pencil, Sparkles, TrendingUp, UsersRound, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
-type Appointment={id:string;staff_id:string;service_id:string|null;service_category:string|null;status:string;start_at:string;price_cents:number|null;client_name:string;service:{name:string;category:string}|null};
+type Appointment={id:string;staff_id:string;service_id:string|null;service_category:string|null;status:string;start_at:string;price_cents:number|null;client_name:string;service:{name:string;category:string}|null;client:{client_type:string}|null};
 type StaffInfo={id:string;name:string;photo_url:string|null;salon_percentage:number};
 type Profile={role:"owner"|"admin"|"staff";staff_id:string|null};
 type Rule={staff_id:string;scope_type:"category"|"service";category:string|null;service_id:string|null;salon_percentage:number};
@@ -35,7 +35,7 @@ export default function ProgressPage(){
       const [{data:s},{data:r},{data:a}]=await Promise.all([
         supabase.from("staff").select("id,name,photo_url,salon_percentage").eq("active",true).order("name"),
         supabase.from("staff_commission_rules").select("staff_id,scope_type,category,service_id,salon_percentage"),
-        supabase.from("appointments").select("id,staff_id,service_id,service_category,status,start_at,price_cents,client_name,service:service_id(name,category)").gte("start_at",new Date(new Date().getFullYear()-1,0,1).toISOString()).order("start_at",{ascending:false})
+        supabase.from("appointments").select("id,staff_id,service_id,service_category,status,start_at,price_cents,client_name,service:service_id(name,category),client:client_id(client_type)").gte("start_at",new Date(new Date().getFullYear()-1,0,1).toISOString()).order("start_at",{ascending:false})
       ]);
       const staffRows=(((s as unknown) as StaffInfo[])||[]).map(x=>({...x,salon_percentage:Number(x.salon_percentage||0)}));
       const ruleRows=(((r as unknown) as Rule[])||[]).map(x=>({...x,salon_percentage:Number(x.salon_percentage||0)}));
@@ -161,7 +161,7 @@ function AgreementModal({staff,onClose,onSaved}:{staff:StaffInfo;onClose:()=>voi
 }
 
 function compute(items:Appointment[],staffRows:StaffInfo[],rules:Rule[]){
-  const completed=items.filter(x=>x.status==="completed");
+  const completed=items.filter(x=>x.status==="completed"&&x.client?.client_type!=="team");
   const revenue=completed.reduce((s,x)=>s+(x.price_cents||0),0);
   const salonCut=completed.reduce((sum,a)=>{const st=staffRows.find(s=>s.id===a.staff_id);if(!st)return sum;return sum+Math.round((a.price_cents||0)*(effectivePct(st,a,rules)/100))},0);
   const clients=new Set(completed.map(x=>x.client_name.trim().toLowerCase()).filter(Boolean)).size;

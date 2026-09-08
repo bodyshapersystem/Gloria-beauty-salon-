@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,20 @@ export default function HubLoginPage(){
   const [loading,setLoading]=useState(false);
   const [showPassword,setShowPassword]=useState(false);
   const [error,setError]=useState<string|null>(null);
+  const [checkingSession,setCheckingSession]=useState(true);
+
+  useEffect(()=>{let active=true;(async()=>{
+    const {data:{session}}=await supabase.auth.getSession();
+    if(!active)return;
+    if(!session){setCheckingSession(false);return;}
+    const {data:profile,error:profileError}=await supabase.from("user_profiles").select("role,staff_id,active").eq("auth_user_id",session.user.id).maybeSingle();
+    if(!active)return;
+    if(profileError){setCheckingSession(false);setError("No pudimos validar tu sesión. Intenta de nuevo en unos segundos.");return;}
+    if(profile?.active&&["owner","admin","manager","staff"].includes(profile.role)){
+      router.replace(profile.role==="staff"?"/hub/my-agenda":"/hub");router.refresh();return;
+    }
+    setCheckingSession(false);
+  })();return()=>{active=false}},[router]);
 
   async function submit(e:FormEvent){
     e.preventDefault();setLoading(true);setError(null);
@@ -25,6 +39,8 @@ export default function HubLoginPage(){
     }
     router.replace(profile.role==="staff"?"/hub/my-agenda":"/hub");router.refresh();
   }
+
+  if(checkingSession)return <div className="min-h-screen bg-[#F7F3ED] flex items-center justify-center"><div className="text-center"><Logo className="h-[76px] w-auto mx-auto"/><p className="mt-5 text-[9px] uppercase tracking-[.28em] text-taupe">Abriendo Gloria Hub…</p></div></div>;
 
   return <div className="min-h-screen bg-[#F7F3ED] px-5 py-10 flex items-center justify-center">
     <div className="w-full max-w-[510px] overflow-hidden rounded-[30px] border border-[#D9C7B9] bg-[#FBF8F3] shadow-[0_28px_80px_rgba(52,38,31,.12)]">

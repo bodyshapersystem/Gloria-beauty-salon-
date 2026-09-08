@@ -30,7 +30,9 @@ export function HubShell({children}:{children:React.ReactNode}){
   useEffect(()=>{(async()=>{
     const {data:{session}}=await supabase.auth.getSession();
     if(!session){setLoading(false);router.replace("/hub-login");return;}
-    const {data}=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();
+    let {data,error:profileError}=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();
+    if(profileError){const retry=await supabase.from("user_profiles").select("role,staff_id").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();data=retry.data;profileError=retry.error;}
+    if(profileError){setLoading(false);return;}
     if(!data||!["owner","admin","manager","staff"].includes(data.role)){await supabase.auth.signOut();setLoading(false);router.replace("/hub-login");return;}
     if(data.role!=="owner"){
       if(!data.staff_id){await supabase.auth.signOut();setLoading(false);router.replace("/hub-login");return;}
