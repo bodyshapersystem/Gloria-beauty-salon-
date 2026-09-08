@@ -5,6 +5,7 @@ import { AboutGloria } from "@/components/public/AboutGloria";
 import { Experience } from "@/components/public/Experience";
 import { Location } from "@/components/public/Location";
 import { Footer } from "@/components/public/Footer";
+import { HomeBookingCTA } from "@/components/public/HomeBookingCTA";
 
 export default function HomePage() {
   return (
@@ -12,6 +13,7 @@ export default function HomePage() {
       <Nav />
       <Hero />
       <ServicesStrip />
+      <HomeBookingCTA />
       <AboutGloria />
       <Experience />
       <Location />

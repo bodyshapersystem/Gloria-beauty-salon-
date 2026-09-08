@@ -48,6 +48,17 @@
   - Tratamientos
   - Extensiones
   - Estilismo
+- Public booking is split into:
+  - instant booking: blowdry/secado, brows and wax
+  - reviewed inquiry: all other services, subject to team approval
+- Team “Reservar con…” CTAs route into /reservar with the professional preselected.
+- Public Memberships route exists for prepaid beauty plans; first concept is 4 blowouts per month as one-time payment.
+
+## PENDING — PUBLIC WEBSITE
+- Fill / complete the Gallery with approved real salon/client imagery.
+- Improve the main homepage visual hierarchy and content flow after core booking QA.
+- Connect Stripe later for deposits and prepaid Memberships / one-time payments.
+- Finalize pricing and commercial rules for the “4 secados al mes” prepaid plan before enabling checkout.
 
 ## Gloria Access
 Existing routes include:
@@ -94,6 +105,7 @@ Existing routes include:
 - /hub/my-agenda
 - /hub/progress
 - /hub/messages
+- /hub/inquiries
 
 Implemented concepts:
 - Protected Hub shell and role-aware navigation
@@ -109,6 +121,7 @@ Implemented concepts:
 - Appointment Settings
 - My Agenda
 - My Progress
+- Inquiry review inbox for services requiring approval
 - Save & Complete / service-specific Client Memory workflow foundations
 
 ## Appointments Architecture
@@ -128,8 +141,11 @@ Supabase has been extended with:
 - Hub status/reschedule RPCs
 - conflict protection / server-side slot revalidation
 - timezone America/New_York
+- booking_inquiries for reviewed service requests
 
-Important design rule: do not send emails directly from appointment UI. Automation hooks exist conceptually; Resend is intentionally postponed.
+Important booking rule:
+- instant public booking is limited to blowdry/secado, brows and wax.
+- other services create a pending inquiry and must be approved by an authorized team member.
 
 ## Client Memory + Beauty Intelligence
 Supabase structures include or were extended for:
@@ -161,17 +177,6 @@ Privacy boundary:
 A GitHub Actions build workflow was added to run install + `npm run build` on main.
 Recent production failures were caused mainly by TypeScript inference on Supabase relation joins returning arrays in generated query types. These are being normalized to singular relations in UI code.
 
-Files already corrected in this QA pass include:
-- Access appointment detail
-- Access profile
-- Hub appointments
-- Hub calendar
-- My Agenda
-- Orders
-- Business Pulse
-- My Progress
-- Team
-
 Do not claim production is live until:
 1. GitHub build check on latest main is SUCCESS.
 2. Vercel latest production deployment is READY.
@@ -191,25 +196,22 @@ Supabase:
 Never place secret keys/tokens in this file or chat.
 
 ## Deferred Until Core Product Is Stable
-- Resend/email automations
-  - Master sending address decided: reservas@gloriabeautysalonmiami.com
-    (source of truth: lib/emails/base.ts SITE.fromAddress). Sending-only,
-    no inbox — never present as a reply-to/support address.
-  - Reply-to inbox: gloriabeauty.hello@gmail.com (SITE.replyToAddress) —
-    a real Gmail inbox Gloria checks. Client replies to automated emails
-    land here. Gmail can't be the "from" address itself (Resend requires
-    DNS-verified domain ownership, which isn't possible for gmail.com).
-  - Domain (gloriabeautysalonmiami.com) still needs to be verified inside
-    Resend (SPF/DKIM/DMARC DNS records) before any send will work.
-- Access invitation automation
 - reminder/rebooking/birthday automation delivery
-- Stripe deposit automation
+- Stripe payments end to end:
+  - connect the Gloria Stripe account and production webhooks
+  - let clients buy Shop products directly on the site with Stripe Checkout
+  - let clients pay for appointments/services directly during booking
+  - calculate and collect required service deposits before confirming the appointment
+  - save payment, deposit, refund and remaining-balance status in Supabase and show it in Hub/Access
+  - enable Memberships / prepaid packages checkout
 - advanced generative Beauty Intelligence
 
 ## Immediate Next Steps for Any Engineer/Agent
 1. Run/inspect latest GitHub build check.
 2. Fix any remaining TypeScript/build errors until green.
 3. Verify Vercel production deployment is Ready on latest main commit.
-4. Verify public menu shows Gloria Access → Iniciar sesión.
-5. Verify /access/login, /reservar, /servicios, /hub routes load as expected.
-6. Only then continue feature development.
+4. QA /reservar for instant booking vs inquiry behavior.
+5. QA /hub/inquiries approval flow and email delivery.
+6. Verify public menu shows Memberships and Hub Access.
+7. Complete gallery and homepage refinement after functional QA.
+8. Implement and QA the complete Stripe payment block listed above.

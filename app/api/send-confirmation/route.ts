@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
     const { clientName, clientEmail, serviceId, staffId, startAt } = body ?? {};
 
     if (!clientEmail || !clientName || !serviceId || !staffId || !startAt) {
-      // Nothing to send (e.g. client didn't give an email) — not an error.
       return NextResponse.json({ ok: true, skipped: "missing_fields" });
     }
 
@@ -50,6 +49,8 @@ export async function POST(req: NextRequest) {
       timeZone: "America/New_York",
     });
 
+    const activationUrl = `https://www.gloriabeautysalonmiami.com/access/create-account?email=${encodeURIComponent(String(clientEmail).trim().toLowerCase())}&from=appointment`;
+
     const html = confirmacionDeCitaEmail({
       clientName: escapeHtml(String(clientName)).slice(0, 120),
       dateLabel,
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
       serviceName: service.name,
       staffName: staff.name,
       manageUrl: "https://www.gloriabeautysalonmiami.com/reservar",
+      accessActivationUrl: activationUrl,
     });
 
     const result = await sendMail({
@@ -68,7 +70,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (err) {
     console.error("send-confirmation error:", err);
-    // Always 200 — a failed email must never surface as a booking error.
     return NextResponse.json({ ok: false, error: "exception" });
   }
 }

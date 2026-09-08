@@ -1,15 +1,18 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 
 type Mode = "login" | "create";
 
+const SITE_URL = "https://www.gloriabeautysalonmiami.com";
+
 export function AuthCard({ mode }: { mode: Mode }) {
   const router = useRouter();
+  const params = useSearchParams();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,6 +22,11 @@ export function AuthCard({ mode }: { mode: Mode }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const invitedEmail = params.get("email");
+    if (mode === "create" && invitedEmail) setEmail(invitedEmail);
+  }, [mode, params]);
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -42,6 +50,7 @@ export function AuthCard({ mode }: { mode: Mode }) {
       email: email.trim(),
       password,
       options: {
+        emailRedirectTo: `${SITE_URL}/access`,
         data: {
           first_name: firstName.trim(),
           last_name: lastName.trim(),
@@ -60,9 +69,13 @@ export function AuthCard({ mode }: { mode: Mode }) {
     if (data.session) {
       router.replace("/access");
       router.refresh();
-    } else {
-      setMessage("Revisa tu email para confirmar tu cuenta y entrar a Gloria Access.");
+      return;
     }
+
+    // This only happens while Supabase email confirmations are enabled.
+    // Production is intended to run with email confirmations disabled so
+    // clients enter Access immediately after creating their account.
+    setMessage("Tu cuenta fue creada. Estamos terminando de activar el acceso directo; intenta iniciar sesión en unos segundos.");
   }
 
   return (
@@ -72,7 +85,7 @@ export function AuthCard({ mode }: { mode: Mode }) {
         <div className="mt-6 text-center">
           <p className="text-[10px] uppercase tracking-[0.34em] text-mocha">Gloria Access</p>
           <h1 className="mt-3 font-serif text-[36px] md:text-[42px] leading-[0.95]">{mode === "login" ? "Welcome back" : "Create your beauty space"}</h1>
-          <p className="mt-4 text-[13px] leading-relaxed text-taupe">{mode === "login" ? "Tus citas, tu beauty history y tus recomendaciones en un solo lugar." : "Puedes crear tu cuenta hoy y reservar cuando quieras. Tu Beauty Profile solo se activará con visitas reales al salón."}</p>
+          <p className="mt-4 text-[13px] leading-relaxed text-taupe">{mode === "login" ? "Tus citas, tu beauty history y tus recomendaciones en un solo lugar." : "Crea tu cuenta y entra directo a tus citas, tu Beauty Profile y toda tu experiencia Gloria."}</p>
         </div>
 
         <form onSubmit={submit} className="mt-8 space-y-4">
@@ -91,7 +104,7 @@ export function AuthCard({ mode }: { mode: Mode }) {
           {message && <p className="rounded-xl bg-champagne/20 px-4 py-3 text-[12px] text-mocha">{message}</p>}
 
           <button disabled={loading} className="w-full min-h-[56px] rounded-full bg-espresso text-ivory text-[11px] font-semibold uppercase tracking-[0.2em] disabled:opacity-50">
-            {loading ? "Procesando..." : mode === "login" ? "Enter Gloria Access" : "Create Account"}
+            {loading ? "Procesando..." : mode === "login" ? "Enter Gloria Access" : "Crear y entrar"}
           </button>
         </form>
 

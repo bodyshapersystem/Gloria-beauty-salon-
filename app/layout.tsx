@@ -27,6 +27,16 @@ export const metadata: Metadata = {
     locale: "es_US",
     type: "website",
   },
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/app-icon-192.png", sizes: "192x192", type: "image/png" }],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Gloria Hub",
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default function RootLayout({

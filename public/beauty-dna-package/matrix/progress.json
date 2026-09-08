@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "required": {
+    "hair": 120,
+    "nails": 60,
+    "lashes": 36,
+    "brows": 60,
+    "total": 276
+  },
+  "completed": {
+    "hair": [
+      "long/straight/black",
+      "short/straight/black",
+      "short/straight/blonde",
+      "short/straight/copper",
+      "short/straight/dark-brown",
+      "short/straight/light-brown",
+      "short/straight/light-brown-plus-highlights",
+      "short/straight/balayage",
+      "short/straight/dark-brown-plus-almond-highlights"
+    ],
+    "nails": [],
+    "lashes": [],
+    "brows": []
+  }
+}

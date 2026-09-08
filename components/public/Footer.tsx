@@ -1,31 +1,68 @@
 import Link from "next/link";
+import { Facebook, Instagram } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
-import { navLinks, site } from "@/lib/data/site";
+import { site } from "@/lib/data/site";
+
+const footerLinks = [
+  { label: "Inicio", href: "/" },
+  { label: "Servicios", href: "/servicios" },
+  { label: "Galería", href: "/galeria" },
+  { label: "Sobre Gloria", href: "/#sobre" },
+  { label: "Equipo", href: "/equipo" },
+  { label: "Contacto", href: "/#contacto" },
+];
 
 export function Footer() {
   return (
-    <footer className="border-t border-taupe/35 px-6 md:px-8 pt-14 pb-12">
-      <div className="max-w-[1220px] mx-auto flex flex-wrap justify-between gap-10">
-        <Logo className="h-[74px] w-auto" />
+    <footer className="bg-[#2F211A] text-[#F8F3EC]">
+      <div className="mx-auto max-w-[1220px] px-6 py-8 md:px-8 md:py-10">
+        <div className="grid gap-7 md:grid-cols-[auto_1fr_auto] md:items-center">
+          <div>
+            <Logo className="h-[54px] w-auto" />
+          </div>
 
-        <ul className="flex flex-wrap gap-7 text-[13px]">
-          {navLinks.slice(0, 5).map((link) => (
-            <li key={link.href}>
-              <Link href={link.href}>{link.label}</Link>
-            </li>
-          ))}
-        </ul>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:justify-center">
+            {footerLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-[9px] text-ivory/75 transition-colors hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+            <span className="mx-1 hidden h-5 w-px bg-white/20 md:block" />
+            <a
+              href="https://www.instagram.com/gloriabeautysalon_/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Instagram Gloria Beauty Salon"
+              className="text-ivory/80 hover:text-white"
+            >
+              <Instagram size={15} />
+            </a>
+            <a
+              href="https://www.facebook.com/iamgloriastylist"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Facebook Gloria Beauty Salon"
+              className="text-ivory/80 hover:text-white"
+            >
+              <Facebook size={15} />
+            </a>
+          </div>
 
-        <div className="text-[11px] tracking-[0.14em] text-taupe text-right">
-          REALZA TU ESENCIA,
-          <br />
-          DEFINE TU ESTILO.
+          <div className="border-l border-white/20 pl-5 font-serif text-[15px] leading-[1.25] text-[#E7D5C7] md:text-right">
+            Realza tu esencia.
+            <br />
+            Define tu estilo.
+          </div>
         </div>
-      </div>
 
-      <div className="max-w-[1220px] mx-auto mt-10 pt-6 border-t border-taupe/20 text-[11px] text-taupe flex flex-wrap justify-between gap-2.5">
-        <span>&copy; {new Date().getFullYear()} {site.name}. Todos los derechos reservados.</span>
-        <span>CALLE 8 · MIAMI, FL</span>
+        <div className="mt-7 flex flex-col gap-2 border-t border-white/10 pt-5 text-[8px] uppercase tracking-[0.08em] text-white/45 sm:flex-row sm:items-center sm:justify-between">
+          <span>© {new Date().getFullYear()} {site.name}. Todos los derechos reservados.</span>
+          <span>Miami, FL · Belleza · Bienestar · Confianza</span>
+        </div>
       </div>
     </footer>
   );
