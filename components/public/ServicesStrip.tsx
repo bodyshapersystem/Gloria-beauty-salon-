@@ -26,9 +26,9 @@ const services = [
     subcopy: "Diseño · Henna · Laminado · Extensiones · Lifting",
     quote: "Miradas que inspiran.",
     accent: "Realza tu esencia",
-    photo: "/images/gloria/brows/diana-service.webp",
+    photo: "/images/gloria/team/diana-hero.jpg",
     href: "/servicios#brows",
-    position: "object-[50%_18%]",
+    position: "object-[50%_28%]",
   },
   {
     title: "Maquillaje & Bronceado",
