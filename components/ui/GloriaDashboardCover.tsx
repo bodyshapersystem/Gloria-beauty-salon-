@@ -24,6 +24,7 @@ export function GloriaDashboardCover({
   const greeting=timeGreeting();
   const lines=tagline?.length?tagline:["Same girls.","Higher standards."];
   const isCaro=name.trim().toLowerCase().startsWith("caro");
+  const isDiana=name.trim().toLowerCase().startsWith("diana");
   return <section className="relative overflow-hidden rounded-[30px] border border-[#D8C7BA] min-h-[690px] shadow-[0_20px_55px_rgba(73,46,40,.10)] md:min-h-[610px]">
     <div className="absolute inset-0" style={{backgroundImage:heroBackground}}/>
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -34,7 +35,7 @@ export function GloriaDashboardCover({
     </div>
 
     {photoUrl&&<div className="absolute inset-y-0 right-0 w-[72%] md:w-[62%]">
-      <img src={photoUrl} alt={name} className="h-full w-full object-cover" style={{objectPosition:isCaro?"22% 22%":"52% 22%"}}/>
+      <img src={photoUrl} alt={name} className="h-full w-full object-cover" style={{objectPosition:isCaro?"22% 22%":isDiana?"50% 25%":"52% 22%"}}/>
       <div className="absolute inset-0 bg-[linear-gradient(90deg,#F7EEE7_0%,rgba(247,238,231,.94)_16%,rgba(247,238,231,.52)_34%,rgba(247,238,231,.08)_60%,rgba(247,238,231,0)_78%)]"/>
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(77,52,42,.05),rgba(77,52,42,.18))]"/>
     </div>}

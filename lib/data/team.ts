@@ -31,7 +31,7 @@ export const team: TeamMember[] = [
     name: "Diana",
     role: "Nails · Brows · Waxing · Makeup",
     services: "Manicure · Pedicure · Cejas · Maquillaje",
-    photo: "/images/gloria/team/diana-hero.jpg",
+    photo: "/images/gloria/team/diana.jpg",
   },
   {
     slug: "caro",

@@ -20,9 +20,12 @@ export default function MyAgendaPage(){
   const attendance=active.length?Math.round((completed.length/active.length)*100):100;
   const name=staff?.name||"Team";
   const message=professionMessage(name,staff?.role||"");
+  const heroPhoto=name.trim().toLowerCase().startsWith("diana")
+    ? "/images/gloria/team/diana-hero.jpg"
+    : staff?.photo_url;
 
   return <div className="pb-5">
-    <GloriaDashboardCover role="HUB - TEAM" name={name} photoUrl={staff?.photo_url} professionMessage={message} tagline={["Same girls.","Higher standards."]} businessMetrics={[
+    <GloriaDashboardCover role="HUB - TEAM" name={name} photoUrl={heroPhoto} professionMessage={message} tagline={["Same girls.","Higher standards."]} businessMetrics={[
       {label:"Citas hoy",value:loading?"…":String(active.length)},
       {label:"Ingresos hoy",value:money(revenue)},
       {label:"Clientas",value:String(clients)},

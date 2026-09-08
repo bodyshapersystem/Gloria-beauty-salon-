@@ -197,8 +197,13 @@ Never place secret keys/tokens in this file or chat.
 
 ## Deferred Until Core Product Is Stable
 - reminder/rebooking/birthday automation delivery
-- Stripe deposit automation
-- Stripe Memberships / prepaid checkout
+- Stripe payments end to end:
+  - connect the Gloria Stripe account and production webhooks
+  - let clients buy Shop products directly on the site with Stripe Checkout
+  - let clients pay for appointments/services directly during booking
+  - calculate and collect required service deposits before confirming the appointment
+  - save payment, deposit, refund and remaining-balance status in Supabase and show it in Hub/Access
+  - enable Memberships / prepaid packages checkout
 - advanced generative Beauty Intelligence
 
 ## Immediate Next Steps for Any Engineer/Agent
@@ -209,3 +214,4 @@ Never place secret keys/tokens in this file or chat.
 5. QA /hub/inquiries approval flow and email delivery.
 6. Verify public menu shows Memberships and Hub Access.
 7. Complete gallery and homepage refinement after functional QA.
+8. Implement and QA the complete Stripe payment block listed above.

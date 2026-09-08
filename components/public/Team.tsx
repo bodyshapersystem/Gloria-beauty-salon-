@@ -33,7 +33,7 @@ export function Team() {
         <div className="flex flex-col">
           {rest.map((member, i) => (
             <div key={member.slug} className={`flex gap-5 items-center py-6 border-t border-taupe/35 last:border-b ${i % 2 === 1 ? "md:pl-9" : ""}`}>
-              <div className="relative w-20 h-20 md:w-[98px] md:h-[98px] shrink-0 overflow-hidden bg-blush"><Image src={member.photo} alt={member.name} fill className="object-cover" style={member.slug==="diana"?{objectPosition:"50% 28%"}:undefined} /></div>
+              <div className="relative w-20 h-20 md:w-[98px] md:h-[98px] shrink-0 overflow-hidden bg-blush"><Image src={member.photo} alt={member.name} fill className="object-cover" /></div>
               <div className="min-w-0"><div className="text-[11px] tracking-[0.16em] text-taupe font-semibold mb-2">{member.role.toUpperCase()}</div><h4 className="font-serif italic font-medium text-[22px]">{member.name}</h4><div className="text-[12.5px] text-mocha mt-1 leading-relaxed">{member.services}</div><UnderlineLink href={`/reservar?staff=${encodeURIComponent(member.slug)}`} className="mt-2">Reservar con {member.name}</UnderlineLink></div>
             </div>
           ))}
