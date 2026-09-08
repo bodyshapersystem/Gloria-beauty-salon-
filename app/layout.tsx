@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: "Gloria",
+    title: "Gloria Hub",
     statusBarStyle: "black-translucent",
   },
 };

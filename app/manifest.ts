@@ -2,10 +2,12 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Gloria Beauty Salon",
-    short_name: "Gloria",
+    id: "/hub",
+    name: "Gloria Hub",
+    short_name: "Gloria Hub",
     description: "Gloria Hub, Gloria Access y tus citas en un solo lugar.",
-    start_url: "/",
+    start_url: "/hub",
+    scope: "/",
     display: "standalone",
     background_color: "#FBF8F3",
     theme_color: "#713943",
