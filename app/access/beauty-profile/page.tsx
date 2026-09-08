@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShoppingBag, Sparkles } from "lucide-react";
 import { useAccess } from "@/components/access/AccessShell";
-import { BeautyProfileMap } from "@/components/beauty/BeautyProfileMap";
+import { BeautyDnaExperience } from "@/components/beauty/BeautyDnaExperience";
 import { supabase } from "@/lib/supabase/client";
 
 type Memory={id:string;category:string;title:string;summary:string|null;details:Record<string,unknown>;products_used:unknown;maintenance_notes:string|null;approved_photo_urls:string[];created_at:string;updated_at:string;service_id:string|null;staff_id:string|null;appointment_id:string|null};
@@ -46,7 +46,7 @@ export default function BeautyProfilePage(){
     </section>
 
     {loading?<p className="mt-8 text-[12px] text-taupe">Preparando tu Beauty Profile…</p>:<>
-      <section className="mt-7"><div className="mb-5"><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Your Beauty Map</p><h2 className="mt-1 font-serif text-[36px] leading-none">Tu look, construido detalle por detalle.</h2><p className="mt-3 max-w-[650px] text-[11px] leading-relaxed text-taupe">Toca Cabello, Cejas, Pestañas o Uñas. Los puntos vino indican que ya hay información real guardada.</p></div><BeautyProfileMap memory={memory} mode="client"/></section>
+      <section className="mt-7"><div className="mb-5"><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Your Beauty DNA</p><h2 className="mt-1 font-serif text-[36px] leading-none">Tu look, construido detalle por detalle.</h2><p className="mt-3 max-w-[650px] text-[11px] leading-relaxed text-taupe">Explora Cabello, Cejas, Pestañas y Uñas con la nueva experiencia visual y sus transiciones.</p></div><BeautyDnaExperience title="My Beauty DNA"/></section>
 
       {memory.length===0?<section className="mt-5 rounded-[24px] border border-[#DCCFC5] bg-white/60 p-6 text-center"><Sparkles size={18} className="mx-auto text-mocha"/><h3 className="mt-3 font-serif text-[30px]">Tu perfil empieza aquí.</h3><p className="mt-2 text-[10px] text-taupe">El team irá completándolo a medida que conozca tus preferencias reales.</p></section>:<section className="mt-8"><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Beauty Memory</p><h2 className="mt-1 font-serif text-[32px]">Tus detalles guardados</h2><div className="mt-4 grid gap-4 lg:grid-cols-2">{families.map(([family,items])=><BeautyCard key={family} family={family} items={items}/>)}</div></section>}
 
