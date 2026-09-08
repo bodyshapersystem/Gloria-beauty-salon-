@@ -57,6 +57,15 @@ const exactNails=new Set([
   "medium/almond/burgundy","medium/almond/mocha-chrome","medium/square/funny-bunny",
   "long/almond/funny-bunny","long/coffin/funny-bunny"
 ]);
+const exactLashes=new Set([
+  "natural/classic/medium","natural/hybrid/short","natural/hybrid/medium","natural/hybrid/long",
+  "natural/mega/medium","cat-eye/hybrid/medium","wispy/greek/medium"
+]);
+const exactBrows=new Set([
+  "natural-arch/medium/dark-brown","soft/medium/light-brown","soft/medium/brown",
+  "soft/medium/dark-brown","soft/medium/black","soft/thin/dark-brown","soft/thick/dark-brown",
+  "straight/medium/dark-brown","defined/medium/dark-brown","high-arch/medium/dark-brown"
+]);
 function comboImg(category=cat){
   if(category==="hair"&&s.hair.Length==="Long"&&s.hair.Texture==="Straight"&&s.hair.Color==="Black")return "/beauty-dna-package/matrix/hair/long/straight/black.webp";
   if(category==="hair"&&s.hair.Length==="Short"&&s.hair.Texture==="Straight"){
@@ -69,6 +78,14 @@ function comboImg(category=cat){
   if(category==="nails"){
     const key=[s.nails.Length,s.nails.Shape,s.nails.Color].map(slug).join("/");
     if(exactNails.has(key))return "/beauty-dna-package/matrix/nails/"+key+".webp";
+  }
+  if(category==="lashes"){
+    const key=[s.lashes.Design,s.lashes.Type,s.lashes.Length].map(slug).join("/");
+    if(exactLashes.has(key))return "/beauty-dna-package/matrix/lashes/"+key+".webp";
+  }
+  if(category==="brows"){
+    const key=[s.brows.Shape,s.brows.Thickness,s.brows.Color].map(slug).join("/");
+    if(exactBrows.has(key))return "/beauty-dna-package/matrix/brows/"+key+".webp";
   }
   return img(activeGroup[category],category)
 }

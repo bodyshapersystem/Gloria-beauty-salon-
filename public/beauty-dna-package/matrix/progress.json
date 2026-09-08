@@ -18,6 +18,14 @@
       "short/straight/light-brown-plus-highlights",
       "short/straight/balayage",
       "short/straight/dark-brown-plus-almond-highlights"
+      ,"medium/straight/black"
+      ,"medium/straight/blonde"
+      ,"medium/straight/copper"
+      ,"medium/straight/dark-brown"
+      ,"medium/straight/light-brown"
+      ,"medium/straight/light-brown-plus-highlights"
+      ,"medium/straight/balayage"
+      ,"medium/straight/dark-brown-plus-almond-highlights"
     ],
     "nails": [
       "short/round/red",
@@ -29,7 +37,26 @@
       "long/almond/funny-bunny",
       "long/coffin/funny-bunny"
     ],
-    "lashes": [],
-    "brows": []
+    "lashes": [
+      "natural/classic/medium",
+      "natural/hybrid/short",
+      "natural/hybrid/medium",
+      "natural/hybrid/long",
+      "natural/mega/medium",
+      "cat-eye/hybrid/medium",
+      "wispy/greek/medium"
+    ],
+    "brows": [
+      "natural-arch/medium/dark-brown",
+      "soft/medium/light-brown",
+      "soft/medium/brown",
+      "soft/medium/dark-brown",
+      "soft/medium/black",
+      "soft/thin/dark-brown",
+      "soft/thick/dark-brown",
+      "straight/medium/dark-brown",
+      "defined/medium/dark-brown",
+      "high-arch/medium/dark-brown"
+    ]
   }
 }
