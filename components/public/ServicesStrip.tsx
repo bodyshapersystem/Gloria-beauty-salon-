@@ -17,7 +17,7 @@ const services = [
     subcopy: "Manicure · Pedicure · Nail Art · Tratamientos",
     quote: "Pequeños detalles, grandes historias.",
     accent: "Arte en tus manos",
-    photo: "/images/gloria/nails/nails-hero-red.png",
+    photo: "/images/gloria/nails/nails-hero-red-v2.webp",
     href: "/servicios#nails",
     position: "object-center",
   },
