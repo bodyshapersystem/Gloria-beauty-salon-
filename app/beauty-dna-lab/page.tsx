@@ -17,6 +17,12 @@ const realAssets:Record<Category,string>={
 export default function BeautyDnaLab(){
   const [cat,setCat]=useState<Category>("hair");
   const [mode,setMode]=useState<"client"|"pro">("client");
+  const [preview,setPreview]=useState<{src:string;label:string}>({src:"/images/beauty-dna/length/length-03.webp",label:"Long · dark chocolate"});
+
+  function changeCategory(next:Category){
+    setCat(next);
+    setPreview({src:realAssets[next],label:`${next} reference`});
+  }
 
   return <main className="min-h-screen bg-[#F4ECE6] text-[#4A2927]">
     <div className="mx-auto min-h-screen max-w-[430px] bg-[radial-gradient(circle_at_80%_5%,rgba(125,73,73,.14),transparent_25%),linear-gradient(180deg,#FCF8F3,#F1E4DC)] shadow-2xl">
@@ -31,7 +37,7 @@ export default function BeautyDnaLab(){
         <p className="mt-3 text-[9px] uppercase tracking-[.28em] text-[#8C655E]">Emmy&apos;s Beauty DNA</p>
         <h1 className="mt-1 font-serif text-[34px] leading-none">Your look, remembered.</h1>
         <div className="mt-4 grid grid-cols-4 gap-2">
-          {tabs.map(([id,label])=><button key={id} onClick={()=>setCat(id)} className={`rounded-2xl border px-2 py-3 text-[10px] transition-all duration-300 ${cat===id?"border-[#7A3E48] bg-[#7A3E48] text-white shadow-lg":"border-white/80 bg-white/55"}`}>{label}</button>)}
+          {tabs.map(([id,label])=><button key={id} onClick={()=>changeCategory(id)} className={`rounded-2xl border px-2 py-3 text-[10px] transition-all duration-300 ${cat===id?"border-[#7A3E48] bg-[#7A3E48] text-white shadow-lg":"border-white/80 bg-white/55"}`}>{label}</button>)}
         </div>
       </header>
 
@@ -44,11 +50,11 @@ export default function BeautyDnaLab(){
             </div>
           </div>
 
-          <RealCanvas category={cat}/>
+          <RealCanvas category={cat} preview={preview}/>
 
           <div className="p-5 pt-4">
-            {cat==="hair"&&<HairControls mode={mode}/>}
-            {cat==="nails"&&<NailsControls mode={mode}/>}
+            {cat==="hair"&&<HairControls mode={mode} onPreview={(src,label)=>setPreview({src,label})}/>} 
+            {cat==="nails"&&<NailsControls mode={mode} onPreview={(src,label)=>setPreview({src,label})}/>} 
             {cat==="brows"&&<BrowsControls mode={mode}/>}
             {cat==="lashes"&&<LashesControls mode={mode}/>}
           </div>
@@ -73,16 +79,16 @@ export default function BeautyDnaLab(){
   </main>
 }
 
-function RealCanvas({category}:{category:Category}){
+function RealCanvas({category,preview}:{category:Category;preview:{src:string;label:string}}){
   const labels={hair:"Real hair reference",nails:"Real manicure reference",brows:"Real brow reference",lashes:"Real lash reference"};
   return <div className="relative mx-3 overflow-hidden rounded-[26px] bg-[#D9C6BA]">
     <div className="relative h-[390px]">
-      <img key={category} src={realAssets[category]} alt={labels[category]} className="h-full w-full object-cover transition-all duration-500 [animation:fadeIn_.45s_ease]"/>
+      <img key={preview.src} src={preview.src} alt={preview.label||labels[category]} className="h-full w-full object-cover object-top transition-all duration-500 [animation:fadeIn_.45s_ease]"/>
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(44,25,23,.03),rgba(44,25,23,.05)_55%,rgba(44,25,23,.68)_100%)]"/>
       <div className="absolute left-4 top-4 rounded-full border border-white/55 bg-black/15 px-3 py-2 text-[8px] uppercase tracking-[.2em] text-white backdrop-blur-md">Real reference</div>
       <div className="absolute bottom-4 left-4 right-4 rounded-[20px] border border-white/35 bg-[#5B3B34]/35 p-4 text-white backdrop-blur-xl">
         <p className="text-[8px] uppercase tracking-[.2em] text-white/75">Live selection</p>
-        <p className="mt-1 font-serif text-[24px]">Tap below to define her signature.</p>
+        <p className="mt-1 font-serif text-[24px]">{preview.label}</p>
       </div>
     </div>
   </div>
@@ -92,13 +98,17 @@ function Choice({label,active,onClick}:{label:string;active:boolean;onClick:()=>
 function Panel({title,children}:{title:string;children:React.ReactNode}){return <div className="mt-4"><p className="mb-2 text-[8px] uppercase tracking-[.22em] text-[#8C655E]">{title}</p><div className="flex flex-wrap gap-2">{children}</div></div>}
 function Summary({text}:{text:string}){return <div className="mt-5 rounded-[22px] border border-[#7A3E48]/10 bg-[#F3E5DF]/80 p-4"><p className="text-[8px] uppercase tracking-[.2em] text-[#8C655E]">Selected look</p><p className="mt-1 font-serif text-[21px]">{text}</p></div>}
 
-function HairControls({mode}:{mode:"client"|"pro"}){
-  const [length,setLength]=useState("Long"),[texture,setTexture]=useState("Waves"),[part,setPart]=useState("Center"),[tone,setTone]=useState("Warm Chocolate");
-  return <><Panel title="Length">{["Short","Shoulder","Mid","Long","XL"].map(x=><Choice key={x} label={x} active={length===x} onClick={()=>setLength(x)}/>)}</Panel><Panel title="Texture">{["Straight","Soft Waves","Defined Waves","Curls","Blowout"].map(x=><Choice key={x} label={x} active={texture===x} onClick={()=>setTexture(x)}/>)}</Panel><Panel title="Part">{["Left","Center","Right"].map(x=><Choice key={x} label={x} active={part===x} onClick={()=>setPart(x)}/>)}</Panel><Panel title="Tone">{["Espresso","Chocolate","Warm Chocolate","Caramel","Copper","Blonde"].map(x=><Choice key={x} label={x} active={tone===x} onClick={()=>setTone(x)}/>)}</Panel><Summary text={`${length} · ${texture} · ${part} part · ${tone}`}/>{mode==="pro"&&<p className="mt-3 text-[9px] text-[#7B625B]">Pro note: add exact formula, developer, technique and processing notes after the service.</p>}</>
+function HairControls({mode,onPreview}:{mode:"client"|"pro";onPreview:(src:string,label:string)=>void}){
+  const lengths=[{label:"Pixie",file:0},{label:"Bob",file:1},{label:"Shoulder",file:2},{label:"Long",file:3},{label:"Extra Long",file:4}];
+  const tones=[{label:"Black",file:0},{label:"Golden Blonde",file:1},{label:"Copper",file:2},{label:"Dark Brown",file:3},{label:"Light Brown",file:4},{label:"Light + Almond Highlights",file:5},{label:"Balayage",file:6},{label:"Dark + Almond Highlights",file:7}];
+  const [length,setLength]=useState("Long"),[texture,setTexture]=useState("Soft Waves"),[part,setPart]=useState("Center"),[tone,setTone]=useState("Dark Brown");
+  return <><Panel title="Length — real haircut preview">{lengths.map(x=><Choice key={x.label} label={x.label} active={length===x.label} onClick={()=>{setLength(x.label);onPreview(`/images/beauty-dna/length/length-${String(x.file).padStart(2,"0")}.webp`,`${x.label} haircut`)}}/>)}</Panel><Panel title="Texture / Blowdry">{["Straight","Soft Waves","Defined Waves","Curls","Blowout"].map(x=><Choice key={x} label={x} active={texture===x} onClick={()=>setTexture(x)}/>)}</Panel><Panel title="Part">{["Left","Center","Right"].map(x=><Choice key={x} label={x} active={part===x} onClick={()=>setPart(x)}/>)}</Panel><Panel title="Color — real color preview">{tones.map(x=><Choice key={x.label} label={x.label} active={tone===x.label} onClick={()=>{setTone(x.label);onPreview(`/images/beauty-dna/color/color-${String(x.file).padStart(2,"0")}.webp`,x.label)}}/>)}</Panel><Summary text={`${length} · ${texture} · ${part} part · ${tone}`}/>{mode==="pro"&&<p className="mt-3 text-[9px] text-[#7B625B]">Pro note: add exact formula, developer, technique and processing notes after the service.</p>}</>
 }
-function NailsControls({mode}:{mode:"client"|"pro"}){
-  const [shape,setShape]=useState("Almond"),[len,setLen]=useState("3"),[color,setColor]=useState("Burgundy"),[finish,setFinish]=useState("Glossy");
-  return <><Panel title="Shape">{["Round","Square","Oval","Almond","Coffin","Stiletto"].map(x=><Choice key={x} label={x} active={shape===x} onClick={()=>setShape(x)}/>)}</Panel><Panel title="Length">{["1","2","3","4","5"].map(x=><Choice key={x} label={x} active={len===x} onClick={()=>setLen(x)}/>)}</Panel><Panel title="Color">{["Milky Nude","Pink","Red","Burgundy","Chocolate","Black"].map(x=><Choice key={x} label={x} active={color===x} onClick={()=>setColor(x)}/>)}</Panel><Panel title="Finish">{["Glossy","Matte","French","Chrome","Natural"].map(x=><Choice key={x} label={x} active={finish===x} onClick={()=>setFinish(x)}/>)}</Panel><Summary text={`${shape} · Length ${len} · ${color} · ${finish}`}/>{mode==="pro"&&<p className="mt-3 text-[9px] text-[#7B625B]">Pro note: save product line, shade number, base/build system and refill details.</p>}</>
+function NailsControls({mode,onPreview}:{mode:"client"|"pro";onPreview:(src:string,label:string)=>void}){
+  const colors=[{label:"Red",file:0},{label:"French",file:1},{label:"Wine",file:2},{label:"Funny Bunny",file:4},{label:"Mocha Cat Eye",file:3}];
+  const shapes=[{label:"Short Round",file:0,len:"1"},{label:"Short Square",file:5,len:"1"},{label:"Oval",file:4,len:"2"},{label:"Almond",file:1,len:"3"},{label:"Coffin",file:6,len:"4"},{label:"Stiletto",file:7,len:"5"}];
+  const [shape,setShape]=useState("Almond"),[len,setLen]=useState("3"),[color,setColor]=useState("Wine"),[finish,setFinish]=useState("Glossy");
+  return <><Panel title="Shape — real shape + length">{shapes.map(x=><Choice key={x.label} label={x.label} active={shape===x.label} onClick={()=>{setShape(x.label);setLen(x.len);onPreview(`/images/beauty-dna/nails/nails-${String(x.file).padStart(2,"0")}.webp`,x.label)}}/>)}</Panel><Panel title="Length">{["1","2","3","4","5"].map(x=><Choice key={x} label={x} active={len===x} onClick={()=>setLen(x)}/>)}</Panel><Panel title="Color — real polish preview">{colors.map(x=><Choice key={x.label} label={x.label} active={color===x.label} onClick={()=>{setColor(x.label);onPreview(`/images/beauty-dna/nails/nails-${String(x.file).padStart(2,"0")}.webp`,x.label)}}/>)}</Panel><Panel title="Finish">{["Glossy","Matte","French","Chrome","Natural"].map(x=><Choice key={x} label={x} active={finish===x} onClick={()=>setFinish(x)}/>)}</Panel><Summary text={`${shape} · Length ${len} · ${color} · ${finish}`}/>{mode==="pro"&&<p className="mt-3 text-[9px] text-[#7B625B]">Pro note: save product line, shade number, base/build system and refill details.</p>}</>
 }
 function BrowsControls({mode}:{mode:"client"|"pro"}){
   const [shape,setShape]=useState("Defined"),[thick,setThick]=useState("Medium"),[color,setColor]=useState("Dark Brown");
