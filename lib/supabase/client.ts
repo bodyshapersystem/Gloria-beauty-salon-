@@ -8,4 +8,11 @@ import { createClient } from "@supabase/supabase-js";
 const SUPABASE_URL = "https://ferznukzbfvzhjefcrye.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_iaAU9rgEtv0CaQCmOwuLgQ_rTNOY3-5";
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+export const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: "gloria-beauty-auth",
+  },
+});
