@@ -9,7 +9,15 @@
   },
   "completed": {
     "hair": [
-      "long/straight/black"
+      "long/straight/black",
+      "short/straight/black",
+      "short/straight/blonde",
+      "short/straight/copper",
+      "short/straight/dark-brown",
+      "short/straight/light-brown",
+      "short/straight/light-brown-plus-highlights",
+      "short/straight/balayage",
+      "short/straight/dark-brown-plus-almond-highlights"
     ],
     "nails": [],
     "lashes": [],
