@@ -13,6 +13,7 @@ import {
   Menu,
   MessageCircle,
   ShoppingBag,
+  ShoppingCart,
   Sparkles,
   UserRound,
   UsersRound,
@@ -55,18 +56,19 @@ export function Nav() {
             <span className="h-3 w-px bg-taupe/35"/>
             <Link href="/hub-login" className="text-[9px] uppercase tracking-[0.16em] text-[#6F3642] hover:text-espresso">Hub / Team</Link>
             <button onClick={cart.open} aria-label="Ver carrito" className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-espresso hover:bg-champagne/15">
-              <ShoppingBag size={19} strokeWidth={1.5} />
+              <ShoppingCart size={19} strokeWidth={1.5} />
               {cart.count > 0 && <span className="absolute -top-1 -right-1 grid h-4 min-w-4 place-items-center rounded-full bg-espresso px-1 text-[8px] text-ivory">{cart.count}</span>}
             </button>
             <Button href="/reservar" variant="solid">RESERVA TU CITA</Button>
           </div>
 
-          <button onClick={cart.open} aria-label="Ver carrito" className="lg:hidden relative inline-flex h-10 w-10 items-center justify-center rounded-full text-espresso">
-            <ShoppingBag size={22} strokeWidth={1.5} />
-            {cart.count > 0 && <span className="absolute top-1 right-1 grid h-4 min-w-4 place-items-center rounded-full bg-espresso px-1 text-[8px] text-ivory">{cart.count}</span>}
-          </button>
-
-          <button aria-label={open ? "Cerrar menú" : "Abrir menú"} aria-expanded={open} onClick={() => setOpen((v) => !v)} className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full text-espresso hover:bg-champagne/15 transition-colors">{open ? <X size={25} strokeWidth={1.5} /> : <Menu size={27} strokeWidth={1.5} />}</button>
+          <div className="flex items-center gap-1 lg:hidden">
+            <button onClick={cart.open} aria-label="Ver carrito" className="relative inline-flex h-10 w-10 items-center justify-center rounded-full text-espresso">
+              <ShoppingCart size={22} strokeWidth={1.5} />
+              {cart.count > 0 && <span className="absolute top-1 right-1 grid h-4 min-w-4 place-items-center rounded-full bg-espresso px-1 text-[8px] text-ivory">{cart.count}</span>}
+            </button>
+            <button aria-label={open ? "Cerrar menú" : "Abrir menú"} aria-expanded={open} onClick={() => setOpen((v) => !v)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-espresso hover:bg-champagne/15 transition-colors">{open ? <X size={25} strokeWidth={1.5} /> : <Menu size={27} strokeWidth={1.5} />}</button>
+          </div>
         </nav>
       </header>
 
