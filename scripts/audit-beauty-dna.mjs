@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const root = process.cwd();
+const strict = process.argv.includes("--strict");
 const progressPath = path.join(root, "public/beauty-dna-package/matrix/progress.json");
 const progress = JSON.parse(fs.readFileSync(progressPath, "utf8"));
 
@@ -59,6 +60,7 @@ function hasFile(category, key, extensions) {
 const report = {};
 let totalDone = 0;
 let totalExpected = 0;
+let hasMismatch = false;
 
 for (const [category, config] of Object.entries(expected)) {
   const required = cartesian(config.groups).map((combo) => combo.map(slug).join("/"));
@@ -73,11 +75,19 @@ for (const [category, config] of Object.entries(expected)) {
     presentButNotRecorded: present.filter((key) => !recorded.includes(key)),
     recordedButMissing: recorded.filter((key) => !present.includes(key)),
   };
+  hasMismatch ||= missing.length > 0 || report[category].presentButNotRecorded.length > 0 || report[category].recordedButMissing.length > 0;
   totalDone += present.length;
   totalExpected += required.length;
 }
 
-console.log(JSON.stringify({
+const result = {
   total: { expected: totalExpected, presentFiles: totalDone, missingFiles: totalExpected - totalDone },
   categories: report,
-}, null, 2));
+};
+
+console.log(JSON.stringify(result, null, 2));
+
+if (strict && hasMismatch) {
+  process.exitCode = 1;
+}
+
