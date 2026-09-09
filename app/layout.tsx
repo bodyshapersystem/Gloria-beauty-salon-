@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
+import { seo, siteUrl } from "@/lib/seo";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -22,11 +23,10 @@ const siteUrl = "https://www.gloriabeautysalonmiami.com";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Gloria Beauty Salon | Calle 8, Miami",
+    default: seo.title,
     template: "%s | Gloria Beauty Salon",
   },
-  description:
-    "Cabello, uñas, cejas, pestañas, bronceado y más, en un solo lugar. Beauty salon en el corazón de Calle 8, Miami.",
+  description: seo.description,
   alternates: {
     canonical: "/",
   },
@@ -35,21 +35,23 @@ export const metadata: Metadata = {
     "salon de belleza Miami",
     "beauty salon Calle 8",
     "hair salon Miami",
-    "nails Miami",
+    "nail salon Miami",
+    "balayage Miami",
+    "blowout Miami",
     "cejas Miami",
     "pestanas Miami",
     "spray tan Miami",
   ],
   openGraph: {
-    title: "Gloria Beauty Salon | Calle 8, Miami",
-    description: "Realza tu esencia, define tu estilo.",
+    title: seo.title,
+    description: seo.description,
     url: siteUrl,
-    siteName: "Gloria Beauty Salon",
+    siteName: seo.name,
     locale: "es_US",
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: seo.ogImage,
         width: 1200,
         height: 630,
         alt: "Gloria Beauty Salon en Calle 8, Miami",
@@ -58,9 +60,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gloria Beauty Salon | Calle 8, Miami",
-    description: "Cabello, uñas, cejas, pestañas, bronceado y más, en un solo lugar.",
-    images: ["/og-image.jpg"],
+    title: seo.title,
+    description: seo.description,
+    images: [seo.ogImage],
   },
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
