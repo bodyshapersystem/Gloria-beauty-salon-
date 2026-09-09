@@ -2,10 +2,10 @@
   "version": 1,
   "required": {
     "hair": 120,
-    "nails": 60,
+    "nails": 75,
     "lashes": 36,
     "brows": 60,
-    "total": 276
+    "total": 291
   },
   "completed": {
     "hair": [
