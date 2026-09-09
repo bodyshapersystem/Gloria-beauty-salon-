@@ -2,23 +2,27 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Plus, Save, Trash2, X } from "lucide-react";
+import { CalendarClock, Plus, Save, Trash2, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
 type Appointment={
   id:string;client_id:string|null;client_name:string;client_phone:string|null;client_email:string|null;
   start_at:string;end_at:string;status:string;source:string|null;notes_internal:string|null;
   price_cents:number|null;deposit_cents:number|null;service:{name:string;price_label:string|null}|null;
-  staff:{name:string}|null;client:{client_type:string|null}|null;
+  staff_id:string;staff:{name:string}|null;client:{id:string;client_type:string|null}|null;
 };
 type Service={id:string;name:string;category:string;duration_minutes:number;price_label:string|null};
+type ClientMatch={id:string;client_type:string|null};
 
 const statusLabels:Record<string,string>={pending:"Pendiente",confirmed:"Confirmada",in_progress:"En curso",completed:"Completada",cancelled:"Cancelada",no_show:"No se presentó"};
 const clientTypeLabels:Record<string,string>={new:"Nueva",regular:"Regular",ambassador:"Ambassador",vip:"VIP Client",team:"Team"};
+const clientTypeOptions=[["new","Nueva"],["regular","Regular"],["ambassador","Ambassador"],["vip","VIP Client"],["team","Team"]];
 
 export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointmentId:string;onClose:()=>void;onSaved:()=>void}){
   const [appointment,setAppointment]=useState<Appointment|null>(null);
   const [services,setServices]=useState<Service[]>([]);
+  const [clientId,setClientId]=useState<string|null>(null);
+  const [clientType,setClientType]=useState("regular");
   const [clientName,setClientName]=useState("");
   const [clientPhone,setClientPhone]=useState("");
   const [clientEmail,setClientEmail]=useState("");
@@ -33,13 +37,15 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
   async function load(){
     setMessage(null);
     const [{data:a,error},{data:s}]=await Promise.all([
-      supabase.from("appointments").select("id,client_id,client_name,client_phone,client_email,start_at,end_at,status,source,notes_internal,price_cents,deposit_cents,service:service_id(name,price_label),staff:staff_id(name),client:client_id(client_type)").eq("id",appointmentId).single(),
+      supabase.from("appointments").select("id,client_id,client_name,client_phone,client_email,start_at,end_at,status,source,notes_internal,price_cents,deposit_cents,staff_id,service:service_id(name,price_label),staff:staff_id(name),client:client_id(id,client_type)").eq("id",appointmentId).single(),
       supabase.from("services").select("id,name,category,duration_minutes,price_label").eq("active",true).order("category").order("name")
     ]);
     if(error){setMessage(error.message);return;}
     const raw=((a as unknown) as any);
     const item={...raw,service:firstRelation(raw.service),staff:firstRelation(raw.staff),client:firstRelation(raw.client)} as Appointment;
+    const resolvedClient=item.client||await resolveClient(item);
     setAppointment(item);setServices(((s as unknown) as Service[])||[]);
+    setClientId(resolvedClient?.id||item.client_id||null);setClientType(resolvedClient?.client_type||"regular");
     setClientName(item.client_name||"");setClientPhone(item.client_phone||"");setClientEmail(item.client_email||"");
     setNotes(item.notes_internal||"");setTotal(centsToInput(item.price_cents));setDepositPaid(Boolean(item.deposit_cents&&item.deposit_cents>0));setDeposit(centsToInput(item.deposit_cents));
   }
@@ -47,7 +53,6 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
   useEffect(()=>{load()},[appointmentId]);
 
   const extraService=useMemo(()=>services.find(s=>s.id===extraServiceId)||null,[services,extraServiceId]);
-  const clientType=appointment?.client?.client_type||"regular";
   const depositCents=depositPaid?inputToCents(deposit):0;
   const totalCents=inputToCents(total);
   const balance=Math.max(0,totalCents-depositCents);
@@ -64,8 +69,18 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
       p_price_cents:totalCents,
       p_deposit_cents:depositCents
     });
+    if(error){setSaving(false);setMessage(error.message);return;}
+    const nextClientId=clientId||((await resolveClient({
+      ...appointment,
+      client_name:clientName.trim(),
+      client_phone:clientPhone.trim(),
+      client_email:clientEmail.trim()||null
+    }))?.id||null);
+    if(nextClientId){
+      const {error:typeError}=await supabase.rpc("hub_update_client_type",{p_client_id:nextClientId,p_client_type:clientType});
+      if(typeError){setSaving(false);setMessage(typeError.message);return;}
+    }
     setSaving(false);
-    if(error){setMessage(error.message);return;}
     setMessage("Cita actualizada.");
     await load();onSaved();
   }
@@ -89,6 +104,22 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
     setSaving(false);
     if(error){setMessage(error.message);return;}
     setExtraServiceId("");setMessage("Servicio extra agregado a la cita.");
+    await load();onSaved();
+  }
+
+  async function reschedule(){
+    if(!appointment)return;
+    const date=window.prompt("Nueva fecha para reagendar (YYYY-MM-DD)",new Date(appointment.start_at).toLocaleDateString("en-CA",{timeZone:"America/New_York"}));
+    if(!date)return;
+    const time=window.prompt("Nueva hora (HH:MM, ejemplo 14:30)",formatInputTime(appointment.start_at));
+    if(!time)return;
+    const nextStart=new Date(`${date}T${time}:00`);
+    if(Number.isNaN(nextStart.getTime())){setMessage("Fecha u hora inválida.");return;}
+    setSaving(true);setMessage(null);
+    const {data,error}=await supabase.rpc("hub_reschedule_appointment",{p_appointment_id:appointment.id,p_staff_id:appointment.staff_id,p_start_at:nextStart.toISOString()});
+    setSaving(false);
+    if(error){setMessage(error.message);return;}
+    setMessage(data==="cancelled_reschedule_limit"?"La cita se canceló por límite de reagendadas.":"Cita reagendada.");
     await load();onSaved();
   }
 
@@ -126,6 +157,7 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
           <Field label="Clienta" value={clientName} set={setClientName}/>
           <Field label="Teléfono" value={clientPhone} set={setClientPhone}/>
           <Field label="Email" value={clientEmail} set={setClientEmail}/>
+          <label className="block"><span className="mb-1.5 block text-[8px] uppercase tracking-[.14em] text-taupe">Tipo de clienta</span><select value={clientType} onChange={e=>setClientType(e.target.value)} className="w-full rounded-[15px] border border-[#D8C8BC] bg-white px-4 py-3.5 text-[12px] outline-none">{clientTypeOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select>{!clientId&&<span className="mt-1.5 block text-[9px] text-taupe">Guarda teléfono o email para enlazar esta cita a una clienta.</span>}</label>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Monto total" value={total} set={setTotal} inputMode="decimal" prefix="$"/>
             <label className="block"><span className="mb-1.5 block text-[8px] uppercase tracking-[.14em] text-taupe">Depósito</span><select value={depositPaid?"yes":"no"} onChange={e=>setDepositPaid(e.target.value==="yes")} className="w-full rounded-[15px] border border-[#D8C8BC] bg-white px-4 py-3.5 text-[12px] outline-none"><option value="no">No pagó depósito</option><option value="yes">Sí pagó depósito</option></select></label>
@@ -151,6 +183,7 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
             {appointment.status==="pending"&&<Action onClick={()=>changeStatus("confirmed")}>Confirmar</Action>}
             {appointment.status==="confirmed"&&<Action onClick={()=>changeStatus("in_progress")}>Iniciar visita</Action>}
             {["confirmed","in_progress"].includes(appointment.status)&&<Link href={`/hub/appointments/${appointment.id}/complete`} className="rounded-[14px] bg-espresso px-4 py-3 text-center text-[9px] uppercase tracking-[0.11em] text-ivory">Completar + progreso</Link>}
+            {["pending","confirmed"].includes(appointment.status)&&<Action onClick={reschedule}><span className="inline-flex items-center justify-center gap-2"><CalendarClock size={14}/>Reagendar</span></Action>}
             <Link href="/hub/calendar?new=1" className="rounded-[14px] border border-mocha/25 bg-white/55 px-4 py-3 text-center text-[9px] uppercase tracking-[0.11em] text-mocha">Nueva cita</Link>
             {["pending","confirmed"].includes(appointment.status)&&<Action soft onClick={()=>changeStatus("cancelled")}>Cancelar</Action>}
             {["pending","confirmed"].includes(appointment.status)&&<Action soft onClick={()=>changeStatus("no_show")}>No se presentó</Action>}
@@ -172,6 +205,17 @@ function inputToCents(v:string){return Math.max(0,Math.round(Number(String(v).re
 function centsToInput(v:number|null|undefined){return v?String((v/100).toFixed(2)).replace(/\.00$/,""):""}
 function parsePrice(v:string|null|undefined){const match=(v||"").match(/\$([0-9]+(?:\.[0-9]{1,2})?)/);return match?Math.round(Number(match[1])*100):0}
 function firstRelation<T>(v:T|T[]|null|undefined){return Array.isArray(v)?(v[0]||null):(v||null)}
+async function resolveClient(item:Appointment):Promise<ClientMatch|null>{
+  const email=item.client_email?.trim().toLowerCase();
+  const phone=normalizePhone(item.client_phone);
+  const name=item.client_name.trim();
+  if(email){const {data}=await supabase.from("client_profiles").select("id,client_type").eq("normalized_email",email).maybeSingle();if(data)return data as ClientMatch;}
+  if(phone){const {data}=await supabase.from("client_profiles").select("id,client_type").eq("normalized_phone",phone).maybeSingle();if(data)return data as ClientMatch;}
+  if(name){const parts=name.split(/\s+/);const first=parts[0]||"";const last=parts.slice(1).join(" ");if(first&&last){const {data}=await supabase.from("client_profiles").select("id,client_type").ilike("first_name",first).ilike("last_name",last).limit(1).maybeSingle();if(data)return data as ClientMatch;}}
+  return null;
+}
+function normalizePhone(v:string|null|undefined){return (v||"").replace(/\D/g,"")||null}
 function money(c:number){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format((c||0)/100)}
 function formatDate(v:string){return new Date(v).toLocaleDateString("es-US",{weekday:"long",month:"long",day:"numeric",year:"numeric",timeZone:"America/New_York"})}
 function formatTime(v:string){return new Date(v).toLocaleTimeString("es-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"})}
+function formatInputTime(v:string){return new Date(v).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",hour12:false,timeZone:"America/New_York"})}
