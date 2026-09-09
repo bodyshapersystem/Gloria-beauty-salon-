@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { CalendarCheck2, ChevronRight, DollarSign, Pencil, Sparkles, TrendingUp, UsersRound, X } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
-type Appointment={id:string;staff_id:string;service_id:string|null;service_category:string|null;status:string;start_at:string;price_cents:number|null;client_name:string;service:{name:string;category:string}|null;client:{client_type:string}|null};
+type Appointment={id:string;staff_id:string;service_id:string|null;service_category:string|null;status:string;start_at:string;price_cents:number|null;tip_cents:number|null;client_name:string;service:{name:string;category:string}|null;client:{client_type:string}|null};
 type StaffInfo={id:string;name:string;photo_url:string|null;salon_percentage:number};
 type Profile={role:"owner"|"admin"|"staff";staff_id:string|null};
 type Rule={staff_id:string;scope_type:"category"|"service";category:string|null;service_id:string|null;salon_percentage:number};
@@ -35,7 +35,7 @@ export default function ProgressPage(){
       const [{data:s},{data:r},{data:a}]=await Promise.all([
         supabase.from("staff").select("id,name,photo_url,salon_percentage").eq("active",true).order("name"),
         supabase.from("staff_commission_rules").select("staff_id,scope_type,category,service_id,salon_percentage"),
-        supabase.from("appointments").select("id,staff_id,service_id,service_category,status,start_at,price_cents,client_name,service:service_id(name,category),client:client_id(client_type)").gte("start_at",new Date(new Date().getFullYear()-1,0,1).toISOString()).order("start_at",{ascending:false})
+        supabase.from("appointments").select("id,staff_id,service_id,service_category,status,start_at,price_cents,tip_cents,client_name,service:service_id(name,category),client:client_id(client_type)").gte("start_at",new Date(new Date().getFullYear()-1,0,1).toISOString()).order("start_at",{ascending:false})
       ]);
       const staffRows=(((s as unknown) as StaffInfo[])||[]).map(x=>({...x,salon_percentage:Number(x.salon_percentage||0)}));
       const ruleRows=(((r as unknown) as Rule[])||[]).map(x=>({...x,salon_percentage:Number(x.salon_percentage||0)}));
@@ -89,6 +89,7 @@ export default function ProgressPage(){
           <Row label={isSalon?"Para el salón":"Para Gloria / salón"} value={money(stats.salonCut)} light/>
           <div className="my-3 h-px bg-white/12"/>
           <Row label={isSalon?"Para el team":"Para ti"} value={money(stats.staffCut)} strong light/>
+          <Row label="Tips" value={money(stats.tips)} light/>
         </div>
       </div>
       <div className="relative mt-5 flex flex-wrap gap-2">
@@ -102,7 +103,7 @@ export default function ProgressPage(){
       <PrettyStat value={String(stats.clients)} label="Clientas" tone="nude"/>
       <PrettyStat value={String(stats.completed.length)} label="Servicios" tone="dust"/>
       <PrettyStat value={money(stats.avg)} label="Ticket promedio" tone="cream"/>
-      <PrettyStat value={stats.top?.name||"—"} label="Más vendido" tone="wine" small/>
+      <PrettyStat value={money(stats.tips)} label="Tips" tone="wine"/>
     </div>
 
     <div className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
@@ -163,6 +164,7 @@ function AgreementModal({staff,onClose,onSaved}:{staff:StaffInfo;onClose:()=>voi
 function compute(items:Appointment[],staffRows:StaffInfo[],rules:Rule[]){
   const completed=items.filter(x=>x.status==="completed"&&x.client?.client_type!=="team");
   const revenue=completed.reduce((s,x)=>s+(x.price_cents||0),0);
+  const tips=completed.reduce((s,x)=>s+(x.tip_cents||0),0);
   const salonCut=completed.reduce((sum,a)=>{const st=staffRows.find(s=>s.id===a.staff_id);if(!st)return sum;return sum+Math.round((a.price_cents||0)*(effectivePct(st,a,rules)/100))},0);
   const clients=new Set(completed.map(x=>x.client_name.trim().toLowerCase()).filter(Boolean)).size;
   const avg=completed.length?Math.round(revenue/completed.length):0;
@@ -171,7 +173,7 @@ function compute(items:Appointment[],staffRows:StaffInfo[],rules:Rule[]){
   const byService=[...map.entries()].map(([name,v])=>({name,...v})).sort((a,b)=>b.value-a.value);
   const dailyBase=[{label:"L",day:1},{label:"M",day:2},{label:"X",day:3},{label:"J",day:4},{label:"V",day:5},{label:"S",day:6},{label:"D",day:0}];
   const daily=dailyBase.map(d=>({label:d.label,value:completed.filter(x=>new Date(x.start_at).getDay()===d.day).reduce((s,x)=>s+(x.price_cents||0),0)}));
-  return {completed,revenue,clients,avg,top:byService[0],byService,daily,maxDaily:Math.max(1,...daily.map(x=>x.value)),salonCut,staffCut:revenue-salonCut,cancelled:items.filter(x=>x.status==="cancelled").length,noShow:items.filter(x=>x.status==="no_show").length};
+  return {completed,revenue,tips,clients,avg,top:byService[0],byService,daily,maxDaily:Math.max(1,...daily.map(x=>x.value)),salonCut,staffCut:revenue-salonCut,cancelled:items.filter(x=>x.status==="cancelled").length,noShow:items.filter(x=>x.status==="no_show").length};
 }
 function periodRange(period:Period){const now=new Date();if(period==="week"){const start=new Date(now);const day=(start.getDay()+6)%7;start.setDate(start.getDate()-day);start.setHours(0,0,0,0);const end=new Date(start);end.setDate(end.getDate()+7);const prevStart=new Date(start);prevStart.setDate(prevStart.getDate()-7);return{start,end,prevStart}}if(period==="month"){const start=new Date(now.getFullYear(),now.getMonth(),1);const end=new Date(now.getFullYear(),now.getMonth()+1,1);const prevStart=new Date(now.getFullYear(),now.getMonth()-1,1);return{start,end,prevStart}}const start=new Date(now.getFullYear(),0,1);const end=new Date(now.getFullYear()+1,0,1);const prevStart=new Date(now.getFullYear()-1,0,1);return{start,end,prevStart}}
 function PrettyStat({value,label,tone,small=false}:{value:string;label:string;tone:"nude"|"dust"|"cream"|"wine";small?:boolean}){const cls={nude:"bg-[#EEE0D5]",dust:"bg-[#E8D0CF]",cream:"bg-[#F5ECE3]",wine:"bg-[#6F3642] text-white"}[tone];return <div className={`relative overflow-hidden rounded-[22px] border border-white/35 p-4 shadow-[0_8px_24px_rgba(52,38,31,.04)] ${cls}`}><span className="absolute -right-8 -bottom-8 h-20 w-24 rounded-full bg-white/20 blur-xl"/><p className={`relative font-serif leading-none ${small?"text-[18px]":"text-[30px]"}`}>{value}</p><p className="relative mt-2 text-[8px] uppercase tracking-[.14em] opacity-65">{label}</p></div>}
