@@ -28,6 +28,7 @@ const menuIcons = [Home, Sparkles, ImageIcon, UserRound, UsersRound, ShoppingBag
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+  const publicNavLinks = navLinks.filter((link) => link.href !== "/hub-login");
   const cart = useCart();
 
   useEffect(() => {
@@ -47,8 +48,8 @@ export function Nav() {
         <nav className="max-w-[1220px] mx-auto flex items-center justify-between px-5 md:px-8 py-3 md:py-4">
           <Link href="/" aria-label="Gloria Beauty Salon — inicio"><Logo className="h-12 md:h-14 w-auto" /></Link>
 
-          <ul className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => <li key={link.href}><Link href={link.href} className="text-[13px] hover:text-mocha transition-colors">{link.label}</Link></li>)}
+          <ul className="hidden lg:flex items-center gap-6 xl:gap-7">
+            {publicNavLinks.map((link) => <li key={link.href}><Link href={link.href} className="text-[10px] font-medium uppercase tracking-[0.2em] text-mocha/75 transition-colors hover:text-espresso">{link.label}</Link></li>)}
           </ul>
 
           <div className="hidden lg:flex items-center gap-4">
@@ -83,7 +84,7 @@ export function Nav() {
               </div>
 
               <div className="mt-2 border-b border-taupe/20">
-                {navLinks.map((link, index) => { const Icon = menuIcons[index] ?? Sparkles; return <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="group flex items-center gap-3 border-b last:border-b-0 border-taupe/15 py-[8px]"><span className="inline-flex h-7 w-7 shrink-0 items-center justify-center text-mocha"><Icon size={17} strokeWidth={1.35} /></span><span className="flex-1 font-serif text-[21px] leading-none text-espresso">{link.label}</span><ChevronRight size={15} strokeWidth={1.35} className="text-mocha" /></Link> })}
+                {publicNavLinks.map((link, index) => { const Icon = menuIcons[index] ?? Sparkles; return <Link key={link.href} href={link.href} onClick={() => setOpen(false)} className="group flex items-center gap-3 border-b last:border-b-0 border-taupe/15 py-[10px]"><span className="inline-flex h-7 w-7 shrink-0 items-center justify-center text-mocha"><Icon size={16} strokeWidth={1.35} /></span><span className="flex-1 text-[10px] font-medium uppercase tracking-[0.22em] text-espresso">{link.label}</span><ChevronRight size={14} strokeWidth={1.35} className="text-mocha" /></Link> })}
               </div>
 
               <Link href="/reservar" onClick={() => setOpen(false)} className="mt-3 inline-flex min-h-[48px] items-center justify-center gap-3 rounded-[4px] bg-gradient-to-r from-mocha to-taupe px-5 text-[10px] font-semibold uppercase tracking-[0.22em] text-ivory">Reserva tu cita <ArrowRight size={15} strokeWidth={1.4} /></Link>
