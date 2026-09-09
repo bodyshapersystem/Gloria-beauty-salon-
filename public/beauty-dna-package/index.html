@@ -106,15 +106,17 @@ function comboImg(category=cat){
   if(category==="lashes"){
     const design=slug(s.lashes.Design),type=slug(s.lashes.Type),length=slug(s.lashes.Length);
     const key=[design,type,length].join("/");
-    const fallbacks=[key,[design,"hybrid",length].join("/"),["natural",type,length].join("/"),["natural","hybrid",length].join("/"),["natural","hybrid","medium"].join("/")];
-    const match=fallbacks.find(k=>exactLashes.has(k));
+    const sameDesign=[...exactLashes].filter(k=>k.startsWith(design+"/"));
+    const fallbacks=[key,[design,type,"medium"].join("/"),[design,"hybrid",length].join("/"),[design,"hybrid","medium"].join("/"),["natural",type,length].join("/"),["natural","hybrid",length].join("/"),["natural","hybrid","medium"].join("/")];
+    const match=fallbacks.find(k=>exactLashes.has(k))||sameDesign.find(k=>k.includes("/"+type+"/"))||sameDesign.find(k=>k.endsWith("/"+length))||sameDesign[0];
     if(match)return "/beauty-dna-package/matrix/lashes/"+match+".webp";
   }
   if(category==="brows"){
     const shape=slug(s.brows.Shape),thickness=slug(s.brows.Thickness),color=slug(s.brows.Color);
     const key=[shape,thickness,color].join("/");
-    const fallbacks=[key,[shape,"medium",color].join("/"),["soft",thickness,color].join("/"),["soft","medium",color].join("/"),[shape,"medium","dark-brown"].join("/")];
-    const match=fallbacks.find(k=>exactBrows.has(k));
+    const sameShape=[...exactBrows].filter(k=>k.startsWith(shape+"/"));
+    const fallbacks=[key,[shape,"medium",color].join("/"),[shape,thickness,"dark-brown"].join("/"),[shape,"medium","dark-brown"].join("/"),["soft",thickness,color].join("/"),["soft","medium",color].join("/")];
+    const match=fallbacks.find(k=>exactBrows.has(k))||sameShape.find(k=>k.endsWith("/"+color))||sameShape.find(k=>k.includes("/"+thickness+"/"))||sameShape[0];
     if(match)return "/beauty-dna-package/matrix/brows/"+match+".webp";
   }
   return img(activeGroup[category],category)
