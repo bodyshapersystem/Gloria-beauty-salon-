@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/lib/cart/CartContext";
+import { CartDrawer } from "@/components/public/CartDrawer";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -47,7 +49,10 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${cormorant.variable} ${manrope.variable}`}>
       <body className="bg-ivory text-espresso font-sans antialiased overflow-x-hidden">
-        {children}
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );
