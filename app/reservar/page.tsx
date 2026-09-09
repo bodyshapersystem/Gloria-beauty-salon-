@@ -3,12 +3,15 @@ import { Nav } from "@/components/public/Nav";
 import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { BookingWidgetV2 } from "@/components/public/BookingWidgetV2";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Reserva tu cita | Gloria Beauty Salon",
+export const metadata: Metadata = createPageMetadata({
+  title: "Reserva tu cita de belleza en Miami",
   description:
-    "Reserva tu cita en Gloria Beauty Salon — elige el servicio, tu profesional favorita, y el horario que mejor te acomode.",
-};
+    "Reserva online tu cita en Gloria Beauty Salon en Calle 8, Miami. Elige servicio, profesional y horario para cabello, unas, cejas, pestanas o spray tan.",
+  path: "/reservar",
+  keywords: ["reservar salon Miami", "book beauty appointment Miami", "cita belleza Calle 8"],
+});
 
 export default function ReservarPage() {
   return (
