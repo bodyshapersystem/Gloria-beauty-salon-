@@ -7,6 +7,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Plus, Sparkles, UserRo
 import { supabase } from "@/lib/supabase/client";
 import { NewAppointmentSheet } from "@/components/hub/NewAppointmentSheet";
 import { MeTimeSheet, type MeTimeBlock } from "@/components/hub/MeTimeSheet";
+import { AppointmentDetailSheet } from "@/components/hub/AppointmentDetailSheet";
 import { categoryBg } from "@/lib/data/serviceCategories";
 
 type View="day"|"week"|"month";
@@ -98,7 +99,7 @@ export default function HubCalendarPage(){
     <NewAppointmentSheet open={newOpen} onClose={()=>router.replace("/hub/calendar")} onCreated={load}/>
     <MeTimeSheet open={meTimeOpen} onClose={()=>{setMeTimeOpen(false);setSelectedBlock(null)}} onSaved={load} staff={staff} user={user} selectedDate={selectedDate} editing={selectedBlock}/>
 
-    {selected&&<div className="fixed inset-0 z-[90] flex justify-end bg-espresso/35" onClick={()=>setSelected(null)}><aside className="h-full w-full max-w-[430px] overflow-y-auto bg-[#FBF8F3] p-6" onClick={e=>e.stopPropagation()}><div className="flex items-start justify-between"><div><p className="text-[8px] uppercase tracking-[0.2em] text-mocha">Cita</p><h2 className="mt-2 font-serif text-[36px] leading-none">{selected.client_name}</h2><span className="mt-3 inline-flex rounded-full bg-[#EAD6D1] px-3 py-1.5 text-[8px] uppercase tracking-[0.1em] text-[#6F3642]">{statusLabels[selected.status]||selected.status}</span></div><button onClick={()=>setSelected(null)} className="grid h-10 w-10 place-items-center rounded-full border border-champagne/35"><X size={19}/></button></div><div className="mt-7 space-y-4 rounded-[20px] border border-champagne/30 bg-white/65 p-5"><Row icon={<CalendarDays size={16}/>} label="Fecha" value={new Date(selected.start_at).toLocaleDateString("es-US",{weekday:"long",month:"short",day:"numeric",timeZone:"America/New_York"})}/><Row icon={<Clock3 size={16}/>} label="Hora" value={`${fmtTime(selected.start_at)} – ${fmtTime(selected.end_at)}`}/><Row icon={<UserRound size={16}/>} label="Profesional" value={selected.staff_name||"Equipo"}/><div className="border-t border-champagne/25 pt-4"><p className="text-[9px] uppercase tracking-[0.16em] text-taupe">Servicio</p><p className="mt-2 font-serif text-[25px]">{selected.service_name||"Cita"}</p></div></div><Link href="/hub/clients" className="mt-5 flex items-center justify-center rounded-full border border-[#6F3642]/25 px-5 py-3.5 text-[9px] uppercase tracking-[0.13em] text-[#6F3642]">Ver clientas</Link></aside></div>}
+    {selected&&<AppointmentDetailSheet appointmentId={selected.id} onClose={()=>setSelected(null)} onSaved={load}/>}
   </div>
 }
 
