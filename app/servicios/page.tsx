@@ -5,12 +5,15 @@ import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button, UnderlineLink } from "@/components/ui/Button";
 import { serviceCategories } from "@/lib/data/services";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Servicios | Gloria Beauty Salon",
+export const metadata: Metadata = createPageMetadata({
+  title: "Servicios de belleza en Miami",
   description:
-    "Hair, Nails, Brows, Lashes, Tanning y Makeup — todo lo que te hace brillar, en Calle 8, Miami.",
-};
+    "Menu de servicios de Gloria Beauty Salon: haircuts, blowouts, color, balayage, keratina, unas, cejas, pestanas, makeup y spray tan en Calle 8, Miami.",
+  path: "/servicios",
+  keywords: ["servicios de belleza Miami", "balayage Miami", "blowout Miami", "nails Calle 8"],
+});
 
 export default function ServiciosPage() {
   return (
