@@ -10,6 +10,17 @@
   "completed": {
     "hair": [
       "long/straight/black",
+      "long/straight/blonde",
+      "long/straight/copper",
+      "long/straight/dark-brown",
+      "long/straight/light-brown",
+      "long/straight/light-brown-plus-highlights",
+      "long/straight/balayage",
+      "long/straight/dark-brown-plus-almond-highlights",
+      "long/soft-waves/dark-brown",
+      "long/defined-waves/dark-brown",
+      "long/curls/dark-brown",
+      "long/blowout/dark-brown",
       "short/straight/black",
       "short/straight/blonde",
       "short/straight/copper",
@@ -17,15 +28,15 @@
       "short/straight/light-brown",
       "short/straight/light-brown-plus-highlights",
       "short/straight/balayage",
-      "short/straight/dark-brown-plus-almond-highlights"
-      ,"medium/straight/black"
-      ,"medium/straight/blonde"
-      ,"medium/straight/copper"
-      ,"medium/straight/dark-brown"
-      ,"medium/straight/light-brown"
-      ,"medium/straight/light-brown-plus-highlights"
-      ,"medium/straight/balayage"
-      ,"medium/straight/dark-brown-plus-almond-highlights"
+      "short/straight/dark-brown-plus-almond-highlights",
+      "medium/straight/black",
+      "medium/straight/blonde",
+      "medium/straight/copper",
+      "medium/straight/dark-brown",
+      "medium/straight/light-brown",
+      "medium/straight/light-brown-plus-highlights",
+      "medium/straight/balayage",
+      "medium/straight/dark-brown-plus-almond-highlights"
     ],
     "nails": [
       "short/round/red",
@@ -34,7 +45,12 @@
       "medium/almond/burgundy",
       "medium/almond/mocha-chrome",
       "medium/square/funny-bunny",
+      "long/almond/red",
+      "long/almond/french",
+      "long/almond/burgundy",
       "long/almond/funny-bunny",
+      "long/almond/mocha-chrome",
+      "long/coffin/red",
       "long/coffin/funny-bunny"
     ],
     "lashes": [

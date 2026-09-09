@@ -52,10 +52,17 @@ lashes:{Design:{Natural:"lashes-hybrid.webp","Cat Eye":"lashes-cat-eye.webp",Wis
 const anchor={hair:"Length",nails:"Shape",brows:"Shape",lashes:"Type"};
 function img(group,category=cat){return A+files[category][group][s[category][group]]}
 function slug(value){return value.toLowerCase().replace(/\+/g,"plus").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+const exactLongHair=new Set([
+  "long/straight/black","long/straight/blonde","long/straight/copper","long/straight/dark-brown",
+  "long/straight/light-brown","long/straight/light-brown-plus-highlights","long/straight/balayage",
+  "long/straight/dark-brown-plus-almond-highlights","long/soft-waves/dark-brown",
+  "long/defined-waves/dark-brown","long/curls/dark-brown","long/blowout/dark-brown"
+]);
 const exactNails=new Set([
   "short/round/red","short/round/french","short/round/funny-bunny",
   "medium/almond/burgundy","medium/almond/mocha-chrome","medium/square/funny-bunny",
-  "long/almond/funny-bunny","long/coffin/funny-bunny"
+  "long/almond/red","long/almond/french","long/almond/burgundy","long/almond/funny-bunny",
+  "long/almond/mocha-chrome","long/coffin/red","long/coffin/funny-bunny"
 ]);
 const exactLashes=new Set([
   "natural/classic/medium","natural/hybrid/short","natural/hybrid/medium","natural/hybrid/long",
@@ -67,7 +74,10 @@ const exactBrows=new Set([
   "straight/medium/dark-brown","defined/medium/dark-brown","high-arch/medium/dark-brown"
 ]);
 function comboImg(category=cat){
-  if(category==="hair"&&s.hair.Length==="Long"&&s.hair.Texture==="Straight"&&s.hair.Color==="Black")return "/beauty-dna-package/matrix/hair/long/straight/black.webp";
+  if(category==="hair"&&s.hair.Length==="Long"){
+    const key=[s.hair.Length,s.hair.Texture,s.hair.Color].map(slug).join("/");
+    if(exactLongHair.has(key))return "/beauty-dna-package/matrix/hair/"+key+".webp";
+  }
   if(category==="hair"&&s.hair.Length==="Short"&&s.hair.Texture==="Straight"){
     if(s.hair.Color==="Dark Brown")return A+"hair-length-short.webp";
     return "/beauty-dna-package/matrix/hair/short/straight/"+slug(s.hair.Color)+".png";
