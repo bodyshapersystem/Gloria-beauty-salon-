@@ -6,10 +6,11 @@ import Link from "next/link";
 import { CalendarDays, Mail, Pencil, Phone, Plus, ShoppingBag, Sparkles, X } from "lucide-react";
 import { BeautyDnaExperience } from "@/components/beauty/BeautyDnaExperience";
 import { supabase } from "@/lib/supabase/client";
+import { AppointmentDetailPanel, type PanelAppointment } from "@/components/hub/AppointmentDetailPanel";
 
 type Client={id:string;first_name:string;last_name:string;email:string|null;phone:string|null;birthday:string|null;access_status:string;beauty_state:string;created_at:string;client_type:string};
 type Memory={id:string;category:string;title:string;summary:string|null;details:Record<string,unknown>;products_used:unknown;maintenance_notes:string|null;client_visible:boolean;updated_at:string;appointment_id:string|null;service_id:string|null;staff_id:string|null};
-type Appt={id:string;start_at:string;status:string;service:{name:string}|null;staff:{name:string}|null};
+type Appt=PanelAppointment;
 type Metrics={segment:string;completed_visits:number;last_visit:string|null;days_since_last_visit:number|null};
 type Tab="overview"|"beauty"|"appointments"|"products"|"activity";
 
@@ -17,14 +18,16 @@ const tabs:Record<Tab,string>={overview:"Resumen",beauty:"My Beauty Profile",app
 
 export default function HubClientDetail(){
   const params=useParams<{id:string}>();const id=params.id;
-  const [client,setClient]=useState<Client|null>(null);const [memory,setMemory]=useState<Memory[]>([]);const [appointments,setAppointments]=useState<Appt[]>([]);const [metrics,setMetrics]=useState<Metrics|null>(null);const [tab,setTab]=useState<Tab>("overview");const [editOpen,setEditOpen]=useState(false);const [memoryOpen,setMemoryOpen]=useState(false);const [reload,setReload]=useState(0);
+  const [client,setClient]=useState<Client|null>(null);const [memory,setMemory]=useState<Memory[]>([]);const [appointments,setAppointments]=useState<Appt[]>([]);const [metrics,setMetrics]=useState<Metrics|null>(null);const [tab,setTab]=useState<Tab>("overview");const [editOpen,setEditOpen]=useState(false);const [memoryOpen,setMemoryOpen]=useState(false);const [reload,setReload]=useState(0);const [role,setRole]=useState<string|null>(null);const [selectedApptId,setSelectedApptId]=useState<string|null>(null);const [apptMessage,setApptMessage]=useState<string|null>(null);
 
-  useEffect(()=>{if(!id)return;(async()=>{const [{data:c},{data:m},{data:a},{data:v}]=await Promise.all([
+  useEffect(()=>{if(!id)return;(async()=>{const {data:{session}}=await supabase.auth.getSession();if(session){const {data:p}=await supabase.from("user_profiles").select("role").eq("auth_user_id",session.user.id).eq("active",true).maybeSingle();setRole(p?.role||null)}const [{data:c},{data:m},{data:a},{data:v}]=await Promise.all([
     supabase.from("client_profiles").select("id,first_name,last_name,email,phone,birthday,access_status,beauty_state,created_at,client_type").eq("id",id).single(),
     supabase.from("client_memory").select("id,category,title,summary,details,products_used,maintenance_notes,client_visible,updated_at,appointment_id,service_id,staff_id").eq("client_id",id).order("updated_at",{ascending:false}),
-    supabase.from("appointments").select("id,start_at,status,service:service_id(name),staff:staff_id(name)").eq("client_id",id).order("start_at",{ascending:false}).limit(40),
+    supabase.from("appointments").select("id,client_name,client_phone,client_email,notes_internal,start_at,end_at,status,source,price_cents,cancellation_fee_cents,cancellation_fee_reason,reschedule_count,service_id,staff_id,service:service_id(name,price_label),staff:staff_id(name)").eq("client_id",id).order("start_at",{ascending:false}).limit(40),
     supabase.from("client_value_metrics").select("segment,completed_visits,last_visit,days_since_last_visit").eq("client_id",id).maybeSingle(),
   ]);setClient(c as Client);setMemory((m as Memory[])||[]);setAppointments(((a as unknown) as Appt[])||[]);setMetrics((v as Metrics|null)||null)})()},[id,reload]);
+  const selectedAppt=useMemo(()=>appointments.find(a=>a.id===selectedApptId)||null,[appointments,selectedApptId]);
+  async function handleApptChanged(message?:string){setReload(v=>v+1);if(message)setApptMessage(message)}
 
   async function toggleAmbassador(){if(!client)return;const next=client.client_type==="ambassador"?"regular":"ambassador";const {error}=await supabase.rpc("hub_update_client_type",{p_client_id:client.id,p_client_type:next});if(!error)setReload(v=>v+1)}
 
@@ -41,7 +44,7 @@ export default function HubClientDetail(){
 
     {tab==="beauty"&&<section className="mt-6"><div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"><div><p className="text-[9px] uppercase tracking-[.22em] text-mocha">My Beauty Profile</p><h2 className="mt-2 font-serif text-[40px] leading-none">Su Beauty DNA, vivo.</h2><p className="mt-3 max-w-[720px] text-[11px] leading-relaxed text-taupe">Cabello, color, mechas, secado, cejas, pestañas y uñas en la nueva experiencia visual completa.</p></div><button onClick={()=>setMemoryOpen(true)} className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-[#4A352B] px-5 py-3 text-[9px] uppercase tracking-[.12em] text-ivory"><Plus size={14}/>Agregar al perfil</button></div><div className="mt-6"><BeautyDnaExperience title={`Beauty DNA de ${client.first_name}`}/></div>{families.length>0&&<div className="mt-5 grid gap-4 xl:grid-cols-2">{families.map(([family,items])=><BeautySection key={family} family={family} items={items}/>)}</div>}</section>}
 
-    {tab==="appointments"&&<section className="mt-6 rounded-[24px] border border-[#DDD0C6] bg-white/70 p-5 md:p-6"><div className="flex items-center justify-between"><div><p className="text-[9px] uppercase tracking-[.2em] text-mocha">Historial</p><h2 className="mt-1 font-serif text-[32px]">Citas</h2></div><Link href="/hub/calendar?new=1" className="rounded-full bg-[#4A352B] px-4 py-2.5 text-[9px] text-ivory">+ Nueva cita</Link></div><div className="mt-5 divide-y divide-[#E7DAD1]">{appointments.map(a=><div key={a.id} className="flex items-center gap-4 py-4"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#EFE1DA] text-mocha"><CalendarDays size={17}/></div><div className="min-w-0 flex-1"><p className="font-serif text-[21px] truncate">{a.service?.name||"Appointment"}</p><p className="mt-1 text-[10px] text-taupe">{date(a.start_at)} · {a.staff?.name||"Team"}</p></div><span className="text-[8px] uppercase tracking-[.08em] text-taupe">{human(a.status)}</span></div>)}</div></section>}
+    {tab==="appointments"&&<section className="mt-6 rounded-[24px] border border-[#DDD0C6] bg-white/70 p-5 md:p-6"><div className="flex items-center justify-between"><div><p className="text-[9px] uppercase tracking-[.2em] text-mocha">Historial</p><h2 className="mt-1 font-serif text-[32px]">Citas</h2></div><Link href="/hub/calendar?new=1" className="rounded-full bg-[#4A352B] px-4 py-2.5 text-[9px] text-ivory">+ Nueva cita</Link></div>{apptMessage&&<p className="mt-3 text-[11px] text-mocha">{apptMessage}</p>}<div className="mt-5 divide-y divide-[#E7DAD1]">{appointments.length===0?<p className="py-6 text-[11px] text-taupe">Todavía no hay citas.</p>:appointments.map(a=><button key={a.id} onClick={()=>setSelectedApptId(a.id)} className="w-full flex items-center gap-4 py-4 text-left hover:bg-white/50 -mx-2 px-2 rounded-xl"><div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#EFE1DA] text-mocha"><CalendarDays size={17}/></div><div className="min-w-0 flex-1"><p className="font-serif text-[21px] truncate">{a.service?.name||"Cita"}</p><p className="mt-1 text-[10px] text-taupe">{date(a.start_at)} · {a.staff?.name||"Equipo"}</p></div><span className="text-[8px] uppercase tracking-[.08em] text-taupe">{human(a.status)}</span></button>)}</div></section>}
 
     {tab==="products"&&<section className="mt-6"><p className="text-[9px] uppercase tracking-[.22em] text-mocha">Products used on her</p><h2 className="mt-2 font-serif text-[38px]">Su rutina real</h2><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{uniqueProducts(memory).length?uniqueProducts(memory).map((p,i)=><div key={`${p.type}-${p.name}-${i}`} className="rounded-[20px] border border-[#DDD0C6] bg-white/70 p-5"><ShoppingBag size={17} className="text-mocha"/><p className="mt-4 text-[8px] uppercase tracking-[.18em] text-taupe">{human(p.type)}</p><p className="mt-1 font-serif text-[24px]">{p.name}</p></div>):<Empty text="Todavía no hay productos registrados."/>}</div></section>}
 
@@ -49,6 +52,7 @@ export default function HubClientDetail(){
 
     {editOpen&&<EditClient client={client} onClose={()=>setEditOpen(false)} onSaved={()=>{setEditOpen(false);setReload(v=>v+1)}}/>}
     {memoryOpen&&<ManualBeautyMemory clientId={client.id} onClose={()=>setMemoryOpen(false)} onSaved={()=>{setMemoryOpen(false);setReload(v=>v+1);setTab("beauty")}}/>}
+    {selectedAppt&&<AppointmentDetailPanel appointment={selectedAppt} role={role} onClose={()=>setSelectedApptId(null)} onChanged={handleApptChanged}/>}
   </div>
 }
 
