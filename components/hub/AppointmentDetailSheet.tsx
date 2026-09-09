@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase/client";
 type Appointment={
   id:string;client_id:string|null;client_name:string;client_phone:string|null;client_email:string|null;
   start_at:string;end_at:string;status:string;source:string|null;notes_internal:string|null;
-  price_cents:number|null;deposit_cents:number|null;service:{name:string;price_label:string|null}|null;
+  price_cents:number|null;deposit_cents:number|null;tip_cents:number|null;service:{name:string;price_label:string|null}|null;
   staff_id:string;staff:{name:string}|null;client:{id:string;client_type:string|null}|null;
 };
 type Service={id:string;name:string;category:string;duration_minutes:number;price_label:string|null};
@@ -30,6 +30,7 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
   const [total,setTotal]=useState("");
   const [depositPaid,setDepositPaid]=useState(false);
   const [deposit,setDeposit]=useState("");
+  const [tip,setTip]=useState("");
   const [extraServiceId,setExtraServiceId]=useState("");
   const [saving,setSaving]=useState(false);
   const [message,setMessage]=useState<string|null>(null);
@@ -37,7 +38,7 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
   async function load(){
     setMessage(null);
     const [{data:a,error},{data:s}]=await Promise.all([
-      supabase.from("appointments").select("id,client_id,client_name,client_phone,client_email,start_at,end_at,status,source,notes_internal,price_cents,deposit_cents,staff_id,service:service_id(name,price_label),staff:staff_id(name),client:client_id(id,client_type)").eq("id",appointmentId).single(),
+      supabase.from("appointments").select("id,client_id,client_name,client_phone,client_email,start_at,end_at,status,source,notes_internal,price_cents,deposit_cents,tip_cents,staff_id,service:service_id(name,price_label),staff:staff_id(name),client:client_id(id,client_type)").eq("id",appointmentId).single(),
       supabase.from("services").select("id,name,category,duration_minutes,price_label").eq("active",true).order("category").order("name")
     ]);
     if(error){setMessage(error.message);return;}
@@ -47,7 +48,7 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
     setAppointment(item);setServices(((s as unknown) as Service[])||[]);
     setClientId(resolvedClient?.id||item.client_id||null);setClientType(resolvedClient?.client_type||"regular");
     setClientName(item.client_name||"");setClientPhone(item.client_phone||"");setClientEmail(item.client_email||"");
-    setNotes(item.notes_internal||"");setTotal(centsToInput(item.price_cents));setDepositPaid(Boolean(item.deposit_cents&&item.deposit_cents>0));setDeposit(centsToInput(item.deposit_cents));
+    setNotes(item.notes_internal||"");setTotal(centsToInput(item.price_cents));setDepositPaid(Boolean(item.deposit_cents&&item.deposit_cents>0));setDeposit(centsToInput(item.deposit_cents));setTip(centsToInput(item.tip_cents));
   }
 
   useEffect(()=>{load()},[appointmentId]);
@@ -55,7 +56,9 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
   const extraService=useMemo(()=>services.find(s=>s.id===extraServiceId)||null,[services,extraServiceId]);
   const depositCents=depositPaid?inputToCents(deposit):0;
   const totalCents=inputToCents(total);
+  const tipCents=inputToCents(tip);
   const balance=Math.max(0,totalCents-depositCents);
+  const collected=totalCents+tipCents;
 
   async function save(){
     if(!appointment)return;
@@ -67,7 +70,8 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
       p_client_email:clientEmail.trim()||null,
       p_notes_internal:notes.trim()||null,
       p_price_cents:totalCents,
-      p_deposit_cents:depositCents
+      p_deposit_cents:depositCents,
+      p_tip_cents:tipCents
     });
     if(error){setSaving(false);setMessage(error.message);return;}
     const nextClientId=clientId||((await resolveClient({
@@ -99,7 +103,8 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
       p_client_email:appointment.client_email||null,
       p_notes_internal:nextNotes,
       p_price_cents:nextTotal,
-      p_deposit_cents:appointment.deposit_cents||0
+      p_deposit_cents:appointment.deposit_cents||0,
+      p_tip_cents:appointment.tip_cents||0
     });
     setSaving(false);
     if(error){setMessage(error.message);return;}
@@ -163,9 +168,19 @@ export function AppointmentDetailSheet({appointmentId,onClose,onSaved}:{appointm
             <label className="block"><span className="mb-1.5 block text-[8px] uppercase tracking-[.14em] text-taupe">Depósito</span><select value={depositPaid?"yes":"no"} onChange={e=>setDepositPaid(e.target.value==="yes")} className="w-full rounded-[15px] border border-[#D8C8BC] bg-white px-4 py-3.5 text-[12px] outline-none"><option value="no">No pagó depósito</option><option value="yes">Sí pagó depósito</option></select></label>
           </div>
           {depositPaid&&<Field label="Monto depósito" value={deposit} set={setDeposit} inputMode="decimal" prefix="$"/>}
+          <div className="rounded-[18px] border border-champagne/25 bg-white/65 p-4">
+            <p className="text-[8px] uppercase tracking-[.14em] text-taupe">Propina opcional</p>
+            <div className="mt-3 grid grid-cols-5 gap-2">
+              {[15,18,20].map(p=><button key={p} onClick={()=>setTip(centsToInput(Math.round(totalCents*(p/100))))} className="rounded-full border border-[#D8C8BC] bg-[#FBF8F3] px-3 py-2 text-[10px] text-mocha">{p}%</button>)}
+              <button onClick={()=>setTip("")} className="rounded-full border border-[#D8C8BC] bg-[#FBF8F3] px-3 py-2 text-[10px] text-mocha">No tip</button>
+              <button onClick={()=>setTip(centsToInput(tipCents))} className="rounded-full border border-[#D8C8BC] bg-[#FBF8F3] px-3 py-2 text-[10px] text-mocha">Otro</button>
+            </div>
+            <div className="mt-3"><Field label="Monto tip" value={tip} set={setTip} inputMode="decimal" prefix="$"/></div>
+            <p className="mt-2 text-[9px] leading-relaxed text-taupe">La propina se registra aparte del servicio y va directa al profesional.</p>
+          </div>
           <textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={4} placeholder="Notas internas" className="w-full rounded-[15px] border border-[#D8C8BC] bg-white px-4 py-3.5 text-[12px] outline-none"/>
           <div className="rounded-[18px] border border-champagne/25 bg-[#F8F1EA] p-4">
-            <Line label="Total" value={money(totalCents)}/><Line label="Depósito" value={depositPaid?money(depositCents):"No pagado"}/><Line label="Balance" value={money(balance)}/>
+            <Line label="Servicio" value={money(totalCents)}/><Line label="Depósito" value={depositPaid?money(depositCents):"No pagado"}/><Line label="Balance" value={money(balance)}/><Line label="Tip" value={tipCents?money(tipCents):"Opcional"}/><Line label="Total cobrado" value={money(collected)}/>
           </div>
           <button onClick={save} disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-espresso px-5 py-4 text-[9px] uppercase tracking-[0.14em] text-ivory disabled:opacity-50"><Save size={14}/>{saving?"Guardando...":"Guardar cambios"}</button>
         </Section>
