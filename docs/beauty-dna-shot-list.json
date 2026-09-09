@@ -1,0 +1,2370 @@
+{
+  "version": 1,
+  "requiredTotal": 291,
+  "completedTotal": 58,
+  "missingTotal": 233,
+  "categories": {
+    "hair": {
+      "required": 120,
+      "completed": 28,
+      "missing": 92,
+      "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop.",
+      "missingShots": [
+        {
+          "key": "short/soft-waves/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/black.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/blonde.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/copper.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/dark-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/light-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/balayage.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/soft-waves/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/soft-waves/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "soft-waves",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/black.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/blonde.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/copper.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/dark-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/light-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/balayage.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/defined-waves/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/defined-waves/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "defined-waves",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/black.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/blonde.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/copper.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/dark-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/light-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/balayage.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/curls/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/curls/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "curls",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/black.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/blonde.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/copper.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/dark-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/light-brown.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/balayage.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "short/blowout/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/short/blowout/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "short",
+            "texture": "blowout",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/black.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/blonde.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/copper.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/dark-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/light-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/balayage.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/soft-waves/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/soft-waves/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "soft-waves",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/black.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/blonde.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/copper.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/dark-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/light-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/balayage.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/defined-waves/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/defined-waves/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "defined-waves",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/black.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/blonde.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/copper.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/dark-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/light-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/balayage.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/curls/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/curls/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "curls",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/black.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/blonde.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/copper.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/dark-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "dark-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/light-brown.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/balayage.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "medium/blowout/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/medium/blowout/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "medium",
+            "texture": "blowout",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/black.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/blonde.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/copper.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/light-brown.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/balayage.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/soft-waves/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/soft-waves/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "soft-waves",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/black.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/blonde.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/copper.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/light-brown.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/balayage.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/defined-waves/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/defined-waves/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "defined-waves",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/black.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/blonde.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/copper.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/light-brown.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/balayage.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/curls/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/curls/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "curls",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/black",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/black.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "black"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/blonde",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/blonde.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "blonde"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/copper",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/copper.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "copper"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/light-brown.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "light-brown"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/light-brown-plus-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/light-brown-plus-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "light-brown-plus-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/balayage",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/balayage.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "balayage"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        },
+        {
+          "key": "long/blowout/dark-brown-plus-almond-highlights",
+          "expectedPath": "public/beauty-dna-package/matrix/hair/long/blowout/dark-brown-plus-almond-highlights.webp",
+          "traits": {
+            "length": "long",
+            "texture": "blowout",
+            "color": "dark-brown-plus-almond-highlights"
+          },
+          "direction": "Same model, front-facing salon portrait, same pose/crop/lighting for every hair combo. Real hairstyle/color result; do not fake it with a color overlay or zoom crop."
+        }
+      ]
+    },
+    "nails": {
+      "required": 75,
+      "completed": 13,
+      "missing": 62,
+      "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered.",
+      "missingShots": [
+        {
+          "key": "short/round/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/round/burgundy.webp",
+          "traits": {
+            "length": "short",
+            "shape": "round",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/round/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/round/mocha-chrome.webp",
+          "traits": {
+            "length": "short",
+            "shape": "round",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/oval/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/oval/red.webp",
+          "traits": {
+            "length": "short",
+            "shape": "oval",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/oval/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/oval/french.webp",
+          "traits": {
+            "length": "short",
+            "shape": "oval",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/oval/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/oval/burgundy.webp",
+          "traits": {
+            "length": "short",
+            "shape": "oval",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/oval/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/oval/funny-bunny.webp",
+          "traits": {
+            "length": "short",
+            "shape": "oval",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/oval/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/oval/mocha-chrome.webp",
+          "traits": {
+            "length": "short",
+            "shape": "oval",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/square/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/square/red.webp",
+          "traits": {
+            "length": "short",
+            "shape": "square",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/square/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/square/french.webp",
+          "traits": {
+            "length": "short",
+            "shape": "square",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/square/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/square/burgundy.webp",
+          "traits": {
+            "length": "short",
+            "shape": "square",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/square/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/square/funny-bunny.webp",
+          "traits": {
+            "length": "short",
+            "shape": "square",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/square/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/square/mocha-chrome.webp",
+          "traits": {
+            "length": "short",
+            "shape": "square",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/almond/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/almond/red.webp",
+          "traits": {
+            "length": "short",
+            "shape": "almond",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/almond/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/almond/french.webp",
+          "traits": {
+            "length": "short",
+            "shape": "almond",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/almond/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/almond/burgundy.webp",
+          "traits": {
+            "length": "short",
+            "shape": "almond",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/almond/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/almond/funny-bunny.webp",
+          "traits": {
+            "length": "short",
+            "shape": "almond",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/almond/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/almond/mocha-chrome.webp",
+          "traits": {
+            "length": "short",
+            "shape": "almond",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/coffin/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/coffin/red.webp",
+          "traits": {
+            "length": "short",
+            "shape": "coffin",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/coffin/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/coffin/french.webp",
+          "traits": {
+            "length": "short",
+            "shape": "coffin",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/coffin/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/coffin/burgundy.webp",
+          "traits": {
+            "length": "short",
+            "shape": "coffin",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/coffin/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/coffin/funny-bunny.webp",
+          "traits": {
+            "length": "short",
+            "shape": "coffin",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "short/coffin/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/short/coffin/mocha-chrome.webp",
+          "traits": {
+            "length": "short",
+            "shape": "coffin",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/round/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/round/red.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "round",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/round/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/round/french.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "round",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/round/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/round/burgundy.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "round",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/round/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/round/funny-bunny.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "round",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/round/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/round/mocha-chrome.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "round",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/oval/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/oval/red.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "oval",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/oval/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/oval/french.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "oval",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/oval/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/oval/burgundy.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "oval",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/oval/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/oval/funny-bunny.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "oval",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/oval/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/oval/mocha-chrome.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "oval",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/square/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/square/red.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "square",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/square/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/square/french.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "square",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/square/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/square/burgundy.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "square",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/square/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/square/mocha-chrome.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "square",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/almond/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/almond/red.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "almond",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/almond/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/almond/french.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "almond",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/almond/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/almond/funny-bunny.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "almond",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/coffin/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/coffin/red.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "coffin",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/coffin/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/coffin/french.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "coffin",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/coffin/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/coffin/burgundy.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "coffin",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/coffin/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/coffin/funny-bunny.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "coffin",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "medium/coffin/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/medium/coffin/mocha-chrome.webp",
+          "traits": {
+            "length": "medium",
+            "shape": "coffin",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/round/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/round/red.webp",
+          "traits": {
+            "length": "long",
+            "shape": "round",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/round/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/round/french.webp",
+          "traits": {
+            "length": "long",
+            "shape": "round",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/round/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/round/burgundy.webp",
+          "traits": {
+            "length": "long",
+            "shape": "round",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/round/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/round/funny-bunny.webp",
+          "traits": {
+            "length": "long",
+            "shape": "round",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/round/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/round/mocha-chrome.webp",
+          "traits": {
+            "length": "long",
+            "shape": "round",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/oval/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/oval/red.webp",
+          "traits": {
+            "length": "long",
+            "shape": "oval",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/oval/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/oval/french.webp",
+          "traits": {
+            "length": "long",
+            "shape": "oval",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/oval/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/oval/burgundy.webp",
+          "traits": {
+            "length": "long",
+            "shape": "oval",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/oval/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/oval/funny-bunny.webp",
+          "traits": {
+            "length": "long",
+            "shape": "oval",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/oval/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/oval/mocha-chrome.webp",
+          "traits": {
+            "length": "long",
+            "shape": "oval",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/square/red",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/square/red.webp",
+          "traits": {
+            "length": "long",
+            "shape": "square",
+            "color": "red"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/square/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/square/french.webp",
+          "traits": {
+            "length": "long",
+            "shape": "square",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/square/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/square/burgundy.webp",
+          "traits": {
+            "length": "long",
+            "shape": "square",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/square/funny-bunny",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/square/funny-bunny.webp",
+          "traits": {
+            "length": "long",
+            "shape": "square",
+            "color": "funny-bunny"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/square/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/square/mocha-chrome.webp",
+          "traits": {
+            "length": "long",
+            "shape": "square",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/coffin/french",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/coffin/french.webp",
+          "traits": {
+            "length": "long",
+            "shape": "coffin",
+            "color": "french"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/coffin/burgundy",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/coffin/burgundy.webp",
+          "traits": {
+            "length": "long",
+            "shape": "coffin",
+            "color": "burgundy"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        },
+        {
+          "key": "long/coffin/mocha-chrome",
+          "expectedPath": "public/beauty-dna-package/matrix/nails/long/coffin/mocha-chrome.webp",
+          "traits": {
+            "length": "long",
+            "shape": "coffin",
+            "color": "mocha-chrome"
+          },
+          "direction": "Same hand, same angle, same background and lighting for every nail combo. Real manicure length/shape/color; keep the hand elegant and centered."
+        }
+      ]
+    },
+    "lashes": {
+      "required": 36,
+      "completed": 7,
+      "missing": 29,
+      "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect.",
+      "missingShots": [
+        {
+          "key": "natural/classic/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/classic/short.webp",
+          "traits": {
+            "design": "natural",
+            "type": "classic",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "natural/classic/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/classic/long.webp",
+          "traits": {
+            "design": "natural",
+            "type": "classic",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "natural/greek/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/greek/short.webp",
+          "traits": {
+            "design": "natural",
+            "type": "greek",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "natural/greek/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/greek/medium.webp",
+          "traits": {
+            "design": "natural",
+            "type": "greek",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "natural/greek/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/greek/long.webp",
+          "traits": {
+            "design": "natural",
+            "type": "greek",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "natural/mega/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/mega/short.webp",
+          "traits": {
+            "design": "natural",
+            "type": "mega",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "natural/mega/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/natural/mega/long.webp",
+          "traits": {
+            "design": "natural",
+            "type": "mega",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/classic/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/classic/short.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "classic",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/classic/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/classic/medium.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "classic",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/classic/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/classic/long.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "classic",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/greek/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/greek/short.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "greek",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/greek/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/greek/medium.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "greek",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/greek/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/greek/long.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "greek",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/hybrid/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/hybrid/short.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "hybrid",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/hybrid/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/hybrid/long.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "hybrid",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/mega/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/mega/short.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "mega",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/mega/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/mega/medium.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "mega",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "cat-eye/mega/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/cat-eye/mega/long.webp",
+          "traits": {
+            "design": "cat-eye",
+            "type": "mega",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/classic/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/classic/short.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "classic",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/classic/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/classic/medium.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "classic",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/classic/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/classic/long.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "classic",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/greek/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/greek/short.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "greek",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/greek/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/greek/long.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "greek",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/hybrid/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/hybrid/short.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "hybrid",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/hybrid/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/hybrid/medium.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "hybrid",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/hybrid/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/hybrid/long.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "hybrid",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/mega/short",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/mega/short.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "mega",
+            "length": "short"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/mega/medium",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/mega/medium.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "mega",
+            "length": "medium"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        },
+        {
+          "key": "wispy/mega/long",
+          "expectedPath": "public/beauty-dna-package/matrix/lashes/wispy/mega/long.webp",
+          "traits": {
+            "design": "wispy",
+            "type": "mega",
+            "length": "long"
+          },
+          "direction": "Same eye crop, same eye direction, same skin tone and lighting for every lash combo. Real lash map/volume/length variation; no painted-on filter effect."
+        }
+      ]
+    },
+    "brows": {
+      "required": 60,
+      "completed": 10,
+      "missing": 50,
+      "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters.",
+      "missingShots": [
+        {
+          "key": "soft/thin/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/soft/thin/light-brown.webp",
+          "traits": {
+            "shape": "soft",
+            "thickness": "thin",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "soft/thin/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/soft/thin/brown.webp",
+          "traits": {
+            "shape": "soft",
+            "thickness": "thin",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "soft/thin/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/soft/thin/black.webp",
+          "traits": {
+            "shape": "soft",
+            "thickness": "thin",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "soft/thick/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/soft/thick/light-brown.webp",
+          "traits": {
+            "shape": "soft",
+            "thickness": "thick",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "soft/thick/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/soft/thick/brown.webp",
+          "traits": {
+            "shape": "soft",
+            "thickness": "thick",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "soft/thick/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/soft/thick/black.webp",
+          "traits": {
+            "shape": "soft",
+            "thickness": "thick",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thin/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thin/light-brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thin",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thin/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thin/brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thin",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thin/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thin/dark-brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thin",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thin/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thin/black.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thin",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/medium/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/medium/light-brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "medium",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/medium/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/medium/brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "medium",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/medium/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/medium/black.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "medium",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thick/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thick/light-brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thick",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thick/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thick/brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thick",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thick/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thick/dark-brown.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thick",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "straight/thick/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/straight/thick/black.webp",
+          "traits": {
+            "shape": "straight",
+            "thickness": "thick",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thin/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thin/light-brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thin",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thin/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thin/brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thin",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thin/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thin/dark-brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thin",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thin/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thin/black.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thin",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/medium/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/medium/light-brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "medium",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/medium/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/medium/brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "medium",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/medium/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/medium/black.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "medium",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thick/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thick/light-brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thick",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thick/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thick/brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thick",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thick/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thick/dark-brown.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thick",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "natural-arch/thick/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/natural-arch/thick/black.webp",
+          "traits": {
+            "shape": "natural-arch",
+            "thickness": "thick",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thin/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thin/light-brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thin",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thin/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thin/brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thin",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thin/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thin/dark-brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thin",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thin/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thin/black.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thin",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/medium/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/medium/light-brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "medium",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/medium/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/medium/brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "medium",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/medium/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/medium/black.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "medium",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thick/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thick/light-brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thick",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thick/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thick/brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thick",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thick/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thick/dark-brown.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thick",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "defined/thick/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/defined/thick/black.webp",
+          "traits": {
+            "shape": "defined",
+            "thickness": "thick",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thin/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thin/light-brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thin",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thin/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thin/brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thin",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thin/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thin/dark-brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thin",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thin/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thin/black.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thin",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/medium/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/medium/light-brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "medium",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/medium/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/medium/brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "medium",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/medium/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/medium/black.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "medium",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thick/light-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thick/light-brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thick",
+            "color": "light-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thick/brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thick/brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thick",
+            "color": "brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thick/dark-brown",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thick/dark-brown.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thick",
+            "color": "dark-brown"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        },
+        {
+          "key": "high-arch/thick/black",
+          "expectedPath": "public/beauty-dna-package/matrix/brows/high-arch/thick/black.webp",
+          "traits": {
+            "shape": "high-arch",
+            "thickness": "thick",
+            "color": "black"
+          },
+          "direction": "Same brow/eye crop, same face angle and lighting for every brow combo. Real brow shape/thickness/color result; avoid synthetic makeup filters."
+        }
+      ]
+    }
+  }
+}
