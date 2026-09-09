@@ -91,8 +91,16 @@ function comboImg(category=cat){
     const length=slug(s.nails.Length),shape=slug(s.nails.Shape),color=slug(s.nails.Color);
     const key=[length,shape,color].join("/");
     const shapeFallback=shape==="oval"?"almond":shape;
-    const fallbacks=[key,[length,shape,"funny-bunny"].join("/"),[length,shapeFallback,color].join("/"),[length,shapeFallback,"funny-bunny"].join("/"),[length,"almond",color].join("/"),[length,"round",color].join("/"),["long","almond",color].join("/")];
-    const match=fallbacks.find(k=>exactNails.has(k))||[...exactNails].find(k=>k.endsWith("/"+color));
+    const sameLength=[...exactNails].filter(k=>k.startsWith(length+"/"));
+    const fallbacks=[
+      key,
+      [length,shapeFallback,color].join("/"),
+      [length,shape,"funny-bunny"].join("/"),
+      [length,shapeFallback,"funny-bunny"].join("/"),
+      [length,"almond",color].join("/"),
+      [length,"round",color].join("/")
+    ];
+    const match=fallbacks.find(k=>exactNails.has(k))||sameLength.find(k=>k.endsWith("/"+color))||sameLength[0];
     if(match)return "/beauty-dna-package/matrix/nails/"+match+".webp";
   }
   if(category==="lashes"){
@@ -126,3 +134,4 @@ render();
 </script>
 </body>
 </html>
+
