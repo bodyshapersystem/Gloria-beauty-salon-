@@ -7,8 +7,8 @@ import { CalendarDays, ChevronLeft, ChevronRight, Clock3, Plus, Sparkles, UserRo
 import { supabase } from "@/lib/supabase/client";
 import { NewAppointmentSheet } from "@/components/hub/NewAppointmentSheet";
 import { MeTimeSheet, type MeTimeBlock } from "@/components/hub/MeTimeSheet";
+import { AppointmentDetailSheet } from "@/components/hub/AppointmentDetailSheet";
 import { categoryBg } from "@/lib/data/serviceCategories";
-import { AppointmentDetailPanel, type PanelAppointment } from "@/components/hub/AppointmentDetailPanel";
 
 type View="day"|"week"|"month";
 type Staff={id:string;name:string;photo_url:string|null};
@@ -27,8 +27,6 @@ export default function HubCalendarPage(){
   const [staff,setStaff]=useState<Staff[]>([]);
   const [user,setUser]=useState<HubUser|null>(null);
   const [selected,setSelected]=useState<Appointment|null>(null);
-  const [selectedFull,setSelectedFull]=useState<PanelAppointment|null>(null);
-  const [calendarMessage,setCalendarMessage]=useState<string|null>(null);
   const [selectedBlock,setSelectedBlock]=useState<MeTimeBlock|null>(null);
   const [meTimeOpen,setMeTimeOpen]=useState(false);
   const [loading,setLoading]=useState(true);
@@ -55,13 +53,6 @@ export default function HubCalendarPage(){
   }
 
   useEffect(()=>{load()},[selectedDate]);
-
-  async function loadSelectedFull(id:string){
-    const {data}=await supabase.from("appointments").select("id,client_name,client_phone,client_email,notes_internal,start_at,end_at,status,source,price_cents,deposit_cents,cancellation_fee_cents,cancellation_fee_reason,reschedule_count,service_id,staff_id,service:service_id(name,price_label,category),staff:staff_id(name)").eq("id",id).maybeSingle();
-    setSelectedFull(((data as unknown) as PanelAppointment)||null);
-  }
-  useEffect(()=>{if(selected)loadSelectedFull(selected.id);else setSelectedFull(null)},[selected?.id]);
-  async function handleApptChanged(message?:string){await load();if(selected)await loadSelectedFull(selected.id);if(message)setCalendarMessage(message)}
 
   const canCreate=Boolean(user&&["owner","admin","staff"].includes(user.role));
   const week=useMemo(()=>weekDays(selectedDate),[selectedDate]);
@@ -108,9 +99,7 @@ export default function HubCalendarPage(){
     <NewAppointmentSheet open={newOpen} onClose={()=>router.replace("/hub/calendar")} onCreated={load}/>
     <MeTimeSheet open={meTimeOpen} onClose={()=>{setMeTimeOpen(false);setSelectedBlock(null)}} onSaved={load} staff={staff} user={user} selectedDate={selectedDate} editing={selectedBlock}/>
 
-    {calendarMessage&&<p className="mt-4 rounded-[15px] bg-blush/30 px-4 py-3 text-[11px] text-mocha">{calendarMessage}</p>}
-
-    {selected&&(selectedFull?<AppointmentDetailPanel appointment={selectedFull} role={user?.role||null} onClose={()=>setSelected(null)} onChanged={handleApptChanged}/>:<div className="fixed inset-0 z-[90] flex justify-end bg-espresso/35" onClick={()=>setSelected(null)}><aside className="h-full w-full max-w-[430px] bg-[#FBF8F3] p-6 flex items-center justify-center" onClick={e=>e.stopPropagation()}><p className="text-[12px] text-taupe">Cargando cita...</p></aside></div>)}
+    {selected&&<AppointmentDetailSheet appointmentId={selected.id} onClose={()=>setSelected(null)} onSaved={load}/>}
   </div>
 }
 

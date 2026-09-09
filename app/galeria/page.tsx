@@ -3,12 +3,15 @@ import Image from "next/image";
 import { Nav } from "@/components/public/Nav";
 import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Galería | Gloria Beauty Salon",
+export const metadata: Metadata = createPageMetadata({
+  title: "Galeria de resultados de belleza en Miami",
   description:
-    "Un vistazo al trabajo y al detrás de cámaras de Gloria Beauty Salon, en Calle 8, Miami.",
-};
+    "Mira resultados y momentos de Gloria Beauty Salon: cabello, color, styling y belleza en Calle 8, Miami.",
+  path: "/galeria",
+  keywords: ["galeria salon Miami", "hair color results Miami", "beauty salon gallery"],
+});
 
 const photos = [
   {

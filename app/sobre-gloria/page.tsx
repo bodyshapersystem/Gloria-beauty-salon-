@@ -4,12 +4,15 @@ import { Nav } from "@/components/public/Nav";
 import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Button } from "@/components/ui/Button";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Sobre Gloria | Gloria Beauty Salon",
+export const metadata: Metadata = createPageMetadata({
+  title: "Sobre Gloria, master stylist en Miami",
   description:
-    "La historia de Gloria — fundadora, master stylist y color specialist de Gloria Beauty Salon, en Calle 8, Miami.",
-};
+    "Conoce a Gloria, fundadora de Gloria Beauty Salon, master stylist y color specialist con mas de 25 anos de experiencia en Calle 8, Miami.",
+  path: "/sobre-gloria",
+  keywords: ["Gloria stylist Miami", "color specialist Miami", "master stylist Calle 8"],
+});
 
 export default function SobreGloriaPage() {
   return (

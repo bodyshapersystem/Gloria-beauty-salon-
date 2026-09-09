@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CalendarDays, ChevronRight, Filter, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import { AppointmentDetailPanel, type PanelAppointment } from "@/components/hub/AppointmentDetailPanel";
+import { AppointmentDetailSheet } from "@/components/hub/AppointmentDetailSheet";
+import type { PanelAppointment } from "@/components/hub/AppointmentDetailPanel";
 import { categoryBg } from "@/lib/data/serviceCategories";
 
 type Appointment=PanelAppointment;
@@ -48,7 +49,7 @@ export default function HubAppointmentsPage(){
 
     <section className="mt-5 space-y-2">{loading?<div className="rounded-[22px] border border-champagne/25 bg-white/45 p-8 text-center text-[12px] text-taupe">Cargando citas...</div>:filtered.length===0?<Empty view={view}/>:filtered.map(a=><button key={a.id} onClick={()=>setSelectedId(a.id)} style={{backgroundImage:categoryBg(a.service?.name,a.service?.category)}} className="group w-full text-left rounded-[20px] p-3.5 md:p-4 text-ivory transition hover:-translate-y-[1px] hover:shadow-[0_10px_28px_rgba(46,39,36,.18)]"><div className="flex items-center gap-3 md:gap-4"><div className="grid h-14 w-16 md:h-16 md:w-20 shrink-0 place-items-center rounded-[15px] bg-white/15 backdrop-blur-sm"><span className="text-center"><span className="block text-[9px] uppercase tracking-[0.12em] text-ivory/70">{shortDate(a.start_at)}</span><span className="mt-1 block font-serif text-[19px] text-ivory">{formatTime(a.start_at)}</span></span></div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-serif text-[22px] md:text-[25px] leading-none truncate">{a.client_name}</p><Status value={a.status}/></div><p className="mt-1.5 text-[10px] md:text-[11px] text-ivory/70 truncate">{a.service?.name||"Cita"} · {a.staff?.name||"Equipo"}</p><div className="mt-2 hidden sm:flex items-center gap-3 text-[9px] text-ivory/60"><span>{minutesBetween(a.start_at,a.end_at)} min</span><span>•</span><span>{sourceLabels[a.source]||a.source}</span>{a.price_cents!=null&&<><span>•</span><span>{money(a.price_cents)}</span></>}</div></div><div className="hidden md:block text-right"><p className="text-[9px] uppercase tracking-[0.14em] text-ivory/70">Abrir</p><ChevronRight size={18} className="mt-2 ml-auto text-ivory transition group-hover:translate-x-0.5"/></div></div></button>)}</section>
 
-    {selected&&<AppointmentDetailPanel appointment={selected} role={role} onClose={()=>setSelectedId(null)} onChanged={handleChanged}/>}
+    {selected&&<AppointmentDetailSheet appointmentId={selected.id} onClose={()=>setSelectedId(null)} onSaved={()=>handleChanged()}/>}
   </div>
 }
 
