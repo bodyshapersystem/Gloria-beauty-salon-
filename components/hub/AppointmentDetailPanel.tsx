@@ -21,7 +21,7 @@ export type PanelAppointment = {
   reschedule_count: number;
   service_id: string;
   staff_id: string;
-  service: { name: string; price_label?: string } | null;
+  service: { name: string; price_label?: string; category?: string } | null;
   staff: { name: string } | null;
 };
 
