@@ -108,7 +108,8 @@ function comboImg(category=cat){
     const key=[design,type,length].join("/");
     const sameDesign=[...exactLashes].filter(k=>k.startsWith(design+"/"));
     const fallbacks=[key,[design,type,"medium"].join("/"),[design,"hybrid",length].join("/"),[design,"hybrid","medium"].join("/"),["natural",type,length].join("/"),["natural","hybrid",length].join("/"),["natural","hybrid","medium"].join("/")];
-    const match=fallbacks.find(k=>exactLashes.has(k))||sameDesign.find(k=>k.includes("/"+type+"/"))||sameDesign.find(k=>k.endsWith("/"+length))||sameDesign[0];
+    const sameDesignMatch=sameDesign.find(k=>k.includes("/"+type+"/"))||sameDesign.find(k=>k.endsWith("/"+length))||sameDesign[0];
+    const match=fallbacks.slice(0,4).find(k=>exactLashes.has(k))||sameDesignMatch||fallbacks.slice(4).find(k=>exactLashes.has(k));
     if(match)return "/beauty-dna-package/matrix/lashes/"+match+".webp";
   }
   if(category==="brows"){
