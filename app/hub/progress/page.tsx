@@ -57,6 +57,7 @@ export default function ProgressPage(){
   const stats=useMemo(()=>compute(current,allStaff,rules),[current,allStaff,rules]);
   const prevStats=useMemo(()=>compute(previous,allStaff,rules),[previous,allStaff,rules]);
   const delta=prevStats.revenue?Math.round(((stats.revenue-prevStats.revenue)/prevStats.revenue)*100):0;
+  const byStaff=useMemo(()=>allStaff.map(s=>({staff:s,stats:compute(current.filter(x=>x.staff_id===s.id),allStaff,rules)})).filter(x=>x.stats.completed.length>0||x.stats.cancelled>0||x.stats.noShow>0).sort((a,b)=>b.stats.revenue-a.stats.revenue),[current,allStaff,rules]);
 
   if(loading)return <div className="py-20 text-center"><p className="font-serif text-[30px]">Preparando tu semana...</p></div>;
   if(!profile)return <div className="py-20 text-center"><p className="font-serif text-[30px]">No encontramos tu perfil.</p></div>;
@@ -97,6 +98,12 @@ export default function ProgressPage(){
         <span className="rounded-full bg-white/10 px-3 py-1.5 text-[8px] text-[#F7E8E5]">{stats.completed.length} servicios</span>
       </div>
     </section>
+
+    {isSalon&&<section className="mt-5 rounded-[28px] border border-[#DACBBF] bg-[#FCF9F5] p-5 md:p-6 shadow-[0_12px_34px_rgba(52,38,31,.05)]">
+      <div className="flex items-center justify-between"><div><p className="text-[8px] uppercase tracking-[.2em] text-mocha">Por profesional</p><h2 className="mt-1 font-serif text-[30px]">Cada quien, por separado</h2></div><UsersRound size={18} className="text-[#7B3C48]"/></div>
+      {byStaff.length===0?<p className="mt-5 text-[11px] text-taupe">Sin actividad de ningún profesional en este período.</p>:<div className="mt-5 divide-y divide-[#E4D9D0]">{byStaff.map(({staff:s,stats:st})=><div key={s.id} className="flex items-center gap-3 py-3.5"><div className="h-9 w-9 shrink-0 overflow-hidden rounded-full bg-[#EADFD7]">{s.photo_url?<img src={s.photo_url} alt={s.name} className="h-full w-full object-cover"/>:<div className="grid h-full place-items-center font-serif text-[15px]">{s.name[0]}</div>}</div><div className="min-w-0 flex-1"><p className="font-serif text-[20px] leading-none truncate">{s.name}</p><p className="mt-1 text-[9px] text-taupe">{st.completed.length} servicios · {st.clients} clientas</p></div><div className="text-right shrink-0"><p className="font-serif text-[19px] leading-none">{money(st.revenue)}</p><p className="mt-1 text-[8px] text-taupe">para ella: {money(st.staffCut)}</p></div></div>)}</div>}
+      <p className="mt-4 text-[9px] text-taupe leading-relaxed">Cada monto es exclusivamente lo que generó y le corresponde a esa profesional — no se mezcla con el resto del equipo.</p>
+    </section>}
 
     <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-4">
       <PrettyStat value={String(stats.clients)} label="Clientas" tone="nude"/>
