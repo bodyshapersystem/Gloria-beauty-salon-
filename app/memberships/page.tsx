@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import { Nav } from "@/components/public/Nav";
 import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { Check, Sparkles } from "lucide-react";
+import { createPageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = createPageMetadata({
+  title: "Memberships de belleza en Miami",
+  description:
+    "Planes prepagados de Gloria Beauty Salon para mantener tu rutina de blowouts y servicios de belleza en Calle 8, Miami.",
+  path: "/memberships",
+  keywords: ["beauty memberships Miami", "blowout membership Miami", "planes belleza Miami"],
+});
 
 export default function MembershipsPage(){
   return <><Nav/><main className="max-w-[1120px] mx-auto px-6 md:px-8 pt-20 md:pt-28 pb-24"><section className="text-center"><Eyebrow>GLORIA MEMBERSHIPS</Eyebrow><h1 className="mt-3 font-serif text-[clamp(44px,7vw,78px)] leading-[.92]">Your beauty routine,<br/><em className="italic text-mocha">already taken care of.</em></h1><p className="mx-auto mt-6 max-w-[560px] text-[14px] leading-relaxed text-taupe">Planes prepagados para las visitas que ya sabes que quieres mantener. Un solo pago, tus servicios listos para usar durante el mes.</p></section>
