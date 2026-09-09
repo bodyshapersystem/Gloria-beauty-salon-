@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const siteUrl = "https://www.gloriabeautysalonmiami.com";
+import { siteUrl } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -19,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
           "/access",
           "/access/book",
           "/access/shop",
-        ],
+                ],
         disallow: [
           "/hub",
           "/hub/",
