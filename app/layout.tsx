@@ -18,8 +18,6 @@ const manrope = Manrope({
   display: "swap",
 });
 
-const siteUrl = "https://www.gloriabeautysalonmiami.com";
-
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
