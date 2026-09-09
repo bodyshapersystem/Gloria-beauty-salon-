@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "beauty-dna:audit": "node scripts/audit-beauty-dna.mjs",
+    "beauty-dna:shot-list": "node scripts/export-beauty-dna-shot-list.mjs",
     "beauty-dna:qa": "node scripts/verify-beauty-dna-fallbacks.mjs && node scripts/verify-beauty-dna-exact-sets.mjs",
     "beauty-dna:strict": "node scripts/verify-beauty-dna-fallbacks.mjs && node scripts/verify-beauty-dna-exact-sets.mjs && node scripts/audit-beauty-dna.mjs --strict"
   },
