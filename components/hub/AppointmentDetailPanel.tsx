@@ -16,6 +16,7 @@ export type PanelAppointment = {
   status: string;
   source: string;
   price_cents: number | null;
+  deposit_cents?: number | null;
   cancellation_fee_cents: number | null;
   cancellation_fee_reason: string | null;
   reschedule_count: number;
@@ -149,6 +150,7 @@ export function AppointmentDetailPanel({
               <Line label="Servicio" value={appointment.service?.name || "—"} />
               <Line label="Profesional" value={appointment.staff?.name || "—"} />
               {appointment.price_cents != null && <Line label="Precio registrado" value={money(appointment.price_cents)} />}
+              <Line label="Depósito" value={appointment.deposit_cents != null ? `Pagado — ${money(appointment.deposit_cents)}` : "No pagó depósito"} />
             </Detail>
             <Detail title="¿Qué quieres hacer?">
               <div className="grid grid-cols-2 gap-2">
@@ -203,6 +205,9 @@ function EditAppointmentForm({ appt, onCancel, onSaved }: { appt: PanelAppointme
   const [phone, setPhone] = useState(appt.client_phone);
   const [email, setEmail] = useState(appt.client_email || "");
   const [notes, setNotes] = useState(appt.notes_internal || "");
+  const [price, setPrice] = useState(appt.price_cents != null ? String(appt.price_cents / 100) : "");
+  const [depositPaid, setDepositPaid] = useState(appt.deposit_cents != null);
+  const [deposit, setDeposit] = useState(appt.deposit_cents != null ? String(appt.deposit_cents / 100) : "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -210,12 +215,16 @@ function EditAppointmentForm({ appt, onCancel, onSaved }: { appt: PanelAppointme
     if (!name.trim() || !phone.trim()) return;
     setSaving(true);
     setError(null);
+    const priceCents = price.trim() === "" ? null : Math.round(Number(price) * 100);
+    const depositCents = depositPaid ? (deposit.trim() === "" ? null : Math.round(Number(deposit) * 100)) : null;
     const { error: e } = await supabase.rpc("hub_update_appointment_details", {
       p_appointment_id: appt.id,
       p_client_name: name.trim(),
       p_client_phone: phone.trim(),
       p_client_email: email.trim() || null,
       p_notes_internal: notes.trim() || null,
+      p_price_cents: priceCents,
+      p_deposit_cents: depositCents,
     });
     setSaving(false);
     if (e) { setError(e.message); return; }
@@ -229,6 +238,12 @@ function EditAppointmentForm({ appt, onCancel, onSaved }: { appt: PanelAppointme
         <label className="block"><span className="block text-[9px] uppercase tracking-[0.12em] text-taupe mb-1.5">Teléfono</span><input value={phone} onChange={(e) => setPhone(e.target.value)} className="w-full rounded-xl border border-taupe/25 bg-ivory px-3 py-2.5 text-[13px]" /></label>
         <label className="block"><span className="block text-[9px] uppercase tracking-[0.12em] text-taupe mb-1.5">Email</span><input value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl border border-taupe/25 bg-ivory px-3 py-2.5 text-[13px]" /></label>
         <label className="block"><span className="block text-[9px] uppercase tracking-[0.12em] text-taupe mb-1.5">Notas internas</span><textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="w-full rounded-xl border border-taupe/25 bg-ivory px-3 py-2.5 text-[13px]" /></label>
+      </Detail>
+      <Detail title="Precio y depósito">
+        <label className="block"><span className="block text-[9px] uppercase tracking-[0.12em] text-taupe mb-1.5">Precio total ($)</span><input type="number" min={0} step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="0.00" className="w-full rounded-xl border border-taupe/25 bg-ivory px-3 py-2.5 text-[13px]" /></label>
+        <label className="flex items-center gap-2.5 text-[12px]"><input type="checkbox" checked={depositPaid} onChange={(e) => setDepositPaid(e.target.checked)} className="h-4 w-4" /> ¿Pagó depósito?</label>
+        {depositPaid && <label className="block"><span className="block text-[9px] uppercase tracking-[0.12em] text-taupe mb-1.5">Monto del depósito ($)</span><input type="number" min={0} step="0.01" value={deposit} onChange={(e) => setDeposit(e.target.value)} placeholder="0.00" className="w-full rounded-xl border border-taupe/25 bg-ivory px-3 py-2.5 text-[13px]" /></label>}
+        <p className="text-[10px] text-taupe leading-relaxed">Si cancela con menos de 24h de aviso, se pierde este depósito. Si no pagó depósito, se cobra el % de la política sobre el precio total.</p>
       </Detail>
       {error && <p className="text-[11px] text-red-700">{error}</p>}
       <div className="grid grid-cols-2 gap-2">

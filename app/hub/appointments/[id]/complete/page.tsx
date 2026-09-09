@@ -5,9 +5,11 @@ import { useParams, useRouter } from "next/navigation";
 import { Check, ChevronLeft, Eye, EyeOff, Save, Sparkles } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 
-type Appointment={id:string;client_name:string;status:string;start_at:string;service_id:string;staff_id:string;client_id:string;service:{name:string;category:string}|null;staff:{name:string}|null};
+type Appointment={id:string;client_name:string;client_phone:string;client_email:string|null;status:string;start_at:string;service_id:string;staff_id:string;client_id:string;service:{name:string;category:string}|null;staff:{name:string}|null};
 type Field={key:string;label:string;placeholder?:string;type?:"text"|"select";options?:string[]};
 type Section={title:string;subtitle:string;fields:Field[]};
+type ServiceOption={id:string;name:string;category:string;duration_minutes:number;price_label:string};
+type StaffOption={id:string;name:string};
 
 const configs:Record<string,Section[]>={
   color:[
@@ -110,8 +112,12 @@ export default function CompleteVisitPage(){
   const [summary,setSummary]=useState("");const [maintenance,setMaintenance]=useState("");
   const [products,setProducts]=useState({shampoo:"",conditioner:"",toner:"",treatment:"",styling:""});
   const [visible,setVisible]=useState(true);const [saving,setSaving]=useState(false);const [message,setMessage]=useState<string|null>(null);const [done,setDone]=useState(false);
+  const [extraOpen,setExtraOpen]=useState(false);const [allServices,setAllServices]=useState<ServiceOption[]>([]);const [extraServiceId,setExtraServiceId]=useState("");const [extraEligibleStaff,setExtraEligibleStaff]=useState<StaffOption[]>([]);const [extraStaffId,setExtraStaffId]=useState("");const [extraPrice,setExtraPrice]=useState("");
 
-  useEffect(()=>{(async()=>{const {data}=await supabase.from("appointments").select("id,client_name,status,start_at,service_id,staff_id,client_id,service:service_id(name,category),staff:staff_id(name)").eq("id",params.id).maybeSingle();setAppt((data as Appointment|null)||null);setLoading(false)})()},[params.id]);
+  useEffect(()=>{(async()=>{const {data}=await supabase.from("appointments").select("id,client_name,client_phone,client_email,status,start_at,service_id,staff_id,client_id,service:service_id(name,category),staff:staff_id(name)").eq("id",params.id).maybeSingle();setAppt((data as Appointment|null)||null);setLoading(false)})()},[params.id]);
+  useEffect(()=>{(async()=>{const {data}=await supabase.from("services").select("id,name,category,duration_minutes,price_label").eq("active",true).order("name");setAllServices((data as ServiceOption[])||[])})()},[]);
+  useEffect(()=>{if(!extraServiceId){setExtraEligibleStaff([]);setExtraStaffId("");return}(async()=>{const {data}=await supabase.from("staff_services").select("staff:staff_id(id,name)").eq("service_id",extraServiceId);const list=((data as any[])||[]).map(x=>x.staff).filter(Boolean);setExtraEligibleStaff(list);setExtraStaffId(list.length===1?list[0].id:"")})()},[extraServiceId]);
+  const extraService=useMemo(()=>allServices.find(s=>s.id===extraServiceId)||null,[allServices,extraServiceId]);
   const family=useMemo(()=>serviceFamily(appt?.service?.name||"",appt?.service?.category||"general"),[appt?.service?.name,appt?.service?.category]);
   const sections=configs[family]||configs.general;
 
@@ -120,7 +126,15 @@ export default function CompleteVisitPage(){
     const productList=Object.entries(products).filter(([,v])=>v.trim()).map(([type,name])=>({type,name:name.trim()}));
     const title=buildTitle(family,details,appt.service?.name||"Visita");
     const {error}=await supabase.rpc("save_and_complete_appointment",{p_appointment_id:appt.id,p_title:title,p_summary:summary||null,p_details:details,p_client_visible:visible,p_maintenance_notes:maintenance||null,p_products_used:productList});
-    setSaving(false);if(error){setMessage(error.message);return;}setDone(true)
+    if(error){setSaving(false);setMessage(error.message);return;}
+    if(extraOpen&&extraServiceId&&extraStaffId){
+      const {data:newId,error:e1}=await supabase.rpc("hub_create_appointment",{p_service_id:extraServiceId,p_staff_id:extraStaffId,p_start_at:appt.start_at,p_client_name:appt.client_name,p_client_phone:appt.client_phone,p_client_email:appt.client_email,p_notes_internal:"Servicio agregado al completar la visita principal.",p_source:"gloria_hub"});
+      if(e1){setSaving(false);setMessage(`Se guardó la visita, pero no se pudo agregar el servicio extra: ${e1.message}`);return;}
+      const priceCents=extraPrice.trim()===""?null:Math.round(Number(extraPrice)*100);
+      await supabase.rpc("hub_update_appointment_status",{p_appointment_id:newId,p_status:"completed"});
+      if(priceCents!==null)await supabase.rpc("hub_update_appointment_details",{p_appointment_id:newId,p_client_name:appt.client_name,p_client_phone:appt.client_phone,p_client_email:appt.client_email,p_notes_internal:"Servicio agregado al completar la visita principal.",p_price_cents:priceCents,p_deposit_cents:null});
+    }
+    setSaving(false);setDone(true)
   }
   if(loading)return <p className="text-[12px] text-taupe">Cargando visita...</p>;
   if(!appt)return <div><h1 className="font-serif text-[40px]">Cita no disponible.</h1><p className="mt-3 text-[12px] text-taupe">Puede que no tengas permiso para acceder a esta cita.</p></div>;
@@ -137,11 +151,20 @@ export default function CompleteVisitPage(){
 
       {(["color","blowdry","treatment","cut","styling","extensions"] as string[]).includes(family)&&<section className="rounded-[24px] border border-champagne/35 bg-[#EFE4DC]/45 p-5 md:p-7"><div><p className="text-[9px] uppercase tracking-[.2em] text-mocha">Productos usados hoy</p><h2 className="mt-2 font-serif text-[30px] leading-none">Su rutina, sin adivinar.</h2><p className="mt-2 text-[11px] text-taupe">Guarda solo lo que realmente usamos en ella.</p></div><div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><ProductField label="Shampoo" value={products.shampoo} onChange={v=>setProducts(p=>({...p,shampoo:v}))}/><ProductField label="Acondicionador" value={products.conditioner} onChange={v=>setProducts(p=>({...p,conditioner:v}))}/><ProductField label="Matizador" value={products.toner} onChange={v=>setProducts(p=>({...p,toner:v}))}/><ProductField label="Tratamiento" value={products.treatment} onChange={v=>setProducts(p=>({...p,treatment:v}))}/><ProductField label="Styling / Finish" value={products.styling} onChange={v=>setProducts(p=>({...p,styling:v}))}/></div></section>}
 
+      <section className="rounded-[24px] border border-champagne/35 bg-white/70 p-5 md:p-7">
+        <div className="flex items-center justify-between gap-4"><div><p className="text-[9px] uppercase tracking-[.2em] text-mocha">¿Se hizo algo más en esta visita?</p><h2 className="mt-2 font-serif text-[28px] leading-none">Agregar otro servicio</h2><p className="mt-2 text-[11px] text-taupe">Si otra profesional hizo parte de esta visita (por ejemplo cabello, que hacen varias), regístralo aquí para que le cuente en su progreso.</p></div><button onClick={()=>setExtraOpen(v=>!v)} className="shrink-0 rounded-full border border-mocha/30 px-4 py-2.5 text-[9px] uppercase tracking-[.12em] text-mocha">{extraOpen?"Quitar":"+ Agregar"}</button></div>
+        {extraOpen&&<div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <label className="sm:col-span-2"><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">Servicio</span><select value={extraServiceId} onChange={e=>setExtraServiceId(e.target.value)} className="mt-2 w-full rounded-[14px] border border-taupe/20 bg-[#FBF8F3] px-3 py-3.5 text-[12px] outline-none"><option value="">Seleccionar servicio</option>{allServices.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select></label>
+          {extraServiceId&&<label><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">¿Con quién fue?</span><select value={extraStaffId} onChange={e=>setExtraStaffId(e.target.value)} className="mt-2 w-full rounded-[14px] border border-taupe/20 bg-[#FBF8F3] px-3 py-3.5 text-[12px] outline-none"><option value="">Seleccionar profesional</option>{extraEligibleStaff.map(s=><option key={s.id} value={s.id}>{s.name}</option>)}</select>{extraEligibleStaff.length===0&&<p className="mt-1.5 text-[10px] text-red-700">Este servicio no tiene profesionales asignadas todavía.</p>}</label>}
+          {extraServiceId&&<label><span className="block text-[9px] uppercase tracking-[0.14em] text-taupe">Precio ($)</span><input type="number" min={0} step="0.01" value={extraPrice} onChange={e=>setExtraPrice(e.target.value)} placeholder={extraService?.price_label||"0.00"} className="mt-2 w-full rounded-[14px] border border-taupe/20 bg-[#FBF8F3] px-3 py-3.5 text-[12px] outline-none"/></label>}
+        </div>}
+      </section>
+
       <section className="rounded-[24px] border border-champagne/35 bg-white/70 p-5 md:p-7"><h2 className="font-serif text-[30px]">Cierre de visita</h2><div className="mt-5 grid gap-4"><Text label="Resumen bonito para la clienta" value={summary} onChange={setSummary} placeholder="Ej. Hoy dejamos tu balayage beige neutro y terminamos con ondas suaves."/><Text label="Mantenimiento / próxima visita" value={maintenance} onChange={setMaintenance} placeholder="Ej. Matizar en 6–8 semanas. No lavar por 48 h. Próximo mantenimiento de extensiones..."/></div></section>
     </div>
 
     {message&&<p className="mt-4 text-[12px] text-red-700">{message}</p>}
-    <div className="sticky bottom-[82px] md:bottom-4 mt-6 rounded-[20px] border border-champagne/35 bg-[#FBF8F3]/95 p-3 backdrop-blur-xl shadow-[0_10px_35px_rgba(52,38,31,.10)]"><button disabled={saving} onClick={save} className="w-full inline-flex items-center justify-center gap-2 rounded-[16px] bg-[#34261F] px-6 py-4 text-[10px] uppercase tracking-[0.14em] text-ivory disabled:opacity-50"><Save size={15}/>{saving?"Guardando...":"Guardar Beauty Profile + Completar cita"}</button></div>
+    <div className="sticky bottom-[82px] md:bottom-4 mt-6 rounded-[20px] border border-champagne/35 bg-[#FBF8F3]/95 p-3 backdrop-blur-xl shadow-[0_10px_35px_rgba(52,38,31,.10)]"><button disabled={saving||(extraOpen&&(!extraServiceId||!extraStaffId))} onClick={save} className="w-full inline-flex items-center justify-center gap-2 rounded-[16px] bg-[#34261F] px-6 py-4 text-[10px] uppercase tracking-[0.14em] text-ivory disabled:opacity-50"><Save size={15}/>{saving?"Guardando...":"Guardar Beauty Profile + Completar cita"}</button></div>
   </div>
 }
 
