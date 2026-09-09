@@ -43,7 +43,11 @@ export default function HubCalendarPage(){
       supabase.rpc("team_calendar_appointments",{p_start:rangeStart.toISOString(),p_end:rangeEnd.toISOString()}),
       supabase.from("staff_blocks").select("id,staff_id,start_at,end_at,reason").gte("start_at",rangeStart.toISOString()).lte("start_at",rangeEnd.toISOString()).order("start_at")
     ]);
-    if(!error)setAppointments(((a as unknown) as Appointment[])||[]);
+    if(!error){
+      const rows=((a as unknown) as Appointment[])||[];
+      const prof=(u as HubUser)||null;
+      setAppointments(prof?.role==="staff"&&prof.staff_id?rows.filter(x=>x.staff_id===prof.staff_id):rows);
+    }
     const staffRows=((s as unknown) as Staff[])||[];
     setStaff(staffRows);
     const staffMap=new Map(staffRows.map(x=>[x.id,x.name]));
@@ -55,6 +59,7 @@ export default function HubCalendarPage(){
   useEffect(()=>{load()},[selectedDate]);
 
   const canCreate=Boolean(user&&["owner","admin","staff"].includes(user.role));
+  const isStaff=user?.role==="staff";
   const week=useMemo(()=>weekDays(selectedDate),[selectedDate]);
   const dayItems=useMemo(()=>appointments.filter(a=>sameDayNY(a.start_at,selectedDate)).sort((a,b)=>+new Date(a.start_at)-+new Date(b.start_at)),[appointments,selectedDate]);
   const dayBlocks=useMemo(()=>blocks.filter(b=>sameDayNY(b.start_at,selectedDate)).sort((a,b)=>+new Date(a.start_at)-+new Date(b.start_at)),[blocks,selectedDate]);
@@ -65,7 +70,7 @@ export default function HubCalendarPage(){
 
   return <div>
     <div className="flex items-start justify-between gap-4">
-      <div><p className="text-[9px] uppercase tracking-[0.25em] text-mocha">Agenda del salón</p><h1 className="mt-1 font-serif text-[40px] md:text-[54px] leading-none">Calendario</h1><p className="mt-2 text-[12px] text-taupe">Citas + Me Time, todo el equipo en un solo lugar.</p></div>
+      <div><p className="text-[9px] uppercase tracking-[0.25em] text-mocha">{isStaff?"Tu agenda":"Agenda del salón"}</p><h1 className="mt-1 font-serif text-[40px] md:text-[54px] leading-none">Calendario</h1><p className="mt-2 text-[12px] text-taupe">{isStaff?"Tus citas + Me Time, día por día.":"Citas + Me Time, todo el equipo en un solo lugar."}</p></div>
       {canCreate&&<div className="hidden sm:flex items-center gap-2"><button onClick={openNewMeTime} className="inline-flex items-center gap-2 rounded-full border border-[#6F3642]/25 bg-[#F2E4DC] px-4 py-3 text-[9px] uppercase tracking-[0.13em] text-[#6F3642]"><Sparkles size={14}/> Me Time</button><Link href="/hub/calendar?new=1" className="inline-flex items-center gap-2 rounded-full bg-[#6F3642] px-4 py-3 text-[9px] uppercase tracking-[0.13em] text-white shadow-sm"><Plus size={14}/> Nueva cita</Link></div>}
     </div>
 
@@ -89,11 +94,11 @@ export default function HubCalendarPage(){
         {dayItems.length===0&&dayBlocks.length===0&&<div className="rounded-[22px] border border-dashed border-champagne/40 bg-white/40 p-8"><p className="font-serif text-[27px]">Tu día está libre.</p><p className="mt-2 text-[10px] text-taupe">Agrega una cita o reserva un Me Time.</p></div>}
       </div>
 
-      <div className="mt-6 overflow-x-auto rounded-[24px] border border-champagne/30 bg-white/60"><div className="min-w-[720px] grid" style={{gridTemplateColumns:`repeat(${Math.max(staff.length,1)},minmax(190px,1fr))`}}>{staff.map(s=>{
+      {!isStaff&&<div className="mt-6 overflow-x-auto rounded-[24px] border border-champagne/30 bg-white/60"><div className="min-w-[720px] grid" style={{gridTemplateColumns:`repeat(${Math.max(staff.length,1)},minmax(190px,1fr))`}}>{staff.map(s=>{
         const staffAppts=dayItems.filter(a=>a.staff_id===s.id);
         const staffBlocks=dayBlocks.filter(b=>b.staff_id===s.id);
         return <div key={s.id} className="border-r border-champagne/20 p-4 last:border-r-0"><div className="flex items-center gap-2"><div className="grid h-9 w-9 place-items-center rounded-full bg-blush/50 text-mocha"><UserRound size={15}/></div><div><p className="font-serif text-[19px]">{s.name}</p><p className="text-[8px] text-taupe">{staffAppts.length} citas · {staffBlocks.length} blocks</p></div></div><div className="mt-3 space-y-2">{staffAppts.map(a=><button key={a.id} onClick={()=>setSelected(a)} style={{backgroundImage:categoryBg(a.service_name,a.service_category)}} className="w-full rounded-[15px] p-3 text-left text-ivory"><p className="text-[8px] text-ivory/70">{fmtTime(a.start_at)}</p><p className="mt-1 font-serif text-[18px] truncate">{a.client_name}</p><p className="mt-1 text-[8px] text-ivory/70 truncate">{a.service_name||"Cita"}</p></button>)}{staffBlocks.map(b=><button key={b.id} onClick={()=>openEditMeTime(b)} className="w-full rounded-[15px] border border-[#B99C8A]/35 bg-[#E8DDD4] p-3 text-left"><p className="text-[8px] text-mocha">{fmtTime(b.start_at)} – {fmtTime(b.end_at)}</p><p className="mt-1 font-serif text-[18px] truncate">Me Time</p><p className="mt-1 text-[8px] text-taupe truncate">{b.reason||"Personal"}</p></button>)}</div></div>
-      })}</div></div>
+      })}</div></div>}
     </>}
 
     <NewAppointmentSheet open={newOpen} onClose={()=>router.replace("/hub/calendar")} onCreated={load}/>
