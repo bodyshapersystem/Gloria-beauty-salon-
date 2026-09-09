@@ -4,12 +4,15 @@ import { Nav } from "@/components/public/Nav";
 import { Footer } from "@/components/public/Footer";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { products } from "@/lib/data/products";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Shop | Gloria Beauty Salon",
+export const metadata: Metadata = createPageMetadata({
+  title: "Shop de productos de belleza en Miami",
   description:
-    "Los productos de belleza que usamos y amamos en Gloria Beauty Salon.",
-};
+    "Compra productos recomendados por Gloria Beauty Salon para mantener tu cabello y rutina de belleza desde casa. Pickup en salon en Miami.",
+  path: "/shop",
+  keywords: ["productos de belleza Miami", "hair products Miami", "beauty shop Calle 8"],
+});
 
 export default function ShopPage() {
   return (
