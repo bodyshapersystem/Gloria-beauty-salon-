@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CalendarRange, ChevronRight, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X, LogOut } from "lucide-react";
+import { CalendarDays, CalendarRange, ChevronRight, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, Wallet, X, LogOut } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
 import { InquiryAlertListener } from "@/components/hub/InquiryAlertListener";
@@ -13,7 +13,7 @@ type Identity={name:string;photo_url:string|null};
 type NavItem={label:string;href:string;icon:any};
 
 const ownerNav:NavItem[]=[
-  {label:"Inicio",href:"/hub",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Citas",href:"/hub/appointments",icon:CalendarDays},{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Servicios",href:"/hub/services",icon:Scissors},{label:"Progress",href:"/hub/progress",icon:TrendingUp},{label:"Equipo",href:"/hub/team",icon:UserRound}
+  {label:"Inicio",href:"/hub",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Citas",href:"/hub/appointments",icon:CalendarDays},{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Servicios",href:"/hub/services",icon:Scissors},{label:"Progress",href:"/hub/progress",icon:TrendingUp},{label:"Corte Semanal",href:"/hub/corte-semanal",icon:Wallet},{label:"Equipo",href:"/hub/team",icon:UserRound}
 ];
 const teamNav:NavItem[]=[
   {label:"Inicio",href:"/hub/my-agenda",icon:LayoutDashboard},{label:"Calendario",href:"/hub/calendar",icon:CalendarRange},{label:"Citas",href:"/hub/appointments",icon:CalendarDays},{label:"Solicitudes",href:"/hub/inquiries",icon:Inbox},{label:"Clientas",href:"/hub/clients",icon:UsersRound},{label:"Servicios",href:"/hub/services",icon:Scissors},{label:"Progress",href:"/hub/progress",icon:TrendingUp}
