@@ -7,31 +7,39 @@ import { supabase } from "@/lib/supabase/client";
 type Service={id:string;name:string;category:string;duration_minutes:number;price_label:string;active:boolean};
 
 const meta:Record<string,{label:string;subtitle:string;bg:string}>={
-  hair:{label:"Hair",subtitle:"Color, secado, corte, tratamientos y extensiones",bg:"linear-gradient(135deg,#6B4F43,#3E2C27)"},
+  corte:{label:"Corte",subtitle:"Dama, caballero y niños",bg:"linear-gradient(135deg,#59433A,#302521)"},
   color:{label:"Color & Tintes",subtitle:"Balayage, highlights, raíces y tintes",bg:"linear-gradient(135deg,#7A3D48,#4B2D33)"},
-  blowdry:{label:"Secado & Estilismo",subtitle:"Blowouts, ondas, peinados y braids",bg:"linear-gradient(135deg,#A98273,#6B4F43)"},
-  cut:{label:"Corte",subtitle:"Dama, caballero y niños",bg:"linear-gradient(135deg,#59433A,#302521)"},
-  treatment:{label:"Tratamientos",subtitle:"Botox, keratina e hidratación",bg:"linear-gradient(135deg,#D9C4B4,#AE8D77)"},
-  extensions:{label:"Extensiones",subtitle:"Largo, volumen y color match",bg:"linear-gradient(135deg,#8D665B,#5A4039)"},
-  nails:{label:"Nails",subtitle:"Manicure, pedicure y diseños",bg:"linear-gradient(135deg,#E7C9C8,#B77F84)"},
+  secado:{label:"Secado",subtitle:"Blowouts y ondas",bg:"linear-gradient(135deg,#A98273,#6B4F43)"},
+  tratamiento:{label:"Tratamiento",subtitle:"Botox, keratina e hidratación",bg:"linear-gradient(135deg,#D9C4B4,#AE8D77)"},
+  estilismo:{label:"Estilismo",subtitle:"Trenzas y extensiones",bg:"linear-gradient(135deg,#8D665B,#5A4039)"},
+  regular:{label:"Regular",subtitle:"Manicure y pedicure regular",bg:"linear-gradient(135deg,#E7C9C8,#B77F84)"},
+  gel:{label:"Gel",subtitle:"Manicure y pedicure en gel",bg:"linear-gradient(135deg,#D9A8A5,#9C6068)"},
+  acrilico:{label:"Acrílico y otros",subtitle:"Dip, polygel, acrílico y aprés",bg:"linear-gradient(135deg,#C08E8A,#7A4A4E)"},
   lashes:{label:"Pestañas",subtitle:"Classic, Greek, Hybrid y Mega",bg:"linear-gradient(135deg,#6E5564,#3E3138)"},
   brows:{label:"Cejas & Wax",subtitle:"Cejas, henna y depilación",bg:"linear-gradient(135deg,#CBAA8E,#9B7455)"},
   makeup:{label:"Maquillaje",subtitle:"Social, eventos y glam",bg:"linear-gradient(135deg,#C9909C,#8A5B69)"},
   tanning:{label:"Spray Tan",subtitle:"Regular y Express",bg:"linear-gradient(135deg,#C59662,#8F633E)"}
 };
 
-const order=["color","blowdry","cut","treatment","extensions","nails","lashes","brows","makeup","tanning","hair"];
+const order=["corte","color","secado","tratamiento","estilismo","regular","gel","acrilico","lashes","brows","makeup","tanning"];
 
 function normalizeCategory(s:Service){
   const n=s.name.toLowerCase();
   const c=s.category.toLowerCase();
-  if(["nails","lashes","brows","makeup","tanning"].includes(c)) return c;
-  if(n.includes("balayage")||n.includes("highlight")||n.includes("root")||n.includes("tinte")||n.includes("color")) return "color";
-  if(n.includes("blow")||n.includes("secado")||n.includes("braid")||n.includes("peinado")||n.includes("style")) return "blowdry";
-  if(n.includes("cut")||n.includes("corte")) return "cut";
-  if(n.includes("botox")||n.includes("keratin")||n.includes("tratamiento")) return "treatment";
-  if(n.includes("extension")) return "extensions";
-  return c==="hair"?"hair":c;
+  if(c==="hair"){
+    if(n.includes("haircut")||n.includes("corte")) return "corte";
+    if(n.includes("balayage")||n.includes("highlight")||n.includes("root")||n.includes("tinte")||n.includes("color")) return "color";
+    if(n.includes("blow")||n.includes("secado")) return "secado";
+    if(n.includes("botox")||n.includes("keratin")||n.includes("tratamiento")) return "tratamiento";
+    if(n.includes("braid")||n.includes("extension")||n.includes("trenza")) return "estilismo";
+    return "secado";
+  }
+  if(c==="nails"){
+    if(n.includes("gel")) return "gel";
+    if(n.includes("regular")) return "regular";
+    return "acrilico";
+  }
+  return c;
 }
 
 export default function ServicesPage(){

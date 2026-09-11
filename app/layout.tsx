@@ -1,9 +1,16 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { seo, siteUrl } from "@/lib/seo";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart/CartContext";
 import { CartDrawer } from "@/components/public/CartDrawer";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+};
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
