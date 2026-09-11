@@ -20,6 +20,34 @@ const categoryMeta:Record<string,{label:string;soft:string;active:string;dot:str
 };
 const categoryOrder=["hair","nails","lashes","brows","makeup","tanning"];
 
+const hairSubgroups=["Corte","Color","Secado","Tratamiento","Estilismo"];
+function hairSubgroup(name:string){
+  const n=name.toLowerCase();
+  if(n.includes("haircut")||n.includes("corte")) return "Corte";
+  if(n.includes("balayage")||n.includes("color")||n.includes("highlight")||n.includes("tinte")) return "Color";
+  if(n.includes("blowdry")||n.includes("secado")) return "Secado";
+  if(n.includes("keratin")||n.includes("botox")||n.includes("tratamiento")) return "Tratamiento";
+  if(n.includes("braid")||n.includes("extension")||n.includes("trenza")) return "Estilismo";
+  return "Otros";
+}
+const nailsSubgroups=["Regular","Gel","Acrílico y otros"];
+function nailsSubgroup(name:string){
+  const n=name.toLowerCase();
+  if(n.includes("gel")) return "Gel";
+  if(n.includes("regular")) return "Regular";
+  return "Acrílico y otros";
+}
+function subgroupOf(category:string,name:string){
+  if(category==="hair")return hairSubgroup(name);
+  if(category==="nails")return nailsSubgroup(name);
+  return null;
+}
+function subgroupOrder(category:string){
+  if(category==="hair")return hairSubgroups;
+  if(category==="nails")return nailsSubgroups;
+  return [];
+}
+
 export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClose:()=>void;onCreated:()=>void}){
   const [clients,setClients]=useState<Client[]>([]);
   const [services,setServices]=useState<Service[]>([]);
@@ -140,23 +168,36 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
 
           <div className="mt-4">
             <div className="mb-2 flex items-center justify-between"><p className="text-[8px] uppercase tracking-[0.16em] text-taupe">{categoryMeta[category]?.label||"Servicios"}</p>{selectedServices.length>0&&<p className="text-[8px] uppercase tracking-[0.14em] text-mocha">{selectedServices.length} seleccionado{selectedServices.length>1?"s":""}</p>}</div>
-            <div className="space-y-2">
+            {subgroupOrder(category).length>0?<div className="space-y-5">
+              {subgroupOrder(category).map(group=>{
+                const groupServices=categoryServices.filter(s=>subgroupOf(category,s.name)===group);
+                if(groupServices.length===0)return null;
+                return <div key={group}>
+                  <p className="mb-2 text-[9px] uppercase tracking-[.14em] text-[#8A5A50]">{group}</p>
+                  <div className="space-y-2">{groupServices.map(s=>{
+                    const selected=serviceIds.includes(s.id);
+                    const meta=categoryMeta[category]||categoryMeta.hair;
+                    return <button key={s.id} onClick={()=>toggleService(s.id)} className={`w-full rounded-[17px] border p-4 text-left transition-all ${selected?`${meta.active} shadow-[0_8px_20px_rgba(52,38,31,.08)]`:"border-champagne/25 bg-white/72 hover:bg-white"}`}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div><p className="font-serif text-[21px] leading-none">{s.name}</p><p className={`mt-2 text-[9px] ${selected?"text-white/70":"text-taupe"}`}>{s.duration_minutes} min · {s.price_label}</p></div>
+                        <span className={`grid h-8 w-8 place-items-center rounded-full border ${selected?"border-white/60 bg-white/15":"border-champagne/30 bg-[#FBF8F3] text-mocha"}`}>{selected?<Check size={14}/>:<ChevronRight size={14}/>}</span>
+                      </div>
+                    </button>
+                  })}</div>
+                </div>
+              })}
+            </div>:<div className="space-y-2">
               {categoryServices.map(s=>{
                 const selected=serviceIds.includes(s.id);
                 const meta=categoryMeta[category]||categoryMeta.hair;
                 return <button key={s.id} onClick={()=>toggleService(s.id)} className={`w-full rounded-[17px] border p-4 text-left transition-all ${selected?`${meta.active} shadow-[0_8px_20px_rgba(52,38,31,.08)]`:"border-champagne/25 bg-white/72 hover:bg-white"}`}>
                   <div className="flex items-center justify-between gap-3">
-                    <div>
-                      <p className="font-serif text-[21px] leading-none">{s.name}</p>
-                      <p className={`mt-2 text-[9px] ${selected?"text-white/70":"text-taupe"}`}>{s.duration_minutes} min · {s.price_label}</p>
-                    </div>
-                    <span className={`grid h-8 w-8 place-items-center rounded-full border ${selected?"border-white/60 bg-white/15":"border-champagne/30 bg-[#FBF8F3] text-mocha"}`}>
-                      {selected?<Check size={14}/>:<ChevronRight size={14}/>}
-                    </span>
+                    <div><p className="font-serif text-[21px] leading-none">{s.name}</p><p className={`mt-2 text-[9px] ${selected?"text-white/70":"text-taupe"}`}>{s.duration_minutes} min · {s.price_label}</p></div>
+                    <span className={`grid h-8 w-8 place-items-center rounded-full border ${selected?"border-white/60 bg-white/15":"border-champagne/30 bg-[#FBF8F3] text-mocha"}`}>{selected?<Check size={14}/>:<ChevronRight size={14}/>}</span>
                   </div>
                 </button>
               })}
-            </div>
+            </div>}
             {selectedServices.length>1&&<p className="mt-3 text-[9px] leading-relaxed text-taupe">Se agendarán uno después del otro con la misma profesional, {totalDuration} min en total.</p>}
           </div>
         </Step>
