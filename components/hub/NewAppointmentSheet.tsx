@@ -27,7 +27,7 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
   const [assignments,setAssignments]=useState<Assignment[]>([]);
   const [clientId,setClientId]=useState("");
   const [category,setCategory]=useState("hair");
-  const [serviceId,setServiceId]=useState("");
+  const [serviceIds,setServiceIds]=useState<string[]>([]);
   const [staffId,setStaffId]=useState("");
   const [date,setDate]=useState(new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"}));
   const [slots,setSlots]=useState<Slot[]>([]);
@@ -49,39 +49,52 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
     setClients((c as Client[])||[]);setServices((s as Service[])||[]);setStaff((t as Staff[])||[]);setAssignments((a as Assignment[])||[]);
   })()},[open]);
 
-  useEffect(()=>{setServiceId("");setStaffId("");setSlot("");setSlots([])},[category]);
-  useEffect(()=>{setStaffId("");setSlot("");setSlots([])},[serviceId]);
-  useEffect(()=>{setSlot("");if(!serviceId||!staffId||!date){setSlots([]);return;}(async()=>{
+  useEffect(()=>{setStaffId("");setSlot("");setSlots([])},[serviceIds.join(",")]);
+  useEffect(()=>{setSlot("");if(serviceIds.length===0||!staffId||!date){setSlots([]);return;}(async()=>{
     setLoadingSlots(true);setError(null);
-    const {data,error}=await supabase.rpc("get_available_slots",{p_staff_id:staffId,p_service_id:serviceId,p_date:date});
+    // Use the first selected service to build the slot grid; the visit's
+    // total duration (sum of all selected services) is what actually
+    // determines when the professional is free, checked at booking time.
+    const {data,error}=await supabase.rpc("get_available_slots",{p_staff_id:staffId,p_service_id:serviceIds[0],p_date:date});
     setLoadingSlots(false);
     if(error){setError(error.message);setSlots([]);return;}
     setSlots(((data as Slot[])||[]));
-  })()},[serviceId,staffId,date]);
+  })()},[serviceIds.join(","),staffId,date]);
 
-  const compatibleStaff=useMemo(()=>staff.filter(s=>assignments.some(a=>a.staff_id===s.id&&a.service_id===serviceId)),[staff,assignments,serviceId]);
+  function toggleService(id:string){setServiceIds(prev=>prev.includes(id)?prev.filter(x=>x!==id):[...prev,id])}
+
+  const selectedServices=useMemo(()=>serviceIds.map(id=>services.find(s=>s.id===id)).filter(Boolean) as Service[],[serviceIds,services]);
+  const totalDuration=useMemo(()=>selectedServices.reduce((n,s)=>n+s.duration_minutes,0),[selectedServices]);
+  // Only staff who can perform every selected service, so the whole visit stays with one professional.
+  const compatibleStaff=useMemo(()=>{if(serviceIds.length===0)return [];return staff.filter(s=>serviceIds.every(id=>assignments.some(a=>a.staff_id===s.id&&a.service_id===id)))},[staff,assignments,serviceIds]);
   const categoryServices=useMemo(()=>services.filter(s=>s.category===category),[services,category]);
   const filteredClients=useMemo(()=>{const needle=q.trim().toLowerCase();if(!needle)return clients.slice(0,8);return clients.filter(c=>`${c.first_name} ${c.last_name} ${c.email||""} ${c.phone||""}`.toLowerCase().includes(needle)).slice(0,8)},[clients,q]);
   const client=clients.find(c=>c.id===clientId)||null;
-  const service=services.find(s=>s.id===serviceId)||null;
   const professional=staff.find(s=>s.id===staffId)||null;
 
   async function create(){
-    if(!client||!serviceId||!staffId||!slot)return;
+    if(!client||serviceIds.length===0||!staffId||!slot)return;
     setLoading(true);setError(null);
-    const {error}=await supabase.rpc("hub_create_appointment",{
-      p_service_id:serviceId,p_staff_id:staffId,p_start_at:slot,
-      p_client_name:`${client.first_name} ${client.last_name}`.trim(),
-      p_client_phone:client.phone||"",p_client_email:client.email||null,
-      p_notes_internal:notes.trim()||null,p_source:"gloria_hub"
-    });
-    if(error){setLoading(false);setError(error.message);return;}
+    let cursor=slot;
+    const createdIds:string[]=[];
+    for(const svc of selectedServices){
+      const {data:newId,error:e}=await supabase.rpc("hub_create_appointment",{
+        p_service_id:svc.id,p_staff_id:staffId,p_start_at:cursor,
+        p_client_name:`${client.first_name} ${client.last_name}`.trim(),
+        p_client_phone:client.phone||"",p_client_email:client.email||null,
+        p_notes_internal:selectedServices.length>1?`${notes.trim()?notes.trim()+" — ":""}Parte de una visita con ${selectedServices.length} servicios.`:(notes.trim()||null),
+        p_source:"gloria_hub"
+      });
+      if(e){setLoading(false);setError(createdIds.length>0?`Se agendó parte de la visita, pero "${svc.name}" no se pudo agendar: ${e.message}`:e.message);return;}
+      createdIds.push(newId as unknown as string);
+      cursor=new Date(new Date(cursor).getTime()+svc.duration_minutes*60000).toISOString();
+    }
     if(client.email){
       try{
         const response=await fetch("/api/send-confirmation",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
           clientName:`${client.first_name} ${client.last_name}`.trim(),
           clientEmail:client.email,
-          serviceId,
+          serviceId:selectedServices[0].id,
           staffId,
           startAt:slot
         })});
@@ -91,14 +104,14 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
     }
     setLoading(false);
     setDone(true);
-    setTimeout(()=>{setDone(false);setClientId("");setCategory("hair");setServiceId("");setStaffId("");setSlot("");setNotes("");onCreated();onClose()},650);
+    setTimeout(()=>{setDone(false);setClientId("");setCategory("hair");setServiceIds([]);setStaffId("");setSlot("");setNotes("");onCreated();onClose()},650);
   }
 
   if(!open)return null;
   return <div className="fixed inset-0 z-[100] bg-espresso/45 backdrop-blur-[2px] flex justify-end" onClick={onClose}>
     <aside className="h-full w-full max-w-[520px] overflow-y-auto bg-[#FBF8F3] p-5 sm:p-7" onClick={e=>e.stopPropagation()}>
       <div className="flex items-start justify-between gap-4">
-        <div><p className="text-[8px] uppercase tracking-[0.22em] text-mocha">Nueva cita</p><h2 className="mt-2 font-serif text-[38px] leading-none">Agenda una experiencia</h2><p className="mt-3 text-[11px] text-taupe">Clienta → servicio → profesional → fecha → hora.</p></div>
+        <div><p className="text-[8px] uppercase tracking-[0.22em] text-mocha">Nueva cita</p><h2 className="mt-2 font-serif text-[38px] leading-none">Agenda una experiencia</h2><p className="mt-3 text-[11px] text-taupe">Clienta → servicio(s) → profesional → fecha → hora.</p></div>
         <button onClick={onClose} className="grid h-10 w-10 shrink-0 place-items-center rounded-full border border-champagne/35"><X size={19}/></button>
       </div>
 
@@ -110,7 +123,7 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
           </>}
         </Step>
 
-        <Step n="02" title="Servicio">
+        <Step n="02" title="Servicio(s)">
           <div>
             <p className="mb-2 text-[8px] uppercase tracking-[0.16em] text-taupe">Categoría</p>
             <div className="grid grid-cols-3 gap-2">
@@ -126,29 +139,30 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
           </div>
 
           <div className="mt-4">
-            <p className="mb-2 text-[8px] uppercase tracking-[0.16em] text-taupe">{categoryMeta[category]?.label||"Servicios"}</p>
+            <div className="mb-2 flex items-center justify-between"><p className="text-[8px] uppercase tracking-[0.16em] text-taupe">{categoryMeta[category]?.label||"Servicios"}</p>{selectedServices.length>0&&<p className="text-[8px] uppercase tracking-[0.14em] text-mocha">{selectedServices.length} seleccionado{selectedServices.length>1?"s":""}</p>}</div>
             <div className="space-y-2">
               {categoryServices.map(s=>{
-                const selected=serviceId===s.id;
+                const selected=serviceIds.includes(s.id);
                 const meta=categoryMeta[category]||categoryMeta.hair;
-                return <button key={s.id} onClick={()=>setServiceId(s.id)} className={`w-full rounded-[17px] border p-4 text-left transition-all ${selected?`${meta.active} shadow-[0_8px_20px_rgba(52,38,31,.08)]`:"border-champagne/25 bg-white/72 hover:bg-white"}`}>
+                return <button key={s.id} onClick={()=>toggleService(s.id)} className={`w-full rounded-[17px] border p-4 text-left transition-all ${selected?`${meta.active} shadow-[0_8px_20px_rgba(52,38,31,.08)]`:"border-champagne/25 bg-white/72 hover:bg-white"}`}>
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="font-serif text-[21px] leading-none">{s.name}</p>
                       <p className={`mt-2 text-[9px] ${selected?"text-white/70":"text-taupe"}`}>{s.duration_minutes} min · {s.price_label}</p>
                     </div>
-                    <span className={`grid h-8 w-8 place-items-center rounded-full border ${selected?"border-white/25 bg-white/10":"border-champagne/30 bg-[#FBF8F3] text-mocha"}`}>
-                      <ChevronRight size={14}/>
+                    <span className={`grid h-8 w-8 place-items-center rounded-full border ${selected?"border-white/60 bg-white/15":"border-champagne/30 bg-[#FBF8F3] text-mocha"}`}>
+                      {selected?<Check size={14}/>:<ChevronRight size={14}/>}
                     </span>
                   </div>
                 </button>
               })}
             </div>
+            {selectedServices.length>1&&<p className="mt-3 text-[9px] leading-relaxed text-taupe">Se agendarán uno después del otro con la misma profesional, {totalDuration} min en total.</p>}
           </div>
         </Step>
 
         <Step n="03" title="Profesional">
-          {!serviceId?<Hint>Selecciona primero un servicio.</Hint>:<div className="grid grid-cols-2 gap-2">{compatibleStaff.map(s=><button key={s.id} onClick={()=>setStaffId(s.id)} className={`rounded-[17px] border p-4 text-left ${staffId===s.id?"border-mocha/35 bg-[#EFE1D8]":"border-champagne/30 bg-white/65"}`}><UserRound size={16} className="text-mocha"/><p className="mt-3 font-serif text-[20px]">{s.name}</p></button>)}</div>}
+          {serviceIds.length===0?<Hint>Selecciona al menos un servicio.</Hint>:compatibleStaff.length===0?<Hint>Ninguna profesional hace todos los servicios elegidos juntos. Intenta agendarlos por separado.</Hint>:<div className="grid grid-cols-2 gap-2">{compatibleStaff.map(s=><button key={s.id} onClick={()=>setStaffId(s.id)} className={`rounded-[17px] border p-4 text-left ${staffId===s.id?"border-mocha/35 bg-[#EFE1D8]":"border-champagne/30 bg-white/65"}`}><UserRound size={16} className="text-mocha"/><p className="mt-3 font-serif text-[20px]">{s.name}</p></button>)}</div>}
         </Step>
 
         <Step n="04" title="Fecha y hora">
@@ -160,15 +174,15 @@ export function NewAppointmentSheet({open,onClose,onCreated}:{open:boolean;onClo
 
         <Step n="05" title="Confirmar">
           <div className="rounded-[20px] border border-champagne/30 bg-white/65 p-4 space-y-3">
-            <Summary icon={<CalendarDays size={15}/>} label="Servicio" value={service?.name||"—"}/>
+            <Summary icon={<CalendarDays size={15}/>} label="Servicio(s)" value={selectedServices.map(s=>s.name).join(" + ")||"—"}/>
             <Summary icon={<UserRound size={15}/>} label="Profesional" value={professional?.name||"—"}/>
-            <Summary icon={<Clock3 size={15}/>} label="Horario" value={slot?`${new Date(slot).toLocaleDateString("es-US",{month:"short",day:"numeric",timeZone:"America/New_York"})} · ${fmtTime(slot)}`:"—"}/>
+            <Summary icon={<Clock3 size={15}/>} label="Horario" value={slot?`${new Date(slot).toLocaleDateString("es-US",{month:"short",day:"numeric",timeZone:"America/New_York"})} · ${fmtTime(slot)}${totalDuration?` · ${totalDuration} min`:""}`:"—"}/>
           </div>
           <textarea value={notes} onChange={e=>setNotes(e.target.value)} rows={3} placeholder="Nota interna opcional" className="mt-3 w-full rounded-[15px] border border-champagne/35 bg-white/75 px-4 py-3 text-[11px] outline-none"/>
         </Step>
 
         {error&&<p className="mt-4 rounded-[15px] bg-red-50 px-4 py-3 text-[10px] text-red-700">{error}</p>}
-        <button disabled={loading||!clientId||!serviceId||!staffId||!slot} onClick={create} className="mt-6 w-full rounded-full bg-[#4A352B] px-5 py-4 text-[9px] uppercase tracking-[0.14em] text-ivory disabled:opacity-35">{loading?"Confirmando…":"Confirmar cita"}</button>
+        <button disabled={loading||!clientId||serviceIds.length===0||!staffId||!slot} onClick={create} className="mt-6 w-full rounded-full bg-[#4A352B] px-5 py-4 text-[9px] uppercase tracking-[0.14em] text-ivory disabled:opacity-35">{loading?"Confirmando…":selectedServices.length>1?`Confirmar ${selectedServices.length} servicios`:"Confirmar cita"}</button>
       </>}
     </aside>
   </div>

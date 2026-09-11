@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { CalendarDays, CalendarRange, ChevronRight, Inbox, LayoutDashboard, Menu, MoreHorizontal, Plus, Scissors, Settings, TrendingUp, UserRound, UsersRound, X, LogOut } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { supabase } from "@/lib/supabase/client";
+import { InquiryAlertListener } from "@/components/hub/InquiryAlertListener";
 
 type HubUser={role:"owner"|"admin"|"manager"|"staff";staff_id:string|null};
 type Identity={name:string;photo_url:string|null};
@@ -57,6 +58,7 @@ export function HubShell({children}:{children:React.ReactNode}){
   if(!user)return null;
 
   return <div className="min-h-screen w-full overflow-x-hidden bg-[#F7F3ED] text-espresso lg:grid lg:grid-cols-[190px_minmax(0,1fr)] pb-[82px] lg:pb-0">
+    <InquiryAlertListener/>
     <aside className="hidden lg:flex bg-[#34261F] px-3 py-4 flex-col sticky top-0 h-screen text-ivory overflow-hidden">
       <div className="px-2"><Logo className="h-10 w-auto brightness-[4] grayscale"/><p className="mt-4 text-[7px] uppercase tracking-[0.28em] text-champagne/70">{isTeam?"Hub · Team":"Gloria Hub"}</p><p className="mt-1.5 font-serif text-[15px] leading-tight text-ivory/90">{isTeam?"Tu día, más simple.":"Beauty lives here."}</p></div>
       <Link href="/hub/calendar?new=1" className="mt-4 flex items-center rounded-[12px] bg-ivory px-3.5 py-2.5 text-espresso"><span className="flex items-center gap-2 text-[8px] font-medium uppercase tracking-[0.16em]"><Plus size={14}/> Nueva cita</span></Link>
