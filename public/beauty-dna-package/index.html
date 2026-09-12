@@ -123,14 +123,37 @@ function comboImg(category=cat){
   return img(activeGroup[category],category)
 }
 function hairPath(key){return "/beauty-dna-package/matrix/hair/"+key+(key.startsWith("short/straight/")&&key!=="short/straight/dark-brown"?".png":".webp")}
+function safeFallbackImg(category=cat){
+  if(category==="hair"){
+    const length=slug(s.hair.Length);
+    return hairPath([length,"straight","dark-brown"].join("/"));
+  }
+  if(category==="nails"){
+    const length=slug(s.nails.Length);
+    const sameLength=[...exactNails].filter(k=>k.startsWith(length+"/"));
+    const match=sameLength.find(k=>k.endsWith("/funny-bunny"))||sameLength[0]||"long/almond/funny-bunny";
+    return "/beauty-dna-package/matrix/nails/"+match+".webp";
+  }
+  if(category==="lashes"){
+    const length=slug(s.lashes.Length);
+    const match=[...exactLashes].find(k=>k.endsWith("/"+length))||"natural/hybrid/medium";
+    return "/beauty-dna-package/matrix/lashes/"+match+".webp";
+  }
+  if(category==="brows"){
+    const color=slug(s.brows.Color);
+    const match=[...exactBrows].find(k=>k.endsWith("/"+color))||"natural-arch/medium/dark-brown";
+    return "/beauty-dna-package/matrix/brows/"+match+".webp";
+  }
+  return img(activeGroup[category],category);
+}
 function pick(group,value){s[cat][group]=value;lastGroup=group;activeGroup[cat]=group;render(true,group)}
 function switchCat(next){cat=next;lastGroup=activeGroup[cat];render(false)}
 function controls(){return '<div class="controls">'+Object.entries(opts[cat]).map(([g,vs])=>'<div class="group"><p>'+g+'<em>stays active</em></p><div class="choices">'+vs.map(v=>`<button class="choice ${s[cat][g]===v?"on":""}" onclick="pick('${g}','${v}')">${v}</button>`).join("")+'</div></div>').join("")+`<div class="summary"><small>Live Beauty DNA</small><div>${Object.values(s[cat]).join(" · ")}</div></div><button class="reveal" onclick="reveal()">Reveal my final DNA ✦</button></div>`}
 function fxLabel(group){return ({Length:"Transforming length",Color:"Infusing color",Texture:"Restyling",Shape:"Sculpting shape",Design:"Mapping the look",Type:"Building volume",Thickness:"Refining density"}[group]||"Transforming")}
 function toolFor(group){if(cat==="nails")return"polish";if(cat==="lashes")return"tweezers";if(cat==="brows")return"brows";if(group==="Length")return"scissors";if(group==="Color")return"tint";return"dryer"}
-function stage(popGroup){const groups=Object.keys(s[cat]),heroGroup=activeGroup[cat];return `<div class="stage ${popGroup?"morph fx-"+popGroup:""}"><img class="hero-photo" src="${comboImg()}" onerror="this.onerror=null;this.src='${img(heroGroup)}'" alt="${tabs.find(x=>x[0]===cat)[1]}: ${Object.values(s[cat]).join(', ')}"><i class="scan"></i><div class="transition-fx">${popGroup?`<i class="tool ${toolFor(popGroup)}"></i><span>${fxLabel(popGroup)}</span>`:""}</div><b class="badge">LIVING BEAUTY DNA</b><div class="trait-stack">${groups.map(g=>`<b class="trait-pill ${popGroup===g?"active":""}">${s[cat][g]}</b>`).join("")}</div><div class="caption"><small>Full-screen live selection</small><strong>${s[cat][heroGroup]}</strong><p>${Object.values(s[cat]).join(" · ")}</p></div></div>`}
+function stage(popGroup){const groups=Object.keys(s[cat]),heroGroup=activeGroup[cat];return `<div class="stage ${popGroup?"morph fx-"+popGroup:""}"><img class="hero-photo" src="${comboImg()}" onerror="this.onerror=null;this.src='${safeFallbackImg(cat)}'" alt="${tabs.find(x=>x[0]===cat)[1]}: ${Object.values(s[cat]).join(', ')}"><i class="scan"></i><div class="transition-fx">${popGroup?`<i class="tool ${toolFor(popGroup)}"></i><span>${fxLabel(popGroup)}</span>`:""}</div><b class="badge">LIVING BEAUTY DNA</b><div class="trait-stack">${groups.map(g=>`<b class="trait-pill ${popGroup===g?"active":""}">${s[cat][g]}</b>`).join("")}</div><div class="caption"><small>Full-screen live selection</small><strong>${s[cat][heroGroup]}</strong><p>${Object.values(s[cat]).join(" · ")}</p></div></div>`}
 function render(animate=false,popGroup=""){document.querySelector("#tabs").innerHTML=tabs.map(([id,label])=>`<button class="${cat===id?"on":""}" onclick="switchCat('${id}')">${label}</button>`).join("");document.querySelector("#title").textContent=tabs.find(x=>x[0]===cat)[1];document.querySelector("#count").textContent=Object.keys(s[cat]).length+" traits";document.querySelector("#sim").innerHTML=stage(animate?popGroup:"")+controls()}
-function reveal(){document.querySelector("#finalTitle").textContent="Complete Beauty DNA";document.querySelector("#finalGrid").innerHTML=tabs.map(([id,label])=>`<figure><img src="${comboImg(id)}" onerror="this.onerror=null;this.src='${img(activeGroup[id],id)}'"><span>${label} · ${Object.values(s[id]).join(" · ")}</span></figure>`).join("");document.querySelector("#finalCopy").textContent=tabs.map(([id,label])=>label+": "+Object.values(s[id]).join(" · ")).join("  |  ");document.querySelector("#modal").classList.add("open");burst()}
+function reveal(){document.querySelector("#finalTitle").textContent="Complete Beauty DNA";document.querySelector("#finalGrid").innerHTML=tabs.map(([id,label])=>`<figure><img src="${comboImg(id)}" onerror="this.onerror=null;this.src='${safeFallbackImg(id)}'"><span>${label} · ${Object.values(s[id]).join(" · ")}</span></figure>`).join("");document.querySelector("#finalCopy").textContent=tabs.map(([id,label])=>label+": "+Object.values(s[id]).join(" · ")).join("  |  ");document.querySelector("#modal").classList.add("open");burst()}
 function closeReveal(){document.querySelector("#modal").classList.remove("open")}
 function burst(){for(let i=0;i<24;i++){let p=document.createElement("i");p.className="particle";p.textContent=i%3?"✦":"●";p.style.left="50%";p.style.top="45%";p.style.setProperty("--x",(Math.random()*330-165)+"px");p.style.setProperty("--y",(Math.random()*500-250)+"px");p.style.animationDelay=(Math.random()*.18)+"s";document.body.appendChild(p);setTimeout(()=>p.remove(),1600)}}
 render();
